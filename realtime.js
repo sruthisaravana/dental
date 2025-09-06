@@ -13,8 +13,9 @@ if (!OPENAI_KEY) {
   process.exit(1);
 }
 
-// URL to OpenAI Realtime - change params per latest docs (model/intent).
-const OPENAI_WS_URL = 'wss://api.openai.com/v1/realtime?intent=transcription';
+// URL to OpenAI Realtime. Specify a transcription model and enable the realtime beta.
+const OPENAI_WS_URL =
+  'wss://api.openai.com/v1/realtime?model=gpt-4o-mini-transcribe';
 
 const server = http.createServer((req, res) => {
   // simple diagnostic endpoint
@@ -33,10 +34,10 @@ wss.on('connection', (clientWs, req) => {
   console.log('Browser connected:', req.socket.remoteAddress);
 
   // Create a connection to OpenAI realtime
-  const openaiWs = new WebSocket(OPENAI_WS_URL, {
+  const openaiWs = new WebSocket(OPENAI_WS_URL, 'openai-realtime-v1', {
     headers: {
       Authorization: `Bearer ${OPENAI_KEY}`,
-      // Add any headers required by OpenAI docs; e.g. 'OpenAI-Beta': 'realtime=v1' if required
+      'OpenAI-Beta': 'realtime=v1',
     },
   });
 
@@ -69,11 +70,8 @@ wss.on('connection', (clientWs, req) => {
       return;
     }
 
-    // If client sent binary (Buffer) — forward as binary
+    // If a binary frame somehow arrives, forward it unchanged
     if (Buffer.isBuffer(msg) || msg instanceof ArrayBuffer) {
-      // If OpenAI expects base64 in JSON, encode; else forward raw binary.
-      // Many realtime implementations accept either raw opus frames or base64 JSON messages.
-      // We'll *forward binary raw* to OpenAI; if OpenAI expects base64, adjust here.
       openaiWs.send(msg);
       return;
     }

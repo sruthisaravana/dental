@@ -33,11 +33,13 @@ const status = ref('');
 
 let mediaRecorder = null;
 let ws = null;
+let hasSentResponse = false;
 
 const start = async () => {
   error.value = null;
   partial.value = '';
   status.value = 'Requesting microphone...';
+  hasSentResponse = false;
 
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -55,7 +57,8 @@ const start = async () => {
     status.value = 'Connecting websocket...';
     const loc = window.location;
     const wsProto = loc.protocol === 'https:' ? 'wss' : 'ws';
-    ws = new WebSocket(`${wsProto}://${loc.host}/api/realtime-ws`);
+    const wsHost = `${loc.hostname}:2095`;
+    ws = new WebSocket(`${wsProto}://${wsHost}/api/realtime-ws`);
 
     ws.addEventListener('open', () => {
       status.value = 'Websocket open — streaming audio';
@@ -91,15 +94,28 @@ const start = async () => {
       isRecording.value = false;
     });
 
-    mediaRecorder.addEventListener('dataavailable', (ev) => {
+    mediaRecorder.addEventListener('dataavailable', async (ev) => {
       if (!ev.data || ev.data.size === 0) return;
-      // Send raw binary to server
       if (ws && ws.readyState === WebSocket.OPEN) {
-        // You can send the Blob directly; server will receive a binary frame
-        // For some proxies you might prefer to read as ArrayBuffer
-        ev.data.arrayBuffer().then((ab) => {
-          ws.send(ab);
-        }).catch((err)=>console.error('chunk->arrayBuffer err',err));
+        try {
+          const ab = await ev.data.arrayBuffer();
+          const base64 = btoa(String.fromCharCode(...new Uint8Array(ab)));
+          ws.send(
+            JSON.stringify({ type: 'input_audio_buffer.append', audio: base64 })
+          );
+          ws.send(JSON.stringify({ type: 'input_audio_buffer.flush' }));
+          if (!hasSentResponse) {
+            ws.send(
+              JSON.stringify({
+                type: 'response.create',
+                response: { modalities: ['text'], instructions: 'transcribe audio' },
+              })
+            );
+            hasSentResponse = true;
+          }
+        } catch (err) {
+          console.error('chunk->base64 err', err);
+        }
       }
     });
 
