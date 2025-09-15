@@ -57,9 +57,7 @@ const showFloatingNotification = ref(true);
 const examinations = ref([]);
 const selectedExamination = ref(null);
 
-// State for tooth history and popup - similar to DentalChart
-const toothHistoryData = ref({});
-const showToothHistory = ref(false);
+// Hover summary state
 const showHoverSummary = ref(false);
 const hoveredTooth = ref(null);
 let hoverTimeout = null;
@@ -68,11 +66,6 @@ let hoverTimeout = null;
 const showRecordDetailPopup = ref(false);
 const selectedToothForRecord = ref(null);
 const recordDetailData = ref(null);
-
-// Condition history popover
-const showConditionHistory = ref(false);
-const selectedToothForHistory = ref(null);
-const historyPopoverPosition = ref({ x: 0, y: 0 });
 
 // Double-click detection
 const clickTimer = ref(null);
@@ -552,20 +545,6 @@ const initializeImageStates = () => {
 };
 const imageError = (toothNumber) => { toothImageExists[toothNumber] = false; };
 
-// Tooth history methods
-const getToothHistoryFromExaminations = (toothNumber) => {
-  if (!examinations.value || examinations.value.length === 0) return [];
-  
-  return examinations.value
-    .filter(exam => exam.condition_of_teeth && exam.condition_of_teeth[toothNumber])
-    .map(exam => ({
-      date: exam.exam_date,
-      condition: exam.condition_of_teeth[toothNumber],
-      examId: exam.id
-    }))
-    .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date, newest first
-};
-
 const getToothCurrentCondition = (toothNumber) => {
   // Use dental records data like DentalChart (primary source)
   const recordCondition = toothConditions.value[String(toothNumber)]?.condition;
@@ -713,12 +692,6 @@ const handleToothLeave = () => {
   }, 200); // Small delay to allow for smooth transitions
 };
 
-// Handle right-click to show condition history
-const handleToothRightClick = (toothNumber, event) => {
-  event.preventDefault();
-  showToothConditionHistory(toothNumber, event);
-};
-
 // Helper methods for tooth display like DentalChart
 const getToothTreatments = (toothNumber) => {
   const toothRecords = props.records.filter(record => 
@@ -827,17 +800,6 @@ const getFormattedCondition = (conditionValue) => {
   return conditionLabels[conditionValue] || conditionValue;
 };
 
-const handleToothClickForHistory = (toothNumber) => {
-  // Open RecordDetailView in a new tab with tooth information
-  const url = `/record-detail?tooth=${toothNumber}&patient=${props.patientId}`;
-  window.open(url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
-};
-
-const handleToothDoubleClick = (toothNumber) => {
-  // For compatibility, also handle double click the same way
-  handleToothClickForHistory(toothNumber);
-};
-
 const handleToothSingleClick = (toothNumber) => {
   clickCount.value++;
   
@@ -868,9 +830,11 @@ const handleToothSingleClick = (toothNumber) => {
     // Double click detected
     clearTimeout(clickTimer.value);
     clickCount.value = 0;
-    
-    // Open popup for detailed view in both modes
-    openRecordDetailPopup(toothNumber);
+
+    // Only open record detail in create mode
+    if (mode.value === 'create') {
+      openRecordDetailPopup(toothNumber);
+    }
   }
 };
 
@@ -1044,8 +1008,6 @@ const closeRecordDetailPopup = () => {
 const handleEscKey = (event) => {
   if (event.key === 'Escape' && showRecordDetailPopup.value) {
     closeRecordDetailPopup();
-  } else if (event.key === 'Escape' && showConditionHistory.value) {
-    hideConditionHistory();
   }
 };
 
@@ -1063,25 +1025,6 @@ const handleRecordSaved = (savedRecord) => {
 // Handle popup errors
 const handlePopupError = (error) => {
   emit('error', error);
-};
-
-// Condition history handlers
-const showToothConditionHistory = (toothNumber, event) => {
-  selectedToothForHistory.value = toothNumber;
-  
-  // Position the popover near the tooth
-  const rect = event.target.getBoundingClientRect();
-  historyPopoverPosition.value = {
-    x: rect.left + rect.width / 2,
-    y: rect.top - 10
-  };
-  
-  showConditionHistory.value = true;
-};
-
-const hideConditionHistory = () => {
-  showConditionHistory.value = false;
-  selectedToothForHistory.value = null;
 };
 
 const formatPayload = (data) => {
@@ -1441,9 +1384,8 @@ const handleClose = () => {
                   <div class="w-full mx-auto">
                     <div class="grid grid-cols-16 gap-1 justify-items-center max-w-6xl mx-auto">
                       <div v-for="tooth in [...adultPermanent.upperRight, ...adultPermanent.upperLeft]" :key="tooth" class="text-center">
-                        <button 
-                          @click="handleToothClick(tooth)" 
-                          @dblclick="handleToothClickForHistory(tooth)"
+                        <button
+                          @click="handleToothClick(tooth)"
                           @mouseenter="handleToothHover(tooth, $event)"
                           @mouseleave="handleToothLeave"
                           class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
@@ -1467,9 +1409,8 @@ const handleClose = () => {
                     <div class="my-4 border-t-2 border-dashed w-full max-w-6xl mx-auto"></div>
                     <div class="grid grid-cols-16 gap-1 justify-items-center max-w-6xl mx-auto">
                       <div v-for="tooth in [...adultPermanent.lowerRight.slice().reverse(), ...adultPermanent.lowerLeft.slice().reverse()]" :key="tooth" class="text-center">
-                        <button 
-                          @click="handleToothClick(tooth)" 
-                          @dblclick="handleToothClickForHistory(tooth)"
+                        <button
+                          @click="handleToothClick(tooth)"
                           @mouseenter="handleToothHover(tooth, $event)"
                           @mouseleave="handleToothLeave"
                           class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
@@ -1798,10 +1739,8 @@ const handleClose = () => {
                           <!-- Upper Right Teeth -->
                           <div v-for="tooth in adultPermanent.upperRight" :key="`chart-${tooth}`" 
                                @click="handleToothClick(tooth)" 
-                               @dblclick="openRecordDetailPopup(tooth)"
                                @mouseenter="handleToothHover(tooth, $event)"
                                @mouseleave="handleToothLeave"
-                               @contextmenu="handleToothRightClick(tooth, $event)"
                                class="cursor-pointer text-center relative group transition-all duration-200 hover:scale-110 hover:z-10">
                               
                               <!-- Current Condition Display (Top) - Show in both modes -->
@@ -1846,10 +1785,8 @@ const handleClose = () => {
                           <!-- Upper Left Teeth -->
                           <div v-for="tooth in adultPermanent.upperLeft" :key="`chart-${tooth}`" 
                                @click="handleToothClick(tooth)" 
-                               @dblclick="openRecordDetailPopup(tooth)"
                                @mouseenter="handleToothHover(tooth, $event)"
                                @mouseleave="handleToothLeave"
-                               @contextmenu="handleToothRightClick(tooth, $event)"
                                class="cursor-pointer text-center relative group transition-all duration-200 hover:scale-110 hover:z-10">
                               
                               <!-- Current Condition Display (Top) - Show in both modes -->
@@ -1893,14 +1830,14 @@ const handleClose = () => {
                       </div>
 
                       <!-- Reduced Middle Separator spacing with consistent dotted lines -->
-                      <div class="my-2 relative">
+                      <div class="my-2 relative px-4">
                         <!-- Horizontal dotted line -->
                         <div class="w-full border-t-2 border-dashed border-gray-400 dark:border-gray-500"></div>
                         <!-- Vertical dotted line -->
                         <div class="absolute top-0 bottom-0 left-1/2 w-0.5 border-l-2 border-dashed border-gray-400 dark:border-gray-500 transform -translate-x-1/2"></div>
                         <div class="flex justify-center -mt-3">
                           <div class="px-4 py-2 bg-white dark:bg-gray-800 rounded-full shadow-sm border border-gray-200 dark:border-gray-600">
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Left  Right</span>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Left | Right</span>
                           </div>
                         </div>
                       </div>
@@ -1918,10 +1855,8 @@ const handleClose = () => {
                           <!-- Lower Right Teeth (48-41) -->
                           <div v-for="tooth in adultPermanent.lowerRight.slice().reverse()" :key="`chart-${tooth}`" 
                                @click="handleToothClick(tooth)" 
-                               @dblclick="openRecordDetailPopup(tooth)"
                                @mouseenter="handleToothHover(tooth, $event)"
                                @mouseleave="handleToothLeave"
-                               @contextmenu="handleToothRightClick(tooth, $event)"
                                class="cursor-pointer text-center relative group transition-all duration-200 hover:scale-110 hover:z-10">
                                
                                <!-- Tooth Number -->
@@ -1968,10 +1903,8 @@ const handleClose = () => {
                           <!-- Lower Left Teeth (31-38) -->
                           <div v-for="tooth in adultPermanent.lowerLeft.slice().reverse()" :key="`chart-${tooth}`" 
                                @click="handleToothClick(tooth)" 
-                               @dblclick="openRecordDetailPopup(tooth)"
                                @mouseenter="handleToothHover(tooth, $event)"
                                @mouseleave="handleToothLeave"
-                               @contextmenu="handleToothRightClick(tooth, $event)"
                                class="cursor-pointer text-center relative group transition-all duration-200 hover:scale-110 hover:z-10">
                                
                                <!-- Tooth Number -->
@@ -2037,10 +1970,8 @@ const handleClose = () => {
                           <!-- Upper Right Teeth -->
                           <div v-for="tooth in childrenPrimary.upperRight" :key="`chart-${tooth}`" 
                                @click="handleToothClick(tooth)" 
-                               @dblclick="openRecordDetailPopup(tooth)"
                                @mouseenter="handleToothHover(tooth, $event)"
                                @mouseleave="handleToothLeave"
-                               @contextmenu="handleToothRightClick(tooth, $event)"
                                class="cursor-pointer text-center relative group transition-all duration-200 hover:scale-110 hover:z-10">
                               
                               <!-- Current Condition Display (Top) - Show in both modes -->
@@ -2085,10 +2016,8 @@ const handleClose = () => {
                           <!-- Upper Left Teeth -->
                           <div v-for="tooth in childrenPrimary.upperLeft" :key="`chart-${tooth}`" 
                                @click="handleToothClick(tooth)" 
-                               @dblclick="openRecordDetailPopup(tooth)"
                                @mouseenter="handleToothHover(tooth, $event)"
                                @mouseleave="handleToothLeave"
-                               @contextmenu="handleToothRightClick(tooth, $event)"
                                class="cursor-pointer text-center relative group transition-all duration-200 hover:scale-110 hover:z-10">
                               
                               <!-- Current Condition Display (Top) - Show in both modes -->
@@ -2132,7 +2061,7 @@ const handleClose = () => {
                       </div>
 
                       <!-- Reduced Middle Separator spacing for children chart with consistent dotted lines -->
-                      <div class="my-4 relative">
+                      <div class="my-4 relative px-4">
                         <!-- Horizontal dotted line -->
                         <div class="w-full border-t-2 border-dashed border-gray-400 dark:border-gray-500"></div>
                         <!-- Vertical dotted line -->
@@ -2157,10 +2086,8 @@ const handleClose = () => {
                           <!-- Lower Right Teeth (reversed) -->
                           <div v-for="tooth in childrenPrimary.lowerRight.slice().reverse()" :key="`chart-${tooth}`" 
                                @click="handleToothClick(tooth)" 
-                               @dblclick="openRecordDetailPopup(tooth)"
                                @mouseenter="handleToothHover(tooth, $event)"
                                @mouseleave="handleToothLeave"
-                               @contextmenu="handleToothRightClick(tooth, $event)"
                                class="cursor-pointer text-center relative group transition-all duration-200 hover:scale-110 hover:z-10">
                                
                                <!-- Tooth Number -->
@@ -2207,10 +2134,8 @@ const handleClose = () => {
                           <!-- Lower Left Teeth (reversed) -->
                           <div v-for="tooth in childrenPrimary.lowerLeft.slice().reverse()" :key="`chart-${tooth}`" 
                                @click="handleToothClick(tooth)" 
-                               @dblclick="openRecordDetailPopup(tooth)"
                                @mouseenter="handleToothHover(tooth, $event)"
                                @mouseleave="handleToothLeave"
-                               @contextmenu="handleToothRightClick(tooth, $event)"
                                class="cursor-pointer text-center relative group transition-all duration-200 hover:scale-110 hover:z-10">
                                
                                <!-- Tooth Number -->
@@ -2558,49 +2483,6 @@ const handleClose = () => {
     </div>
   </div>
 
-  <!-- Condition History Popover -->
-  <Teleport to="body">
-    <div v-if="showConditionHistory && selectedToothForHistory" 
-         class="fixed z-[70] pointer-events-none"
-         :style="{ 
-           left: `${historyPopoverPosition.x - 150}px`, 
-           top: `${historyPopoverPosition.y - 200}px` 
-         }">
-      <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl w-[300px] pointer-events-auto">
-        <div class="p-4">
-          <div class="flex items-center justify-between mb-3">
-            <h4 class="font-semibold text-gray-900 dark:text-white">
-              Tooth {{ selectedToothForHistory }} History
-            </h4>
-            <button @click="hideConditionHistory" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-              <X class="h-4 w-4" />
-            </button>
-          </div>
-          
-          <div class="space-y-2 max-h-48 overflow-y-auto">
-            <div v-for="(history, index) in getToothHistoryFromExaminations(selectedToothForHistory)" 
-                 :key="index"
-                 class="p-2 bg-gray-50 dark:bg-gray-700 rounded border-l-4"
-                 :class="getConditionDisplayClass(history.condition)">
-              <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-gray-900 dark:text-white">
-                  {{ getConditionDisplayLabel(history.condition) }}
-                </span>
-                <span class="text-xs text-gray-500 dark:text-gray-400">
-                  {{ formatDate(history.date) }}
-                </span>
-              </div>
-            </div>
-            
-            <div v-if="getToothHistoryFromExaminations(selectedToothForHistory).length === 0" 
-                 class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-              No condition history available
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </Teleport>
 
   <!-- RecordDetailNew Popup Modal - Full Page -->
   <Teleport to="body">
