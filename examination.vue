@@ -169,7 +169,6 @@ const createNewExaminationObject = () => ({
 
 // State for 'create' mode
 const newExaminationData = reactive(createNewExaminationObject());
-const activeTab = ref('adult'); // Tab for adult vs children teeth
 const selectedCondition = ref('Healthy');
 const otherConditionText = ref('');
 const toothImageExists = reactive({});
@@ -506,14 +505,6 @@ const getMidlineSpacingClass = (toothNumber) => {
 };
 
 // Get current teeth array based on active tab
-const getCurrentTeethArray = () => {
-  return activeTab.value === 'adult' ? allTeeth : allChildrenTeeth;
-};
-
-// Get current teeth structure based on active tab
-const getCurrentTeethStructure = () => {
-  return activeTab.value === 'adult' ? adultPermanent : childrenPrimary;
-};
 
 // --- METHODS ---
 const initializeImageStates = () => {
@@ -1507,36 +1498,8 @@ const handleClose = () => {
                         </div>
                       </div>
                       
-                      <!-- Tab System for Adult/Children -->
-                      <div class="flex justify-center mb-3">
-                        <div class="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-                          <button 
-                            @click="activeTab = 'adult'"
-                            :class="[
-                              'px-4 py-2 rounded-md text-sm font-medium transition-all duration-200',
-                              activeTab === 'adult' 
-                                ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm' 
-                                : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
-                            ]"
-                          >
-                            Adult Teeth
-                          </button>
-                          <button 
-                            @click="activeTab = 'children'"
-                            :class="[
-                              'px-4 py-2 rounded-md text-sm font-medium transition-all duration-200',
-                              activeTab === 'children' 
-                                ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm' 
-                                : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
-                            ]"
-                          >
-                            Children Teeth
-                          </button>
-                        </div>
-                      </div>
-
                       <!-- Adult Teeth Chart -->
-                      <div v-if="activeTab === 'adult'" class="adult-chart">
+                      <div class="adult-chart">
                       <!-- Upper Jaw -->
                       <div class="text-center mb-4">
                         <span class="font-semibold text-lg text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
@@ -1733,7 +1696,14 @@ const handleClose = () => {
                           </div>
                       </div>
                       <!-- Children Teeth Chart -->
-                      <div v-if="activeTab === 'children'" class="children-chart">
+                      <div class="text-center mt-12 mb-4">
+                        <span class="font-semibold text-lg text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
+                          <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
+                          Children's Primary Teeth
+                          <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
+                        </span>
+                      </div>
+                      <div class="children-chart">
                       <!-- Upper Jaw -->
                       <div class="text-center mb-4">
                         <span class="font-semibold text-lg text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
