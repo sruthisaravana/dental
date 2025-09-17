@@ -17,7 +17,6 @@ import {
   Activity,
   FileText,
   Info,
-  PlusCircle,
   Save,
   X,
   Search,
@@ -170,7 +169,6 @@ const createNewExaminationObject = () => ({
 
 // State for 'create' mode
 const newExaminationData = reactive(createNewExaminationObject());
-const activeTab = ref('adult'); // Tab for adult vs children teeth
 const selectedCondition = ref('Healthy');
 const otherConditionText = ref('');
 const toothImageExists = reactive({});
@@ -404,6 +402,9 @@ const childrenPrimary = {
   lowerLeft: [71, 72, 73, 74, 75],
 };
 
+const rightMidlineTeeth = new Set([11, 41, 51, 81]);
+const leftMidlineTeeth = new Set([21, 31, 61, 71]);
+
 // --- COMPUTED PROPERTIES ---
 // Tooth conditions from dental records (like DentalChart)
 const toothConditions = computed(() => {
@@ -485,54 +486,25 @@ const getConditionInfo = (val, prop) => {
   return allConditions.find(c => c.value === val)?.[prop] || (prop === 'color' ? 'bg-gray-200' : val);
 };
 
-const getToothBorderClass = (condition) => {
-  const conditionColors = {
-    'Healthy': 'border-emerald-400',
-    'Decayed': 'border-rose-400',
-    'Filled': 'border-sky-400',
-    'Missing': 'border-slate-400',
-    'Cracked': 'border-orange-400',
-    'Wisdom': 'border-violet-400',
-    'Fully Decayed': 'border-rose-600',
-    'Root Canal': 'border-violet-500',
-    'Root Canal Done': 'border-violet-600',
-    'Impacted': 'border-amber-500',
-    'Tooth Removed': 'border-slate-600',
-    'Removed': 'border-slate-600',
-    'Stained': 'border-yellow-400',
-    'Worn': 'border-orange-300',
-    'Abrasion': 'border-orange-500',
-    'Erosion': 'border-rose-300',
-    'Chipped': 'border-amber-400',
-    'Fractured Cusp': 'border-orange-600',
-    'Hypersensitive': 'border-pink-400',
-    'Periapical Abscess': 'border-rose-700',
-    'Gingivitis': 'border-pink-300',
-    'Periodontitis': 'border-rose-500',
-    'Pericoronitis': 'border-pink-500',
-    'Supernumerary': 'border-indigo-300',
-    'Un-erupted Primary': 'border-slate-300',
-    'Retained Primary': 'border-slate-400',
-    'Malocclusion': 'border-indigo-500',
-    'Attrition': 'border-amber-600',
-    'Enamel Hypoplasia': 'border-yellow-500',
-    'Amelogenesis Imperfecta': 'border-yellow-600',
-    'Dentinogenesis Imperfecta': 'border-blue-400',
-    'Gingival Recession': 'border-pink-600'
-  };
-  return conditionColors[condition] || 'border-gray-300';
+const getConditionRingClass = (condition) => {
+  const colorClass = getConditionInfo(condition, 'color');
+  return colorClass ? colorClass.replace('bg-', 'ring-') : '';
 };
+
 const getToothImagePath = (t) => `/img/teeth/${t}.png`;
 
-// Get current teeth array based on active tab
-const getCurrentTeethArray = () => {
-  return activeTab.value === 'adult' ? allTeeth : allChildrenTeeth;
+const getMidlineSpacingClass = (toothNumber) => {
+  const num = Number(toothNumber);
+  if (rightMidlineTeeth.has(num)) {
+    return 'mr-4 lg:mr-6 xl:mr-8';
+  }
+  if (leftMidlineTeeth.has(num)) {
+    return 'ml-4 lg:ml-6 xl:ml-8';
+  }
+  return '';
 };
 
-// Get current teeth structure based on active tab
-const getCurrentTeethStructure = () => {
-  return activeTab.value === 'adult' ? adultPermanent : childrenPrimary;
-};
+// Get current teeth array based on active tab
 
 // --- METHODS ---
 const initializeImageStates = () => {
@@ -557,14 +529,17 @@ const getToothHistoryFromExaminations = (toothNumber) => {
 };
 
 const getToothCurrentCondition = (toothNumber) => {
-  // Use dental records data like DentalChart (primary source)
+  const pendingCondition = newExaminationData.condition_of_teeth[toothNumber];
+  if (mode.value === 'create' && pendingCondition) {
+    return pendingCondition;
+  }
+
   const recordCondition = toothConditions.value[String(toothNumber)]?.condition;
   if (recordCondition) {
     return recordCondition;
   }
-  
-  // Use current form data
-  return newExaminationData.condition_of_teeth[toothNumber] || null;
+
+  return null;
 };
 
 // Add methods similar to DentalChart for condition display
@@ -605,7 +580,7 @@ const getConditionDisplayLabel = (condition) => {
 
 const getConditionDisplayClass = (condition) => {
   if (!condition) return '';
-  
+
   const conditionColors = {
     'Healthy': 'bg-emerald-400 text-white',
     'Decayed': 'bg-rose-400 text-white',
@@ -637,42 +612,35 @@ const getConditionDisplayClass = (condition) => {
     'Malocclusion': 'bg-indigo-500 text-white',
     'Enamel Hypoplasia': 'bg-yellow-400 text-white'
   };
-  
+
   return conditionColors[condition] || 'bg-gray-400 text-white';
 };
 
-const getToothConditionBackgroundClass = (toothNumber) => {
-  const condition = getToothCurrentCondition(toothNumber);
-  if (!condition) return '';
-  
-  const backgroundColors = {
-    'Healthy': 'bg-emerald-100 dark:bg-emerald-800',
-    'Decayed': 'bg-rose-100 dark:bg-rose-800',
-    'Filled': 'bg-sky-100 dark:bg-sky-800',
-    'Missing': 'bg-slate-200 dark:bg-slate-600',
-    'Cracked': 'bg-orange-100 dark:bg-orange-800',
-    'Wisdom': 'bg-violet-100 dark:bg-violet-800',
-    'Impacted': 'bg-amber-100 dark:bg-amber-800',
-    'Fully Decayed': 'bg-rose-200 dark:bg-rose-900',
-    'Root Canal Done': 'bg-violet-200 dark:bg-violet-900',
-    'Removed': 'bg-slate-300 dark:bg-slate-700',
-    'Crown': 'bg-yellow-100 dark:bg-yellow-800',
-    'Bridge': 'bg-teal-100 dark:bg-teal-800',
-    'Implant': 'bg-gray-200 dark:bg-gray-700',
-    'Stained': 'bg-yellow-100 dark:bg-yellow-800',
-    'Worn': 'bg-orange-50 dark:bg-orange-900',
-    'Abrasion': 'bg-orange-100 dark:bg-orange-800',
-    'Erosion': 'bg-rose-50 dark:bg-rose-900',
-    'Chipped': 'bg-amber-50 dark:bg-amber-900',
-    'Fractured Cusp': 'bg-orange-200 dark:bg-orange-900',
-    'Hypersensitive': 'bg-pink-100 dark:bg-pink-800',
-    'Periapical Abscess': 'bg-rose-300 dark:bg-rose-900',
-    'Gingivitis': 'bg-pink-50 dark:bg-pink-900',
-    'Periodontitis': 'bg-rose-100 dark:bg-rose-800',
-    'Pericoronitis': 'bg-pink-100 dark:bg-pink-800'
-  };
-  
-  return backgroundColors[condition] || '';
+const getToothCardClasses = (toothNumber) => {
+  const classes = [
+    'bg-white',
+    'dark:bg-slate-900',
+    'transition-all',
+    'duration-200'
+  ];
+
+  const recordCondition = toothConditions.value[String(toothNumber)]?.condition;
+  const pendingCondition = newExaminationData.condition_of_teeth[toothNumber];
+  const hasPendingHighlight =
+    mode.value === 'create' && pendingCondition && pendingCondition !== recordCondition;
+
+  if (hasPendingHighlight) {
+    const ringClass = getConditionRingClass(pendingCondition) || 'ring-indigo-400';
+    classes.push(
+      'ring-2',
+      ringClass,
+      'ring-offset-2',
+      'ring-offset-white',
+      'dark:ring-offset-slate-900'
+    );
+  }
+
+  return classes;
 };
 
 const handleToothHover = (toothNumber, event) => {
@@ -706,42 +674,126 @@ const handleToothRightClick = (toothNumber, event) => {
 
 // Helper methods for tooth display like DentalChart
 const getToothTreatments = (toothNumber) => {
-  const toothRecords = props.records.filter(record => 
+  const toothRecords = props.records.filter(record =>
     String(record.tooth_number) === String(toothNumber)
   );
-  
+
   const treatments = [];
   toothRecords.forEach(record => {
     if (record.treatments && Array.isArray(record.treatments)) {
       treatments.push(...record.treatments);
     }
   });
-  
+
   return treatments;
 };
 
+const normalizeStatus = (status) => {
+  if (!status) return null;
+  const normalized = String(status).trim().toLowerCase().replace(/[\s-]+/g, '_');
+  const mapping = {
+    'in_treatment': 'intreatment',
+    'in_progress': 'intreatment',
+    'in-progress': 'intreatment',
+    'inprogress': 'intreatment',
+    'ongoing': 'intreatment',
+    'active': 'intreatment',
+    'started': 'intreatment',
+    'planned': 'diagnosis_planned',
+    'planning': 'diagnosis_planned',
+    'pending': 'diagnosis_planned',
+    'scheduled': 'diagnosis_planned',
+    'waiting': 'diagnosis_planned',
+    'not_started': 'initial',
+    'not-started': 'initial',
+    'notstarted': 'initial',
+    'new_condition': 'new',
+    'newcondition': 'new',
+    'complete': 'completed',
+    'completed': 'completed',
+    'done': 'completed',
+    'finished': 'completed'
+  };
+  return mapping[normalized] || normalized;
+};
+
+const getAggregateTreatmentStatus = (treatments) => {
+  if (!treatments || treatments.length === 0) return null;
+
+  const statuses = treatments.map(treatment =>
+    normalizeStatus(treatment.status) || normalizeStatus(calculateTreatmentStatus(treatment))
+  ).filter(Boolean);
+
+  if (statuses.length === 0) return null;
+
+  if (statuses.every(status => status === 'completed')) {
+    return 'completed';
+  }
+
+  if (statuses.some(status => status === 'intreatment')) {
+    return 'intreatment';
+  }
+
+  if (statuses.some(status => status === 'diagnosis_planned')) {
+    return 'diagnosis_planned';
+  }
+
+  if (statuses.some(status => status === 'initial')) {
+    return 'initial';
+  }
+
+  return statuses[0];
+};
+
 const getToothStatus = (toothNumber) => {
-  return toothConditions.value[String(toothNumber)]?.status;
+  const treatments = getToothTreatments(toothNumber);
+  const treatmentStatus = getAggregateTreatmentStatus(treatments);
+  if (treatmentStatus) {
+    return treatmentStatus;
+  }
+
+  const recordStatus = normalizeStatus(toothConditions.value[String(toothNumber)]?.status);
+  if (recordStatus) {
+    return recordStatus;
+  }
+
+  if (mode.value === 'create' && newExaminationData.condition_of_teeth[toothNumber]) {
+    return 'new';
+  }
+
+  return null;
 };
 
 const getStatusLabel = (status) => {
+  const normalized = normalizeStatus(status);
   const statusLabels = {
     'initial': 'Initial',
     'diagnosis_planned': 'Planned',
     'intreatment': 'In Treatment',
-    'completed': 'Complete'
+    'completed': 'Complete',
+    'new': 'New Condition'
   };
-  return statusLabels[status?.toLowerCase()] || 'Unknown';
+  if (normalized && statusLabels[normalized]) {
+    return statusLabels[normalized];
+  }
+
+  if (!normalized) {
+    return 'Unknown';
+  }
+
+  return normalized.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
 const getHoverStatusClass = (status) => {
+  const normalized = normalizeStatus(status);
   const statusClasses = {
     'initial': 'bg-sky-50 text-sky-700 border-sky-200',
     'diagnosis_planned': 'bg-purple-50 text-purple-700 border-purple-200',
     'intreatment': 'bg-amber-50 text-amber-700 border-amber-200',
-    'completed': 'bg-emerald-50 text-emerald-700 border-emerald-200'
+    'completed': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    'new': 'bg-indigo-50 text-indigo-700 border-indigo-200'
   };
-  return statusClasses[status?.toLowerCase()] || 'bg-gray-50 text-gray-700 border-gray-200';
+  return statusClasses[normalized] || 'bg-gray-50 text-gray-700 border-gray-200';
 };
 
 const getQuadrantName = (toothNumber) => {
@@ -1342,45 +1394,45 @@ const handleClose = () => {
                     
                     <!-- Conditions with Images -->
                     <div class="grid grid-cols-3 gap-2 mb-4">
-                      <button 
-                        v-for="cond in filteredPredefinedConditions" 
-                        :key="cond.value" 
-                        @click="selectedCondition = cond.value" 
+                      <button
+                        v-for="cond in filteredPredefinedConditions"
+                        :key="cond.value"
+                        @click="selectedCondition = cond.value"
                         :class="['rounded-2xl border-2 flex items-center justify-center h-28 transition-all duration-200 overflow-hidden', selectedCondition === cond.value ? `${cond.color} border-transparent shadow-lg` : 'bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 hover:scale-102']"
                       >
                         <img :src="cond.image" :alt="cond.label" class="w-full h-full object-contain rounded-2xl" @error="(e) => e.target.style.display = 'none'" />
                       </button>
                     </div>
-                    
+
                     <!-- Additional Conditions with Images (same layout as predefined) -->
                     <div class="grid grid-cols-3 gap-2 mb-4">
-                      <button 
-                        v-for="cond in filteredAdditionalConditions" 
-                        :key="cond.value" 
-                        @click="selectedCondition = cond.value" 
+                      <button
+                        v-for="cond in filteredAdditionalConditions"
+                        :key="cond.value"
+                        @click="selectedCondition = cond.value"
                         :class="['rounded-2xl border-2 flex items-center justify-center h-28 transition-all duration-200 overflow-hidden', selectedCondition === cond.value ? `${cond.color} border-transparent shadow-lg` : 'bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 hover:scale-102']"
                         :title="cond.shortDescription"
                       >
-                        <img 
-                          v-if="cond.image" 
-                          :src="cond.image" 
-                          :alt="cond.label" 
-                          class="w-full h-full object-contain rounded-2xl" 
-                          @error="(e) => e.target.style.display = 'none'" 
+                        <img
+                          v-if="cond.image"
+                          :src="cond.image"
+                          :alt="cond.label"
+                          class="w-full h-full object-contain rounded-2xl"
+                          @error="(e) => e.target.style.display = 'none'"
                         />
-                        <div 
-                          v-else 
+                        <div
+                          v-else
                           class="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 rounded-2xl flex items-center justify-center text-2xl"
                         >
                           🦷
                         </div>
                       </button>
                     </div>
-                    
+
                     <!-- Other Condition -->
                     <div class="space-y-2">
-                      <button 
-                        @click="selectedCondition = 'other'" 
+                      <button
+                        @click="selectedCondition = 'other'"
                         :class="['w-full p-2 text-sm font-medium rounded-lg border-2', selectedCondition === 'other' ? 'bg-slate-500 text-white border-transparent shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300']"
                       >
                         Other Condition
@@ -1431,7 +1483,7 @@ const handleClose = () => {
                 <div class="flex flex-col items-center space-y-6">
                   
                   <!-- Dental Chart with full width -->
-                  <div class="bg-white dark:bg-gray-800 rounded-xl p-2 shadow-lg border border-gray-200 dark:border-gray-700 w-full">
+                  <div class="bg-white dark:bg-gray-800 rounded-xl p-0 shadow-lg border border-gray-200 dark:border-gray-700 w-full">
                       
                       <!-- Header with Title and Instructions -->
                       <div class="flex justify-between items-center mb-3">
@@ -1446,45 +1498,17 @@ const handleClose = () => {
                         </div>
                       </div>
                       
-                      <!-- Tab System for Adult/Children -->
-                      <div class="flex justify-center mb-3">
-                        <div class="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-                          <button 
-                            @click="activeTab = 'adult'"
-                            :class="[
-                              'px-4 py-2 rounded-md text-sm font-medium transition-all duration-200',
-                              activeTab === 'adult' 
-                                ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm' 
-                                : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
-                            ]"
-                          >
-                            Adult Teeth
-                          </button>
-                          <button 
-                            @click="activeTab = 'children'"
-                            :class="[
-                              'px-4 py-2 rounded-md text-sm font-medium transition-all duration-200',
-                              activeTab === 'children' 
-                                ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm' 
-                                : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
-                            ]"
-                          >
-                            Children Teeth
-                          </button>
-                        </div>
-                      </div>
-
                       <!-- Adult Teeth Chart -->
-                      <div v-if="activeTab === 'adult'" class="adult-chart">
+                      <div class="adult-chart">
                       <!-- Upper Jaw -->
-                      <div class="text-center mb-2">
+                      <div class="text-center mb-4">
                         <span class="font-semibold text-lg text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
                           <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
                           Upper Jaw
                           <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
                         </span>
                       </div>
-                      <div class="grid grid-cols-16 gap-x-4 gap-y-2 justify-items-center relative max-w-7xl mx-auto px-4">
+                      <div class="grid grid-cols-16 gap-x-8 gap-y-8 justify-items-center relative max-w-7xl mx-auto py-10">
                           <!-- Enhanced Quadrant Dividing Lines using dotted lines -->
                           <div class="absolute top-0 bottom-0 left-1/2 w-0.5 border-l-2 border-dashed border-gray-400 dark:border-gray-500 transform -translate-x-1/2 z-0"></div>
                           
@@ -1494,46 +1518,37 @@ const handleClose = () => {
                           <div class="absolute -top-8 right-4 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q1</div>
                           
                           <!-- Upper Right Teeth -->
-                        <div v-for="tooth in adultPermanent.upperRight" :key="`chart-${tooth}`" 
-     @click="handleToothClick(tooth)" 
+                        <div v-for="tooth in adultPermanent.upperRight" :key="`chart-${tooth}`"
+     @click="handleToothClick(tooth)"
      @dblclick="openRecordDetailPopup(tooth)"
      @mouseenter="handleToothHover(tooth, $event)"
      @mouseleave="handleToothLeave"
      @contextmenu="handleToothRightClick(tooth, $event)"
-     class="cursor-pointer text-center relative group transition-all duration-200 hover:scale-110 hover:z-10 p-1">
-                              <!-- Selected condition label for create mode (Top) -->
-                              <div v-if="mode === 'create' && newExaminationData.condition_of_teeth[tooth]" class="mb-0.5">
-                                <div class="text-xs font-medium px-0.5 py-0.5 rounded" :class="getConditionDisplayClass(newExaminationData.condition_of_teeth[tooth])">
-                                  {{ getConditionDisplayLabel(newExaminationData.condition_of_teeth[tooth]) }}
-                                </div>
-                              </div>
-                              
-                              <div class="relative">
-                                  <!-- Background condition color -->
-                                  <div :class="getToothConditionBackgroundClass(tooth)" class="absolute inset-0 rounded-lg opacity-60 transition-opacity duration-200"></div>
-                                  <!-- Hover effect -->
-                                  <div class="absolute inset-0 bg-blue-200 dark:bg-blue-800 rounded-lg opacity-0 group-hover:opacity-30 transition-opacity duration-200"></div>
-                                  
-                                  <div class="w-20 h-24 mx-auto flex items-center justify-center relative z-10">
-                                      <img v-if="toothImageExists[tooth]" 
-                                           :src="getToothImagePath(tooth)" 
-                                           @error="imageError(tooth)" 
-                                           class="w-full h-full object-contain transition-all duration-200 group-hover:brightness-110" />
-                                      <div v-else class="w-18 h-22 bg-gray-100 dark:bg-gray-700 rounded-md border-2 flex items-center justify-center text-3xl">🦷</div>
+     class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10 px-1"
+     :class="getMidlineSpacingClass(tooth)">
+                              <div class="relative flex flex-col items-center">
+                                  <div
+                                    class="relative w-20 h-24 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                    :class="getToothCardClasses(tooth)"
+                                  >
+                                      <img v-if="toothImageExists[tooth]"
+                                           :src="getToothImagePath(tooth)"
+                                           @error="imageError(tooth)"
+                                           class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105" />
+                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">
+                                        🦷
+                                      </div>
                                   </div>
-                                  
-                                  <!-- Applied condition overlay for create mode -->
-                                  <div v-if="mode === 'create'" :class="['absolute inset-0 rounded-lg transition-opacity', newExaminationData.condition_of_teeth[tooth] ? `${getConditionInfo(newExaminationData.condition_of_teeth[tooth], 'color')} opacity-70` : 'opacity-0 group-hover:opacity-40 ' + getConditionInfo(selectedCondition === 'other' ? 'other' : selectedCondition, 'color')]"></div>
                               </div>
-                              
-                              <div class="mt-0.5 text-center">
+
+                              <div class="mt-2 text-center">
                                 <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
                               </div>
-                              
+
                               <!-- Current Condition Display (Bottom) - Show in both modes -->
-                              <div class="mt-0.5 min-h-[16px]">
-                                <div v-if="getToothCurrentCondition(tooth)" 
-                                     class="text-xs font-medium py-0.5 rounded" 
+                              <div class="mt-1 min-h-[18px]">
+                                <div v-if="getToothCurrentCondition(tooth)"
+                                     class="text-xs font-medium px-2 py-0.5 rounded"
                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))">
                                   {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
                                 </div>
@@ -1541,46 +1556,37 @@ const handleClose = () => {
                           </div>
                           
                           <!-- Upper Left Teeth -->
-<div v-for="tooth in adultPermanent.upperLeft" :key="`chart-${tooth}`" 
-     @click="handleToothClick(tooth)" 
+                        <div v-for="tooth in adultPermanent.upperLeft" :key="`chart-${tooth}`"
+     @click="handleToothClick(tooth)"
      @dblclick="openRecordDetailPopup(tooth)"
      @mouseenter="handleToothHover(tooth, $event)"
      @mouseleave="handleToothLeave"
      @contextmenu="handleToothRightClick(tooth, $event)"
-     class="cursor-pointer text-center relative group transition-all duration-200 hover:scale-110 hover:z-10 p-1">
-                              <!-- Selected condition label for create mode (Top) -->
-                              <div v-if="mode === 'create' && newExaminationData.condition_of_teeth[tooth]" class="mb-0.5">
-                                <div class="text-xs font-medium px-0.5 py-0.5 rounded" :class="getConditionDisplayClass(newExaminationData.condition_of_teeth[tooth])">
-                                  {{ getConditionDisplayLabel(newExaminationData.condition_of_teeth[tooth]) }}
-                                </div>
-                              </div>
-                              
-                              <div class="relative">
-                                  <!-- Background condition color -->
-                                  <div :class="getToothConditionBackgroundClass(tooth)" class="absolute inset-0 rounded-lg opacity-60 transition-opacity duration-200"></div>
-                                  <!-- Hover effect -->
-                                  <div class="absolute inset-0 bg-blue-200 dark:bg-blue-800 rounded-lg opacity-0 group-hover:opacity-30 transition-opacity duration-200"></div>
-                                  
-                                  <div class="w-20 h-24 mx-auto flex items-center justify-center relative z-10">
-                                      <img v-if="toothImageExists[tooth]" 
-                                           :src="getToothImagePath(tooth)" 
-                                           @error="imageError(tooth)" 
-                                           class="w-full h-full object-contain transition-all duration-200 group-hover:brightness-110" />
-                                      <div v-else class="w-18 h-22 bg-gray-100 dark:bg-gray-700 rounded-md border-2 flex items-center justify-center text-3xl">🦷</div>
+     class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10 px-1"
+     :class="getMidlineSpacingClass(tooth)">
+                              <div class="relative flex flex-col items-center">
+                                  <div
+                                    class="relative w-20 h-24 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                    :class="getToothCardClasses(tooth)"
+                                  >
+                                      <img v-if="toothImageExists[tooth]"
+                                           :src="getToothImagePath(tooth)"
+                                           @error="imageError(tooth)"
+                                           class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105" />
+                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">
+                                        🦷
+                                      </div>
                                   </div>
-                                  
-                                  <!-- Applied condition overlay for create mode -->
-                                  <div v-if="mode === 'create'" :class="['absolute inset-0 rounded-lg transition-opacity', newExaminationData.condition_of_teeth[tooth] ? `${getConditionInfo(newExaminationData.condition_of_teeth[tooth], 'color')} opacity-70` : 'opacity-0 group-hover:opacity-40 ' + getConditionInfo(selectedCondition === 'other' ? 'other' : selectedCondition, 'color')]"></div>
                               </div>
-                              
-                              <div class="mt-0.5 text-center">
+
+                              <div class="mt-2 text-center">
                                 <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
                               </div>
-                              
+
                               <!-- Current Condition Display (Bottom) - Show in both modes -->
-                              <div class="mt-0.5 min-h-[16px]">
-                                <div v-if="getToothCurrentCondition(tooth)" 
-                                     class="text-xs font-medium py-0.5 rounded" 
+                              <div class="mt-1 min-h-[18px]">
+                                <div v-if="getToothCurrentCondition(tooth)"
+                                     class="text-xs font-medium px-2 py-0.5 rounded"
                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))">
                                   {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
                                 </div>
@@ -1589,7 +1595,7 @@ const handleClose = () => {
                       </div>
 
                       <!-- Reduced Middle Separator spacing with consistent dotted lines -->
-                      <div class="my-2 relative">
+                      <div class="my-6 relative">
                         <!-- Horizontal dotted line -->
                         <div class="w-full border-t-2 border-dashed border-gray-400 dark:border-gray-500"></div>
                         <!-- Vertical dotted line -->
@@ -1602,7 +1608,7 @@ const handleClose = () => {
                       </div>
 
                       <!-- Lower Jaw -->
-                      <div class="grid grid-cols-16 gap-x-4 gap-y-2 justify-items-center relative max-w-7xl mx-auto px-4">
+                      <div class="grid grid-cols-16 gap-x-8 gap-y-8 justify-items-center relative max-w-7xl mx-auto py-10">
                           <!-- Enhanced Quadrant Dividing Lines for lower jaw using dotted lines -->
                           <div class="absolute top-0 bottom-0 left-1/2 w-0.5 border-l-2 border-dashed border-gray-400 dark:border-gray-500 transform -translate-x-1/2 z-0"></div>
                           
@@ -1612,49 +1618,38 @@ const handleClose = () => {
                           <div class="absolute -bottom-8 right-4 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q4</div>
                           
                           <!-- Lower Right Teeth (48-41) -->
-                          <div v-for="tooth in adultPermanent.lowerRight.slice().reverse()" :key="`chart-${tooth}`" 
-                               @click="handleToothClick(tooth)" 
+                          <div v-for="tooth in adultPermanent.lowerRight.slice().reverse()" :key="`chart-${tooth}`"
+                               @click="handleToothClick(tooth)"
                                @dblclick="openRecordDetailPopup(tooth)"
                                @mouseenter="handleToothHover(tooth, $event)"
                                @mouseleave="handleToothLeave"
                                @contextmenu="handleToothRightClick(tooth, $event)"
-                               class="cursor-pointer text-center relative group transition-all duration-200 hover:scale-110 hover:z-10 p-1">
-                               
-                               <!-- Selected condition label for create mode (Top) -->
-                               <div v-if="mode === 'create' && newExaminationData.condition_of_teeth[tooth]" class="mb-0.5">
-                                 <div class="text-xs font-medium px-0.5 py-0.5 rounded" :class="getConditionDisplayClass(newExaminationData.condition_of_teeth[tooth])">
-                                   {{ getConditionDisplayLabel(newExaminationData.condition_of_teeth[tooth]) }}
-                                 </div>
-                               </div>
-                               
-                               <div class="relative">
-                                  <!-- Background condition color -->
-                                  <div :class="getToothConditionBackgroundClass(tooth)" class="absolute inset-0 rounded-lg opacity-60 transition-opacity duration-200"></div>
-                                  <!-- Hover effect -->
-                                  <div class="absolute inset-0 bg-blue-200 dark:bg-blue-800 rounded-lg opacity-0 group-hover:opacity-30 transition-opacity duration-200"></div>
-                                  
-                                  <div class="w-20 h-24 mx-auto flex items-center justify-center relative z-10">
-                                      <img v-if="toothImageExists[tooth]" 
-                                           :src="getToothImagePath(tooth)" 
-                                           @error="imageError(tooth)" 
+                               class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10 px-1"
+                               :class="getMidlineSpacingClass(tooth)">
+
+                               <div class="relative flex flex-col items-center">
+                                  <div
+                                    class="relative w-20 h-24 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                    :class="getToothCardClasses(tooth)"
+                                  >
+                                      <img v-if="toothImageExists[tooth]"
+                                           :src="getToothImagePath(tooth)"
+                                           @error="imageError(tooth)"
                                            :alt="'Tooth ' + tooth"
-                                           class="w-full h-full object-contain transition-all duration-200 group-hover:brightness-110" />
-                                      <div v-else class="w-18 h-22 bg-gray-100 dark:bg-gray-700 rounded-md border-2 flex items-center justify-center text-3xl">🦷</div>
+                                           class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105" />
+                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">🦷</div>
                                   </div>
-                                  
-                                  <!-- Applied condition overlay for create mode -->
-                                  <div v-if="mode === 'create'" :class="['absolute inset-0 rounded-lg transition-opacity', newExaminationData.condition_of_teeth[tooth] ? `${getConditionInfo(newExaminationData.condition_of_teeth[tooth], 'color')} opacity-70` : 'opacity-0 group-hover:opacity-40 ' + getConditionInfo(selectedCondition === 'other' ? 'other' : selectedCondition, 'color')]"></div>
-                              </div>
-                              
-                               <!-- Tooth Number -->
-                               <div class="mt-0.5 text-center">
-                                 <span class="text-xs text-gray-700 dark:text-gray-300 font-semibold">{{ tooth }}</span>
                                </div>
-                               
+
+                               <!-- Tooth Number -->
+                               <div class="mt-2 text-center">
+                                 <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
+                               </div>
+
                                <!-- Current Condition Display (Bottom) -->
-                               <div class="mt-0.5 min-h-[16px]">
-                                 <div v-if="getToothCurrentCondition(tooth)" 
-                                      class="text-xs font-medium py-0.5 rounded" 
+                               <div class="mt-1 min-h-[18px]">
+                                 <div v-if="getToothCurrentCondition(tooth)"
+                                      class="text-xs font-medium px-2 py-0.5 rounded"
                                       :class="getConditionDisplayClass(getToothCurrentCondition(tooth))">
                                    {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
                                  </div>
@@ -1662,49 +1657,38 @@ const handleClose = () => {
                           </div>
                           
                           <!-- Lower Left Teeth (31-38) -->
-                          <div v-for="tooth in adultPermanent.lowerLeft.slice().reverse()" :key="`chart-${tooth}`" 
-                               @click="handleToothClick(tooth)" 
+                          <div v-for="tooth in adultPermanent.lowerLeft.slice().reverse()" :key="`chart-${tooth}`"
+                               @click="handleToothClick(tooth)"
                                @dblclick="openRecordDetailPopup(tooth)"
                                @mouseenter="handleToothHover(tooth, $event)"
                                @mouseleave="handleToothLeave"
                                @contextmenu="handleToothRightClick(tooth, $event)"
-                               class="cursor-pointer text-center relative group transition-all duration-200 hover:scale-110 hover:z-10 p-1">
-                               
-                               <!-- Selected condition label for create mode (Top) -->
-                               <div v-if="mode === 'create' && newExaminationData.condition_of_teeth[tooth]" class="mb-0.5">
-                                 <div class="text-xs font-medium px-0.5 py-0.5 rounded" :class="getConditionDisplayClass(newExaminationData.condition_of_teeth[tooth])">
-                                   {{ getConditionDisplayLabel(newExaminationData.condition_of_teeth[tooth]) }}
-                                 </div>
-                               </div>
-                               
-                               <div class="relative">
-                                  <!-- Background condition color -->
-                                  <div :class="getToothConditionBackgroundClass(tooth)" class="absolute inset-0 rounded-lg opacity-60 transition-opacity duration-200"></div>
-                                  <!-- Hover effect -->
-                                  <div class="absolute inset-0 bg-blue-200 dark:bg-blue-800 rounded-lg opacity-0 group-hover:opacity-30 transition-opacity duration-200"></div>
-                                  
-                                  <div class="w-20 h-24 mx-auto flex items-center justify-center relative z-10">
-                                      <img v-if="toothImageExists[tooth]" 
-                                           :src="getToothImagePath(tooth)" 
-                                           @error="imageError(tooth)" 
+                               class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10 px-1"
+                               :class="getMidlineSpacingClass(tooth)">
+
+                               <div class="relative flex flex-col items-center">
+                                  <div
+                                    class="relative w-20 h-24 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                    :class="getToothCardClasses(tooth)"
+                                  >
+                                      <img v-if="toothImageExists[tooth]"
+                                           :src="getToothImagePath(tooth)"
+                                           @error="imageError(tooth)"
                                            :alt="'Tooth ' + tooth"
-                                           class="w-full h-full object-contain transition-all duration-200 group-hover:brightness-110" />
-                                      <div v-else class="w-18 h-22 bg-gray-100 dark:bg-gray-700 rounded-md border-2 flex items-center justify-center text-3xl">🦷</div>
+                                           class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105" />
+                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">🦷</div>
                                   </div>
-                                  
-                                  <!-- Applied condition overlay for create mode -->
-                                  <div v-if="mode === 'create'" :class="['absolute inset-0 rounded-lg transition-opacity', newExaminationData.condition_of_teeth[tooth] ? `${getConditionInfo(newExaminationData.condition_of_teeth[tooth], 'color')} opacity-70` : 'opacity-0 group-hover:opacity-40 ' + getConditionInfo(selectedCondition === 'other' ? 'other' : selectedCondition, 'color')]"></div>
-                              </div>
-                              
-                               <!-- Tooth Number -->
-                               <div class="mt-0.5 text-center">
-                                 <span class="text-xs text-gray-700 dark:text-gray-300 font-semibold">{{ tooth }}</span>
                                </div>
-                               
+
+                               <!-- Tooth Number -->
+                               <div class="mt-2 text-center">
+                                 <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
+                               </div>
+
                                <!-- Current Condition Display (Bottom) -->
-                               <div class="mt-0.5 min-h-[16px]">
-                                 <div v-if="getToothCurrentCondition(tooth)" 
-                                      class="text-xs font-medium py-0.5 rounded" 
+                               <div class="mt-1 min-h-[18px]">
+                                 <div v-if="getToothCurrentCondition(tooth)"
+                                      class="text-xs font-medium px-2 py-0.5 rounded"
                                       :class="getConditionDisplayClass(getToothCurrentCondition(tooth))">
                                    {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
                                  </div>
@@ -1712,16 +1696,23 @@ const handleClose = () => {
                           </div>
                       </div>
                       <!-- Children Teeth Chart -->
-                      <div v-if="activeTab === 'children'" class="children-chart">
+                      <div class="text-center mt-12 mb-4">
+                        <span class="font-semibold text-lg text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
+                          <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
+                          Children's Primary Teeth
+                          <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
+                        </span>
+                      </div>
+                      <div class="children-chart">
                       <!-- Upper Jaw -->
-                      <div class="text-center mb-2">
+                      <div class="text-center mb-4">
                         <span class="font-semibold text-lg text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
                           <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
                           Upper Jaw (Primary)
                           <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
                         </span>
                       </div>
-                      <div class="grid grid-cols-10 gap-x-4 gap-y-2 justify-items-center relative max-w-5xl mx-auto px-4">
+                      <div class="grid grid-cols-10 gap-x-7 gap-y-8 justify-items-center relative max-w-5xl mx-auto py-10">
                           <!-- Enhanced Quadrant Dividing Lines for children chart using dotted lines -->
                           <div class="absolute top-0 bottom-0 left-1/2 w-0.5 border-l-2 border-dashed border-gray-400 dark:border-gray-500 transform -translate-x-1/2 z-0"></div>
                           
@@ -1731,47 +1722,36 @@ const handleClose = () => {
                           <div class="absolute -top-8 right-4 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q1</div>
                           
                           <!-- Upper Right Teeth -->
-                          <div v-for="tooth in childrenPrimary.upperRight" :key="`chart-${tooth}`" 
-                               @click="handleToothClick(tooth)" 
+                          <div v-for="tooth in childrenPrimary.upperRight" :key="`chart-${tooth}`"
+                               @click="handleToothClick(tooth)"
                                @dblclick="openRecordDetailPopup(tooth)"
                                @mouseenter="handleToothHover(tooth, $event)"
                                @mouseleave="handleToothLeave"
                                @contextmenu="handleToothRightClick(tooth, $event)"
-                               class="cursor-pointer text-center relative group transition-all duration-200 hover:scale-110 hover:z-10 p-1">
-                              
-                              <!-- Selected condition label for create mode (Top) -->
-                              <div v-if="mode === 'create' && newExaminationData.condition_of_teeth[tooth]" class="mb-0.5">
-                                <div class="text-xs font-medium px-0.5 py-0.5 rounded" :class="getConditionDisplayClass(newExaminationData.condition_of_teeth[tooth])">
-                                  {{ getConditionDisplayLabel(newExaminationData.condition_of_teeth[tooth]) }}
-                                </div>
-                              </div>
-                              
-                              <div class="relative">
-                                  <!-- Background condition color -->
-                                  <div :class="getToothConditionBackgroundClass(tooth)" class="absolute inset-0 rounded-lg opacity-60 transition-opacity duration-200"></div>
-                                  <!-- Hover effect -->
-                                  <div class="absolute inset-0 bg-blue-200 dark:bg-blue-800 rounded-lg opacity-0 group-hover:opacity-30 transition-opacity duration-200"></div>
-                                  
-                                  <div class="w-18 h-22 mx-auto flex items-center justify-center relative z-10">
-                                      <img v-if="toothImageExists[tooth]" 
-                                           :src="getToothImagePath(tooth)" 
-                                           @error="imageError(tooth)" 
-                                           class="w-full h-full object-contain transition-all duration-200 group-hover:brightness-110" />
-                                      <div v-else class="w-16 h-20 bg-gray-100 dark:bg-gray-700 rounded-md border-2 flex items-center justify-center text-2xl">🦷</div>
+                               class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10 px-1"
+                               :class="getMidlineSpacingClass(tooth)">
+
+                              <div class="relative flex flex-col items-center">
+                                  <div
+                                    class="relative w-18 h-22 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                    :class="getToothCardClasses(tooth)"
+                                  >
+                                      <img v-if="toothImageExists[tooth]"
+                                           :src="getToothImagePath(tooth)"
+                                           @error="imageError(tooth)"
+                                           class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105" />
+                                      <div v-else class="flex items-center justify-center w-full h-full text-2xl text-gray-400 dark:text-gray-500">🦷</div>
                                   </div>
-                                  
-                                  <!-- Applied condition overlay for create mode -->
-                                  <div v-if="mode === 'create'" :class="['absolute inset-0 rounded-lg transition-opacity', newExaminationData.condition_of_teeth[tooth] ? `${getConditionInfo(newExaminationData.condition_of_teeth[tooth], 'color')} opacity-70` : 'opacity-0 group-hover:opacity-40 ' + getConditionInfo(selectedCondition === 'other' ? 'other' : selectedCondition, 'color')]"></div>
                               </div>
-                              
-                              <div class="mt-0.5 text-center">
+
+                              <div class="mt-2 text-center">
                                 <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
                               </div>
-                              
+
                               <!-- Current Condition Display (Bottom) - Show in both modes -->
-                              <div class="mt-0.5 min-h-[16px]">
-                                <div v-if="getToothCurrentCondition(tooth)" 
-                                     class="text-xs font-medium py-0.5 rounded" 
+                              <div class="mt-1 min-h-[18px]">
+                                <div v-if="getToothCurrentCondition(tooth)"
+                                     class="text-xs font-medium px-2 py-0.5 rounded"
                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))">
                                   {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
                                 </div>
@@ -1779,47 +1759,36 @@ const handleClose = () => {
                           </div>
                           
                           <!-- Upper Left Teeth -->
-                          <div v-for="tooth in childrenPrimary.upperLeft" :key="`chart-${tooth}`" 
-                               @click="handleToothClick(tooth)" 
+                          <div v-for="tooth in childrenPrimary.upperLeft" :key="`chart-${tooth}`"
+                               @click="handleToothClick(tooth)"
                                @dblclick="openRecordDetailPopup(tooth)"
                                @mouseenter="handleToothHover(tooth, $event)"
                                @mouseleave="handleToothLeave"
                                @contextmenu="handleToothRightClick(tooth, $event)"
-                               class="cursor-pointer text-center relative group transition-all duration-200 hover:scale-110 hover:z-10 p-1">
-                              
-                              <!-- Selected condition label for create mode (Top) -->
-                              <div v-if="mode === 'create' && newExaminationData.condition_of_teeth[tooth]" class="mb-0.5">
-                                <div class="text-xs font-medium px-0.5 py-0.5 rounded" :class="getConditionDisplayClass(newExaminationData.condition_of_teeth[tooth])">
-                                  {{ getConditionDisplayLabel(newExaminationData.condition_of_teeth[tooth]) }}
-                                </div>
-                              </div>
-                              
-                              <div class="relative">
-                                  <!-- Background condition color -->
-                                  <div :class="getToothConditionBackgroundClass(tooth)" class="absolute inset-0 rounded-lg opacity-60 transition-opacity duration-200"></div>
-                                  <!-- Hover effect -->
-                                  <div class="absolute inset-0 bg-blue-200 dark:bg-blue-800 rounded-lg opacity-0 group-hover:opacity-30 transition-opacity duration-200"></div>
-                                  
-                                  <div class="w-18 h-22 mx-auto flex items-center justify-center relative z-10">
-                                      <img v-if="toothImageExists[tooth]" 
-                                           :src="getToothImagePath(tooth)" 
-                                           @error="imageError(tooth)" 
-                                           class="w-full h-full object-contain transition-all duration-200 group-hover:brightness-110" />
-                                      <div v-else class="w-16 h-20 bg-gray-100 dark:bg-gray-700 rounded-md border-2 flex items-center justify-center text-2xl">🦷</div>
+                               class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10 px-1"
+                               :class="getMidlineSpacingClass(tooth)">
+
+                              <div class="relative flex flex-col items-center">
+                                  <div
+                                    class="relative w-18 h-22 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                    :class="getToothCardClasses(tooth)"
+                                  >
+                                      <img v-if="toothImageExists[tooth]"
+                                           :src="getToothImagePath(tooth)"
+                                           @error="imageError(tooth)"
+                                           class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105" />
+                                      <div v-else class="flex items-center justify-center w-full h-full text-2xl text-gray-400 dark:text-gray-500">🦷</div>
                                   </div>
-                                  
-                                  <!-- Applied condition overlay for create mode -->
-                                  <div v-if="mode === 'create'" :class="['absolute inset-0 rounded-lg transition-opacity', newExaminationData.condition_of_teeth[tooth] ? `${getConditionInfo(newExaminationData.condition_of_teeth[tooth], 'color')} opacity-70` : 'opacity-0 group-hover:opacity-40 ' + getConditionInfo(selectedCondition === 'other' ? 'other' : selectedCondition, 'color')]"></div>
                               </div>
-                              
-                              <div class="mt-0.5 text-center">
+
+                              <div class="mt-2 text-center">
                                 <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
                               </div>
-                              
+
                               <!-- Current Condition Display (Bottom) - Show in both modes -->
-                              <div class="mt-0.5 min-h-[16px]">
-                                <div v-if="getToothCurrentCondition(tooth)" 
-                                     class="text-xs font-medium py-0.5 rounded" 
+                              <div class="mt-1 min-h-[18px]">
+                                <div v-if="getToothCurrentCondition(tooth)"
+                                     class="text-xs font-medium px-2 py-0.5 rounded"
                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))">
                                   {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
                                 </div>
@@ -1828,7 +1797,7 @@ const handleClose = () => {
                       </div>
 
                       <!-- Reduced Middle Separator spacing for children chart with consistent dotted lines -->
-                      <div class="my-4 relative">
+                      <div class="my-6 relative">
                         <!-- Horizontal dotted line -->
                         <div class="w-full border-t-2 border-dashed border-gray-400 dark:border-gray-500"></div>
                         <!-- Vertical dotted line -->
@@ -1841,7 +1810,7 @@ const handleClose = () => {
                       </div>
 
                       <!-- Lower Jaw -->
-                      <div class="grid grid-cols-10 gap-x-4 gap-y-2 justify-items-center relative max-w-5xl mx-auto px-4">
+                      <div class="grid grid-cols-10 gap-x-7 gap-y-8 justify-items-center relative max-w-5xl mx-auto py-10">
                           <!-- Enhanced Quadrant Dividing Lines for children lower jaw using dotted lines -->
                           <div class="absolute top-0 bottom-0 left-1/2 w-0.5 border-l-2 border-dashed border-gray-400 dark:border-gray-500 transform -translate-x-1/2 z-0"></div>
                           
@@ -1851,50 +1820,38 @@ const handleClose = () => {
                           <div class="absolute -bottom-8 right-4 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q4</div>
                           
                           <!-- Lower Right Teeth (reversed) -->
-                          <div v-for="tooth in childrenPrimary.lowerRight.slice().reverse()" :key="`chart-${tooth}`" 
-                               @click="handleToothClick(tooth)" 
+                          <div v-for="tooth in childrenPrimary.lowerRight.slice().reverse()" :key="`chart-${tooth}`"
+                               @click="handleToothClick(tooth)"
                                @dblclick="openRecordDetailPopup(tooth)"
                                @mouseenter="handleToothHover(tooth, $event)"
                                @mouseleave="handleToothLeave"
                                @contextmenu="handleToothRightClick(tooth, $event)"
-                               class="cursor-pointer text-center relative group transition-all duration-200 hover:scale-110 hover:z-10"
-                               :class="{ 'mr-4': tooth === 85 }">  <!-- Add this line for tooth 85 -->
-                               
-                               <!-- Selected condition label for create mode (Top) -->
-                               <div v-if="mode === 'create' && newExaminationData.condition_of_teeth[tooth]" class="mb-0.5">
-                                 <div class="text-xs font-medium py-0.5 rounded" :class="getConditionDisplayClass(newExaminationData.condition_of_teeth[tooth])">
-                                   {{ getConditionDisplayLabel(newExaminationData.condition_of_teeth[tooth]) }}
-                                 </div>
-                               </div>
-                               
-                               <div class="relative">
-                                  <!-- Background condition color -->
-                                  <div :class="getToothConditionBackgroundClass(tooth)" class="absolute inset-0 rounded-lg opacity-60 transition-opacity duration-200"></div>
-                                  <!-- Hover effect -->
-                                  <div class="absolute inset-0 bg-blue-200 dark:bg-blue-800 rounded-lg opacity-0 group-hover:opacity-30 transition-opacity duration-200"></div>
-                                  
-                                  <div class="w-18 h-22 mx-auto flex items-center justify-center relative z-10">
-                                      <img v-if="toothImageExists[tooth]" 
-                                           :src="getToothImagePath(tooth)" 
-                                           @error="imageError(tooth)" 
+                               class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10 px-1"
+                               :class="getMidlineSpacingClass(tooth)">
+
+                               <div class="relative flex flex-col items-center">
+                                  <div
+                                    class="relative w-18 h-22 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                    :class="getToothCardClasses(tooth)"
+                                  >
+                                      <img v-if="toothImageExists[tooth]"
+                                           :src="getToothImagePath(tooth)"
+                                           @error="imageError(tooth)"
                                            :alt="'Tooth ' + tooth"
-                                           class="w-full h-full object-contain transition-all duration-200 group-hover:brightness-110" />
-                                      <div v-else class="w-16 h-20 bg-gray-100 dark:bg-gray-700 rounded-md border-2 flex items-center justify-center text-2xl">🦷</div>
+                                           class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105" />
+                                      <div v-else class="flex items-center justify-center w-full h-full text-2xl text-gray-400 dark:text-gray-500">🦷</div>
                                   </div>
-                                  
-                                  <!-- Applied condition overlay for create mode -->
-                                  <div v-if="mode === 'create'" :class="['absolute inset-0 rounded-lg transition-opacity', newExaminationData.condition_of_teeth[tooth] ? `${getConditionInfo(newExaminationData.condition_of_teeth[tooth], 'color')} opacity-70` : 'opacity-0 group-hover:opacity-40 ' + getConditionInfo(selectedCondition === 'other' ? 'other' : selectedCondition, 'color')]"></div>
-                              </div>
-                              
-                               <!-- Tooth Number -->
-                               <div class="mt-0.5 text-center">
-                                 <span class="text-xs text-gray-700 dark:text-gray-300 font-semibold">{{ tooth }}</span>
                                </div>
-                               
+
+                               <!-- Tooth Number -->
+                               <div class="mt-2 text-center">
+                                 <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
+                               </div>
+
                                <!-- Current Condition Display (Bottom) -->
-                               <div class="mt-0.5 min-h-[16px]">
-                                 <div v-if="getToothCurrentCondition(tooth)" 
-                                      class="text-xs font-medium py-0.5 rounded" 
+                               <div class="mt-1 min-h-[18px]">
+                                 <div v-if="getToothCurrentCondition(tooth)"
+                                      class="text-xs font-medium px-2 py-0.5 rounded"
                                       :class="getConditionDisplayClass(getToothCurrentCondition(tooth))">
                                    {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
                                  </div>
@@ -1902,50 +1859,38 @@ const handleClose = () => {
                           </div>
                           
                           <!-- Lower Left Teeth (reversed) -->
-                          <div v-for="tooth in childrenPrimary.lowerLeft.slice().reverse()" :key="`chart-${tooth}`" 
-                               @click="handleToothClick(tooth)" 
+                          <div v-for="tooth in childrenPrimary.lowerLeft.slice().reverse()" :key="`chart-${tooth}`"
+                               @click="handleToothClick(tooth)"
                                @dblclick="openRecordDetailPopup(tooth)"
                                @mouseenter="handleToothHover(tooth, $event)"
                                @mouseleave="handleToothLeave"
                                @contextmenu="handleToothRightClick(tooth, $event)"
-                               class="cursor-pointer text-center relative group transition-all duration-200 hover:scale-110 hover:z-10"
-                               :class="{ 'mr-4': tooth === 71 }">  <!-- Add this line for tooth 71 -->
-                               
-                               <!-- Selected condition label for create mode (Top) -->
-                               <div v-if="mode === 'create' && newExaminationData.condition_of_teeth[tooth]" class="mb-0.5">
-                                 <div class="text-xs font-medium py-0.5 rounded" :class="getConditionDisplayClass(newExaminationData.condition_of_teeth[tooth])">
-                                   {{ getConditionDisplayLabel(newExaminationData.condition_of_teeth[tooth]) }}
-                                 </div>
-                               </div>
-                               
-                               <div class="relative">
-                                  <!-- Background condition color -->
-                                  <div :class="getToothConditionBackgroundClass(tooth)" class="absolute inset-0 rounded-lg opacity-60 transition-opacity duration-200"></div>
-                                  <!-- Hover effect -->
-                                  <div class="absolute inset-0 bg-blue-200 dark:bg-blue-800 rounded-lg opacity-0 group-hover:opacity-30 transition-opacity duration-200"></div>
-                                  
-                                  <div class="w-18 h-22 mx-auto flex items-center justify-center relative z-10">
-                                      <img v-if="toothImageExists[tooth]" 
-                                           :src="getToothImagePath(tooth)" 
-                                           @error="imageError(tooth)" 
+                               class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10 px-1"
+                               :class="getMidlineSpacingClass(tooth)">
+
+                               <div class="relative flex flex-col items-center">
+                                  <div
+                                    class="relative w-18 h-22 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                    :class="getToothCardClasses(tooth)"
+                                  >
+                                      <img v-if="toothImageExists[tooth]"
+                                           :src="getToothImagePath(tooth)"
+                                           @error="imageError(tooth)"
                                            :alt="'Tooth ' + tooth"
-                                           class="w-full h-full object-contain transition-all duration-200 group-hover:brightness-110" />
-                                      <div v-else class="w-16 h-20 bg-gray-100 dark:bg-gray-700 rounded-md border-2 flex items-center justify-center text-2xl">🦷</div>
+                                           class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105" />
+                                      <div v-else class="flex items-center justify-center w-full h-full text-2xl text-gray-400 dark:text-gray-500">🦷</div>
                                   </div>
-                                  
-                                  <!-- Applied condition overlay for create mode -->
-                                  <div v-if="mode === 'create'" :class="['absolute inset-0 rounded-lg transition-opacity', newExaminationData.condition_of_teeth[tooth] ? `${getConditionInfo(newExaminationData.condition_of_teeth[tooth], 'color')} opacity-70` : 'opacity-0 group-hover:opacity-40 ' + getConditionInfo(selectedCondition === 'other' ? 'other' : selectedCondition, 'color')]"></div>
-                              </div>
-                              
-                               <!-- Tooth Number -->
-                               <div class="mt-0.5 text-center">
-                                 <span class="text-xs text-gray-700 dark:text-gray-300 font-semibold">{{ tooth }}</span>
                                </div>
-                               
+
+                               <!-- Tooth Number -->
+                               <div class="mt-2 text-center">
+                                 <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
+                               </div>
+
                                <!-- Current Condition Display (Bottom) -->
-                               <div class="mt-0.5 min-h-[16px]">
-                                 <div v-if="getToothCurrentCondition(tooth)" 
-                                      class="text-xs font-medium py-0.5 rounded" 
+                               <div class="mt-1 min-h-[18px]">
+                                 <div v-if="getToothCurrentCondition(tooth)"
+                                      class="text-xs font-medium px-2 py-0.5 rounded"
                                       :class="getConditionDisplayClass(getToothCurrentCondition(tooth))">
                                    {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
                                  </div>
