@@ -34,7 +34,7 @@ wss.on('connection', (clientWs, req) => {
   console.log('Browser connected:', req.socket.remoteAddress);
 
   // Create a connection to OpenAI realtime
-  const openaiWs = new WebSocket(OPENAI_WS_URL, {
+  const openaiWs = new WebSocket(OPENAI_WS_URL, 'openai-realtime-v1', {
     headers: {
       Authorization: `Bearer ${OPENAI_KEY}`,
       'OpenAI-Beta': 'realtime=v1',
