@@ -174,6 +174,7 @@ const otherConditionText = ref('');
 const toothImageExists = reactive({});
 const newCustomCondition = ref('');
 const showInstructions = ref(true); // Show instructions initially, hide after 5 seconds
+const activeChartTab = ref('adult');
 
 // Search functionality state
 const searchQuery = ref('');
@@ -402,9 +403,6 @@ const childrenPrimary = {
   lowerLeft: [71, 72, 73, 74, 75],
 };
 
-const rightMidlineTeeth = new Set([11, 41, 51, 81]);
-const leftMidlineTeeth = new Set([21, 31, 61, 71]);
-
 // --- COMPUTED PROPERTIES ---
 // Tooth conditions from dental records (like DentalChart)
 const toothConditions = computed(() => {
@@ -492,17 +490,6 @@ const getConditionRingClass = (condition) => {
 };
 
 const getToothImagePath = (t) => `/img/teeth/${t}.png`;
-
-const getMidlineSpacingClass = (toothNumber) => {
-  const num = Number(toothNumber);
-  if (rightMidlineTeeth.has(num)) {
-    return 'mr-4 lg:mr-6 xl:mr-8';
-  }
-  if (leftMidlineTeeth.has(num)) {
-    return 'ml-4 lg:ml-6 xl:ml-8';
-  }
-  return '';
-};
 
 // Get current teeth array based on active tab
 
@@ -1498,415 +1485,443 @@ const handleClose = () => {
                         </div>
                       </div>
                       
-                      <!-- Adult Teeth Chart -->
-                      <div class="adult-chart">
-                      <!-- Upper Jaw -->
-                      <div class="text-center mb-4">
-                        <span class="font-semibold text-lg text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
-                          <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
-                          Upper Jaw
-                          <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
-                        </span>
-                      </div>
-                      <div class="grid grid-cols-16 gap-x-8 gap-y-8 justify-items-center relative max-w-7xl mx-auto py-10">
-                          <!-- Enhanced Quadrant Dividing Lines using dotted lines -->
-                          <div class="absolute top-0 bottom-0 left-1/2 w-0.5 border-l-2 border-dashed border-gray-400 dark:border-gray-500 transform -translate-x-1/2 z-0"></div>
-                          
-                          <!-- Q2 Label (Upper Left) with better positioning -->
-                          <div class="absolute -top-8 left-4 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q2</div>
-                          <!-- Q1 Label (Upper Right) with better positioning -->
-                          <div class="absolute -top-8 right-4 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q1</div>
-                          
-                          <!-- Upper Right Teeth -->
-                        <div v-for="tooth in adultPermanent.upperRight" :key="`chart-${tooth}`"
-     @click="handleToothClick(tooth)"
-     @dblclick="openRecordDetailPopup(tooth)"
-     @mouseenter="handleToothHover(tooth, $event)"
-     @mouseleave="handleToothLeave"
-     @contextmenu="handleToothRightClick(tooth, $event)"
-     class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10 px-1"
-     :class="getMidlineSpacingClass(tooth)">
-                              <div class="relative flex flex-col items-center">
-                                  <div
-                                    class="relative w-20 h-24 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
-                                    :class="getToothCardClasses(tooth)"
-                                  >
-                                      <img v-if="toothImageExists[tooth]"
-                                           :src="getToothImagePath(tooth)"
-                                           @error="imageError(tooth)"
-                                           class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105" />
-                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">
-                                        🦷
-                                      </div>
-                                  </div>
-                              </div>
-
-                              <div class="mt-2 text-center">
-                                <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
-                              </div>
-
-                              <!-- Current Condition Display (Bottom) - Show in both modes -->
-                              <div class="mt-1 min-h-[18px]">
-                                <div v-if="getToothCurrentCondition(tooth)"
-                                     class="text-xs font-medium px-2 py-0.5 rounded"
-                                     :class="getConditionDisplayClass(getToothCurrentCondition(tooth))">
-                                  {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
-                                </div>
-                              </div>
-                          </div>
-                          
-                          <!-- Upper Left Teeth -->
-                        <div v-for="tooth in adultPermanent.upperLeft" :key="`chart-${tooth}`"
-     @click="handleToothClick(tooth)"
-     @dblclick="openRecordDetailPopup(tooth)"
-     @mouseenter="handleToothHover(tooth, $event)"
-     @mouseleave="handleToothLeave"
-     @contextmenu="handleToothRightClick(tooth, $event)"
-     class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10 px-1"
-     :class="getMidlineSpacingClass(tooth)">
-                              <div class="relative flex flex-col items-center">
-                                  <div
-                                    class="relative w-20 h-24 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
-                                    :class="getToothCardClasses(tooth)"
-                                  >
-                                      <img v-if="toothImageExists[tooth]"
-                                           :src="getToothImagePath(tooth)"
-                                           @error="imageError(tooth)"
-                                           class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105" />
-                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">
-                                        🦷
-                                      </div>
-                                  </div>
-                              </div>
-
-                              <div class="mt-2 text-center">
-                                <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
-                              </div>
-
-                              <!-- Current Condition Display (Bottom) - Show in both modes -->
-                              <div class="mt-1 min-h-[18px]">
-                                <div v-if="getToothCurrentCondition(tooth)"
-                                     class="text-xs font-medium px-2 py-0.5 rounded"
-                                     :class="getConditionDisplayClass(getToothCurrentCondition(tooth))">
-                                  {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
-                                </div>
-                              </div>
-                          </div>
-                      </div>
-
-                      <!-- Reduced Middle Separator spacing with consistent dotted lines -->
-                      <div class="my-6 relative">
-                        <!-- Horizontal dotted line -->
-                        <div class="w-full border-t-2 border-dashed border-gray-400 dark:border-gray-500"></div>
-                        <!-- Vertical dotted line -->
-                        <div class="absolute top-0 bottom-0 left-1/2 w-0.5 border-l-2 border-dashed border-gray-400 dark:border-gray-500 transform -translate-x-1/2"></div>
-                        <div class="flex justify-center -mt-3">
-                          <!-- <div class="px-4 py-2 bg-white dark:bg-gray-800 rounded-full shadow-sm border border-gray-200 dark:border-gray-600">
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Left  Right</span>
-                          </div> -->
+                      <!-- Chart view toggle -->
+                      <div class="flex justify-center mb-6">
+                        <div class="inline-flex rounded-full border border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-800/60 p-1 shadow-sm">
+                          <button
+                            type="button"
+                            @click="activeChartTab = 'adult'"
+                            :class="[
+                              'px-5 py-2 text-sm font-semibold rounded-full transition-colors duration-200',
+                              activeChartTab === 'adult'
+                                ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow'
+                                : 'text-slate-600 dark:text-slate-300'
+                            ]"
+                          >
+                            Adult Teeth
+                          </button>
+                          <button
+                            type="button"
+                            @click="activeChartTab = 'children'"
+                            :class="[
+                              'px-5 py-2 text-sm font-semibold rounded-full transition-colors duration-200',
+                              activeChartTab === 'children'
+                                ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow'
+                                : 'text-slate-600 dark:text-slate-300'
+                            ]"
+                          >
+                            Children Teeth
+                          </button>
                         </div>
                       </div>
 
-                      <!-- Lower Jaw -->
-                      <div class="grid grid-cols-16 gap-x-8 gap-y-8 justify-items-center relative max-w-7xl mx-auto py-10">
-                          <!-- Enhanced Quadrant Dividing Lines for lower jaw using dotted lines -->
-                          <div class="absolute top-0 bottom-0 left-1/2 w-0.5 border-l-2 border-dashed border-gray-400 dark:border-gray-500 transform -translate-x-1/2 z-0"></div>
-                          
-                          <!-- Q3 Label (Lower Left) with better positioning -->
-                          <div class="absolute -bottom-8 left-4 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q3</div>
-                          <!-- Q4 Label (Lower Right) with better positioning -->
-                          <div class="absolute -bottom-8 right-4 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q4</div>
-                          
-                          <!-- Lower Right Teeth (48-41) -->
-                          <div v-for="tooth in adultPermanent.lowerRight.slice().reverse()" :key="`chart-${tooth}`"
-                               @click="handleToothClick(tooth)"
-                               @dblclick="openRecordDetailPopup(tooth)"
-                               @mouseenter="handleToothHover(tooth, $event)"
-                               @mouseleave="handleToothLeave"
-                               @contextmenu="handleToothRightClick(tooth, $event)"
-                               class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10 px-1"
-                               :class="getMidlineSpacingClass(tooth)">
-
-                               <div class="relative flex flex-col items-center">
-                                  <div
-                                    class="relative w-20 h-24 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
-                                    :class="getToothCardClasses(tooth)"
-                                  >
-                                      <img v-if="toothImageExists[tooth]"
-                                           :src="getToothImagePath(tooth)"
-                                           @error="imageError(tooth)"
-                                           :alt="'Tooth ' + tooth"
-                                           class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105" />
-                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">🦷</div>
-                                  </div>
-                               </div>
-
-                               <!-- Tooth Number -->
-                               <div class="mt-2 text-center">
-                                 <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
-                               </div>
-
-                               <!-- Current Condition Display (Bottom) -->
-                               <div class="mt-1 min-h-[18px]">
-                                 <div v-if="getToothCurrentCondition(tooth)"
-                                      class="text-xs font-medium px-2 py-0.5 rounded"
-                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))">
-                                   {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
-                                 </div>
-                               </div>
+                      <div v-if="activeChartTab === 'adult'" class="space-y-10">
+                        <!-- Adult Upper Jaw -->
+                        <section>
+                          <div class="text-center mb-4">
+                            <span class="font-semibold text-lg text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
+                              <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
+                              Upper Jaw
+                              <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
+                            </span>
                           </div>
-                          
-                          <!-- Lower Left Teeth (31-38) -->
-                          <div v-for="tooth in adultPermanent.lowerLeft.slice().reverse()" :key="`chart-${tooth}`"
-                               @click="handleToothClick(tooth)"
-                               @dblclick="openRecordDetailPopup(tooth)"
-                               @mouseenter="handleToothHover(tooth, $event)"
-                               @mouseleave="handleToothLeave"
-                               @contextmenu="handleToothRightClick(tooth, $event)"
-                               class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10 px-1"
-                               :class="getMidlineSpacingClass(tooth)">
-
-                               <div class="relative flex flex-col items-center">
-                                  <div
-                                    class="relative w-20 h-24 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
-                                    :class="getToothCardClasses(tooth)"
-                                  >
-                                      <img v-if="toothImageExists[tooth]"
-                                           :src="getToothImagePath(tooth)"
-                                           @error="imageError(tooth)"
-                                           :alt="'Tooth ' + tooth"
-                                           class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105" />
-                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">🦷</div>
+                          <div class="relative max-w-7xl mx-auto px-4 sm:px-6">
+                            <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
+                            <div class="pointer-events-none absolute -top-8 left-6 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q2</div>
+                            <div class="pointer-events-none absolute -top-8 right-6 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q1</div>
+                            <div class="relative flex justify-center gap-16 py-10 z-10">
+                              <div class="flex gap-6">
+                                <div
+                                  v-for="tooth in adultPermanent.upperRight"
+                                  :key="`chart-${tooth}`"
+                                  @click="handleToothClick(tooth)"
+                                  @dblclick="openRecordDetailPopup(tooth)"
+                                  @mouseenter="handleToothHover(tooth, $event)"
+                                  @mouseleave="handleToothLeave"
+                                  @contextmenu="handleToothRightClick(tooth, $event)"
+                                  class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10"
+                                >
+                                  <div class="relative flex flex-col items-center">
+                                    <div
+                                      class="relative w-20 h-24 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                      :class="getToothCardClasses(tooth)"
+                                    >
+                                      <img
+                                        v-if="toothImageExists[tooth]"
+                                        :src="getToothImagePath(tooth)"
+                                        @error="imageError(tooth)"
+                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+                                      />
+                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">
+                                        🦷
+                                      </div>
+                                    </div>
                                   </div>
-                               </div>
-
-                               <!-- Tooth Number -->
-                               <div class="mt-2 text-center">
-                                 <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
-                               </div>
-
-                               <!-- Current Condition Display (Bottom) -->
-                               <div class="mt-1 min-h-[18px]">
-                                 <div v-if="getToothCurrentCondition(tooth)"
+                                  <div class="mt-2 text-center">
+                                    <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
+                                  </div>
+                                  <div class="mt-1 min-h-[18px]">
+                                    <div
+                                      v-if="getToothCurrentCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
-                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))">
-                                   {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
-                                 </div>
-                               </div>
-                          </div>
-                      </div>
-                      <!-- Children Teeth Chart -->
-                      <div class="text-center mt-12 mb-4">
-                        <span class="font-semibold text-lg text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
-                          <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
-                          Children's Primary Teeth
-                          <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
-                        </span>
-                      </div>
-                      <div class="children-chart">
-                      <!-- Upper Jaw -->
-                      <div class="text-center mb-4">
-                        <span class="font-semibold text-lg text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
-                          <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
-                          Upper Jaw (Primary)
-                          <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
-                        </span>
-                      </div>
-                      <div class="grid grid-cols-10 gap-x-7 gap-y-8 justify-items-center relative max-w-5xl mx-auto py-10">
-                          <!-- Enhanced Quadrant Dividing Lines for children chart using dotted lines -->
-                          <div class="absolute top-0 bottom-0 left-1/2 w-0.5 border-l-2 border-dashed border-gray-400 dark:border-gray-500 transform -translate-x-1/2 z-0"></div>
-                          
-                          <!-- Q2 Label (Upper Left) with better positioning -->
-                          <div class="absolute -top-8 left-4 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q2</div>
-                          <!-- Q1 Label (Upper Right) with better positioning -->
-                          <div class="absolute -top-8 right-4 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q1</div>
-                          
-                          <!-- Upper Right Teeth -->
-                          <div v-for="tooth in childrenPrimary.upperRight" :key="`chart-${tooth}`"
-                               @click="handleToothClick(tooth)"
-                               @dblclick="openRecordDetailPopup(tooth)"
-                               @mouseenter="handleToothHover(tooth, $event)"
-                               @mouseleave="handleToothLeave"
-                               @contextmenu="handleToothRightClick(tooth, $event)"
-                               class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10 px-1"
-                               :class="getMidlineSpacingClass(tooth)">
-
-                              <div class="relative flex flex-col items-center">
-                                  <div
-                                    class="relative w-18 h-22 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
-                                    :class="getToothCardClasses(tooth)"
-                                  >
-                                      <img v-if="toothImageExists[tooth]"
-                                           :src="getToothImagePath(tooth)"
-                                           @error="imageError(tooth)"
-                                           class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105" />
-                                      <div v-else class="flex items-center justify-center w-full h-full text-2xl text-gray-400 dark:text-gray-500">🦷</div>
+                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))"
+                                    >
+                                      {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                    </div>
                                   </div>
-                              </div>
-
-                              <div class="mt-2 text-center">
-                                <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
-                              </div>
-
-                              <!-- Current Condition Display (Bottom) - Show in both modes -->
-                              <div class="mt-1 min-h-[18px]">
-                                <div v-if="getToothCurrentCondition(tooth)"
-                                     class="text-xs font-medium px-2 py-0.5 rounded"
-                                     :class="getConditionDisplayClass(getToothCurrentCondition(tooth))">
-                                  {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
                                 </div>
                               </div>
-                          </div>
-                          
-                          <!-- Upper Left Teeth -->
-                          <div v-for="tooth in childrenPrimary.upperLeft" :key="`chart-${tooth}`"
-                               @click="handleToothClick(tooth)"
-                               @dblclick="openRecordDetailPopup(tooth)"
-                               @mouseenter="handleToothHover(tooth, $event)"
-                               @mouseleave="handleToothLeave"
-                               @contextmenu="handleToothRightClick(tooth, $event)"
-                               class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10 px-1"
-                               :class="getMidlineSpacingClass(tooth)">
-
-                              <div class="relative flex flex-col items-center">
-                                  <div
-                                    class="relative w-18 h-22 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
-                                    :class="getToothCardClasses(tooth)"
-                                  >
-                                      <img v-if="toothImageExists[tooth]"
-                                           :src="getToothImagePath(tooth)"
-                                           @error="imageError(tooth)"
-                                           class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105" />
-                                      <div v-else class="flex items-center justify-center w-full h-full text-2xl text-gray-400 dark:text-gray-500">🦷</div>
+                              <div class="flex gap-6">
+                                <div
+                                  v-for="tooth in adultPermanent.upperLeft"
+                                  :key="`chart-${tooth}`"
+                                  @click="handleToothClick(tooth)"
+                                  @dblclick="openRecordDetailPopup(tooth)"
+                                  @mouseenter="handleToothHover(tooth, $event)"
+                                  @mouseleave="handleToothLeave"
+                                  @contextmenu="handleToothRightClick(tooth, $event)"
+                                  class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10"
+                                >
+                                  <div class="relative flex flex-col items-center">
+                                    <div
+                                      class="relative w-20 h-24 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                      :class="getToothCardClasses(tooth)"
+                                    >
+                                      <img
+                                        v-if="toothImageExists[tooth]"
+                                        :src="getToothImagePath(tooth)"
+                                        @error="imageError(tooth)"
+                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+                                      />
+                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">
+                                        🦷
+                                      </div>
+                                    </div>
                                   </div>
-                              </div>
-
-                              <div class="mt-2 text-center">
-                                <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
-                              </div>
-
-                              <!-- Current Condition Display (Bottom) - Show in both modes -->
-                              <div class="mt-1 min-h-[18px]">
-                                <div v-if="getToothCurrentCondition(tooth)"
-                                     class="text-xs font-medium px-2 py-0.5 rounded"
-                                     :class="getConditionDisplayClass(getToothCurrentCondition(tooth))">
-                                  {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                  <div class="mt-2 text-center">
+                                    <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
+                                  </div>
+                                  <div class="mt-1 min-h-[18px]">
+                                    <div
+                                      v-if="getToothCurrentCondition(tooth)"
+                                      class="text-xs font-medium px-2 py-0.5 rounded"
+                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))"
+                                    >
+                                      {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
+                            </div>
                           </div>
-                      </div>
+                        </section>
 
-                      <!-- Reduced Middle Separator spacing for children chart with consistent dotted lines -->
-                      <div class="my-6 relative">
-                        <!-- Horizontal dotted line -->
-                        <div class="w-full border-t-2 border-dashed border-gray-400 dark:border-gray-500"></div>
-                        <!-- Vertical dotted line -->
-                        <div class="absolute top-0 bottom-0 left-1/2 w-0.5 border-l-2 border-dashed border-gray-400 dark:border-gray-500 transform -translate-x-1/2"></div>
-                        <div class="flex justify-center -mt-3">
-                          <div class="px-4 py-2 bg-white dark:bg-gray-800 rounded-full shadow-sm border border-gray-200 dark:border-gray-600">
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Left | Right</span>
-                          </div>
+                        <div class="relative my-4 max-w-5xl mx-auto h-6">
+                          <div class="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 border-t-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
+                          <div class="pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
                         </div>
-                      </div>
 
-                      <!-- Lower Jaw -->
-                      <div class="grid grid-cols-10 gap-x-7 gap-y-8 justify-items-center relative max-w-5xl mx-auto py-10">
-                          <!-- Enhanced Quadrant Dividing Lines for children lower jaw using dotted lines -->
-                          <div class="absolute top-0 bottom-0 left-1/2 w-0.5 border-l-2 border-dashed border-gray-400 dark:border-gray-500 transform -translate-x-1/2 z-0"></div>
-                          
-                          <!-- Q3 Label (Lower Left) with better positioning -->
-                          <div class="absolute -bottom-8 left-4 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q3</div>
-                          <!-- Q4 Label (Lower Right) with better positioning -->
-                          <div class="absolute -bottom-8 right-4 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q4</div>
-                          
-                          <!-- Lower Right Teeth (reversed) -->
-                          <div v-for="tooth in childrenPrimary.lowerRight.slice().reverse()" :key="`chart-${tooth}`"
-                               @click="handleToothClick(tooth)"
-                               @dblclick="openRecordDetailPopup(tooth)"
-                               @mouseenter="handleToothHover(tooth, $event)"
-                               @mouseleave="handleToothLeave"
-                               @contextmenu="handleToothRightClick(tooth, $event)"
-                               class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10 px-1"
-                               :class="getMidlineSpacingClass(tooth)">
-
-                               <div class="relative flex flex-col items-center">
-                                  <div
-                                    class="relative w-18 h-22 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
-                                    :class="getToothCardClasses(tooth)"
-                                  >
-                                      <img v-if="toothImageExists[tooth]"
-                                           :src="getToothImagePath(tooth)"
-                                           @error="imageError(tooth)"
-                                           :alt="'Tooth ' + tooth"
-                                           class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105" />
-                                      <div v-else class="flex items-center justify-center w-full h-full text-2xl text-gray-400 dark:text-gray-500">🦷</div>
-                                  </div>
-                               </div>
-
-                               <!-- Tooth Number -->
-                               <div class="mt-2 text-center">
-                                 <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
-                               </div>
-
-                               <!-- Current Condition Display (Bottom) -->
-                               <div class="mt-1 min-h-[18px]">
-                                 <div v-if="getToothCurrentCondition(tooth)"
-                                      class="text-xs font-medium px-2 py-0.5 rounded"
-                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))">
-                                   {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
-                                 </div>
-                               </div>
+                        <!-- Adult Lower Jaw -->
+                        <section>
+                          <div class="text-center mb-4">
+                            <span class="font-semibold text-lg text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
+                              <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
+                              Lower Jaw
+                              <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
+                            </span>
                           </div>
-                          
-                          <!-- Lower Left Teeth (reversed) -->
-                          <div v-for="tooth in childrenPrimary.lowerLeft.slice().reverse()" :key="`chart-${tooth}`"
-                               @click="handleToothClick(tooth)"
-                               @dblclick="openRecordDetailPopup(tooth)"
-                               @mouseenter="handleToothHover(tooth, $event)"
-                               @mouseleave="handleToothLeave"
-                               @contextmenu="handleToothRightClick(tooth, $event)"
-                               class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10 px-1"
-                               :class="getMidlineSpacingClass(tooth)">
-
-                               <div class="relative flex flex-col items-center">
-                                  <div
-                                    class="relative w-18 h-22 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
-                                    :class="getToothCardClasses(tooth)"
-                                  >
-                                      <img v-if="toothImageExists[tooth]"
-                                           :src="getToothImagePath(tooth)"
-                                           @error="imageError(tooth)"
-                                           :alt="'Tooth ' + tooth"
-                                           class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105" />
-                                      <div v-else class="flex items-center justify-center w-full h-full text-2xl text-gray-400 dark:text-gray-500">🦷</div>
+                          <div class="relative max-w-7xl mx-auto px-4 sm:px-6">
+                            <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
+                            <div class="pointer-events-none absolute -bottom-10 left-6 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q3</div>
+                            <div class="pointer-events-none absolute -bottom-10 right-6 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q4</div>
+                            <div class="relative flex justify-center gap-16 py-10 z-10">
+                              <div class="flex gap-6">
+                                <div
+                                  v-for="tooth in adultPermanent.lowerRight.slice().reverse()"
+                                  :key="`chart-${tooth}`"
+                                  @click="handleToothClick(tooth)"
+                                  @dblclick="openRecordDetailPopup(tooth)"
+                                  @mouseenter="handleToothHover(tooth, $event)"
+                                  @mouseleave="handleToothLeave"
+                                  @contextmenu="handleToothRightClick(tooth, $event)"
+                                  class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10"
+                                >
+                                  <div class="relative flex flex-col items-center">
+                                    <div
+                                      class="relative w-20 h-24 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                      :class="getToothCardClasses(tooth)"
+                                    >
+                                      <img
+                                        v-if="toothImageExists[tooth]"
+                                        :src="getToothImagePath(tooth)"
+                                        @error="imageError(tooth)"
+                                        :alt="'Tooth ' + tooth"
+                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+                                      />
+                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">🦷</div>
+                                    </div>
                                   </div>
-                               </div>
-
-                               <!-- Tooth Number -->
-                               <div class="mt-2 text-center">
-                                 <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
-                               </div>
-
-                               <!-- Current Condition Display (Bottom) -->
-                               <div class="mt-1 min-h-[18px]">
-                                 <div v-if="getToothCurrentCondition(tooth)"
+                                  <div class="mt-2 text-center">
+                                    <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
+                                  </div>
+                                  <div class="mt-1 min-h-[18px]">
+                                    <div
+                                      v-if="getToothCurrentCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
-                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))">
-                                   {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
-                                 </div>
-                               </div>
+                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))"
+                                    >
+                                      {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="flex gap-6">
+                                <div
+                                  v-for="tooth in adultPermanent.lowerLeft.slice().reverse()"
+                                  :key="`chart-${tooth}`"
+                                  @click="handleToothClick(tooth)"
+                                  @dblclick="openRecordDetailPopup(tooth)"
+                                  @mouseenter="handleToothHover(tooth, $event)"
+                                  @mouseleave="handleToothLeave"
+                                  @contextmenu="handleToothRightClick(tooth, $event)"
+                                  class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10"
+                                >
+                                  <div class="relative flex flex-col items-center">
+                                    <div
+                                      class="relative w-20 h-24 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                      :class="getToothCardClasses(tooth)"
+                                    >
+                                      <img
+                                        v-if="toothImageExists[tooth]"
+                                        :src="getToothImagePath(tooth)"
+                                        @error="imageError(tooth)"
+                                        :alt="'Tooth ' + tooth"
+                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+                                      />
+                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">🦷</div>
+                                    </div>
+                                  </div>
+                                  <div class="mt-2 text-center">
+                                    <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
+                                  </div>
+                                  <div class="mt-1 min-h-[18px]">
+                                    <div
+                                      v-if="getToothCurrentCondition(tooth)"
+                                      class="text-xs font-medium px-2 py-0.5 rounded"
+                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))"
+                                    >
+                                      {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                           </div>
+                        </section>
                       </div>
-                       <div class="text-center mt-2">
-                        <span class="font-semibold text-lg text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
-                          <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
-                          Lower Jaw (Primary)
-                          <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
-                        </span>
+
+                      <div v-else class="space-y-10">
+                        <!-- Children Upper Jaw -->
+                        <section>
+                          <div class="text-center mb-4">
+                            <span class="font-semibold text-lg text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
+                              <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
+                              Upper Jaw (Primary)
+                              <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
+                            </span>
+                          </div>
+                          <div class="relative max-w-5xl mx-auto px-4 sm:px-6">
+                            <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
+                            <div class="pointer-events-none absolute -top-8 left-6 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q2</div>
+                            <div class="pointer-events-none absolute -top-8 right-6 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q1</div>
+                            <div class="relative flex justify-center gap-14 py-10 z-10">
+                              <div class="flex gap-6">
+                                <div
+                                  v-for="tooth in childrenPrimary.upperRight"
+                                  :key="`chart-${tooth}`"
+                                  @click="handleToothClick(tooth)"
+                                  @dblclick="openRecordDetailPopup(tooth)"
+                                  @mouseenter="handleToothHover(tooth, $event)"
+                                  @mouseleave="handleToothLeave"
+                                  @contextmenu="handleToothRightClick(tooth, $event)"
+                                  class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10"
+                                >
+                                  <div class="relative flex flex-col items-center">
+                                    <div
+                                      class="relative w-20 h-24 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                      :class="getToothCardClasses(tooth)"
+                                    >
+                                      <img
+                                        v-if="toothImageExists[tooth]"
+                                        :src="getToothImagePath(tooth)"
+                                        @error="imageError(tooth)"
+                                        :alt="'Tooth ' + tooth"
+                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+                                      />
+                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">🦷</div>
+                                    </div>
+                                  </div>
+                                  <div class="mt-2 text-center">
+                                    <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
+                                  </div>
+                                  <div class="mt-1 min-h-[18px]">
+                                    <div
+                                      v-if="getToothCurrentCondition(tooth)"
+                                      class="text-xs font-medium px-2 py-0.5 rounded"
+                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))"
+                                    >
+                                      {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="flex gap-6">
+                                <div
+                                  v-for="tooth in childrenPrimary.upperLeft"
+                                  :key="`chart-${tooth}`"
+                                  @click="handleToothClick(tooth)"
+                                  @dblclick="openRecordDetailPopup(tooth)"
+                                  @mouseenter="handleToothHover(tooth, $event)"
+                                  @mouseleave="handleToothLeave"
+                                  @contextmenu="handleToothRightClick(tooth, $event)"
+                                  class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10"
+                                >
+                                  <div class="relative flex flex-col items-center">
+                                    <div
+                                      class="relative w-20 h-24 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                      :class="getToothCardClasses(tooth)"
+                                    >
+                                      <img
+                                        v-if="toothImageExists[tooth]"
+                                        :src="getToothImagePath(tooth)"
+                                        @error="imageError(tooth)"
+                                        :alt="'Tooth ' + tooth"
+                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+                                      />
+                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">🦷</div>
+                                    </div>
+                                  </div>
+                                  <div class="mt-2 text-center">
+                                    <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
+                                  </div>
+                                  <div class="mt-1 min-h-[18px]">
+                                    <div
+                                      v-if="getToothCurrentCondition(tooth)"
+                                      class="text-xs font-medium px-2 py-0.5 rounded"
+                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))"
+                                    >
+                                      {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </section>
+
+                        <div class="relative my-4 max-w-4xl mx-auto h-6">
+                          <div class="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 border-t-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
+                          <div class="pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
+                        </div>
+
+                        <!-- Children Lower Jaw -->
+                        <section>
+                          <div class="text-center mb-4">
+                            <span class="font-semibold text-lg text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2">
+                              <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
+                              Lower Jaw (Primary)
+                              <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
+                            </span>
+                          </div>
+                          <div class="relative max-w-5xl mx-auto px-4 sm:px-6">
+                            <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
+                            <div class="pointer-events-none absolute -bottom-10 left-6 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q3</div>
+                            <div class="pointer-events-none absolute -bottom-10 right-6 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q4</div>
+                            <div class="relative flex justify-center gap-14 py-10 z-10">
+                              <div class="flex gap-6">
+                                <div
+                                  v-for="tooth in childrenPrimary.lowerRight.slice().reverse()"
+                                  :key="`chart-${tooth}`"
+                                  @click="handleToothClick(tooth)"
+                                  @dblclick="openRecordDetailPopup(tooth)"
+                                  @mouseenter="handleToothHover(tooth, $event)"
+                                  @mouseleave="handleToothLeave"
+                                  @contextmenu="handleToothRightClick(tooth, $event)"
+                                  class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10"
+                                >
+                                  <div class="relative flex flex-col items-center">
+                                    <div
+                                      class="relative w-20 h-24 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                      :class="getToothCardClasses(tooth)"
+                                    >
+                                      <img
+                                        v-if="toothImageExists[tooth]"
+                                        :src="getToothImagePath(tooth)"
+                                        @error="imageError(tooth)"
+                                        :alt="'Tooth ' + tooth"
+                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+                                      />
+                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">🦷</div>
+                                    </div>
+                                  </div>
+                                  <div class="mt-2 text-center">
+                                    <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
+                                  </div>
+                                  <div class="mt-1 min-h-[18px]">
+                                    <div
+                                      v-if="getToothCurrentCondition(tooth)"
+                                      class="text-xs font-medium px-2 py-0.5 rounded"
+                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))"
+                                    >
+                                      {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="flex gap-6">
+                                <div
+                                  v-for="tooth in childrenPrimary.lowerLeft.slice().reverse()"
+                                  :key="`chart-${tooth}`"
+                                  @click="handleToothClick(tooth)"
+                                  @dblclick="openRecordDetailPopup(tooth)"
+                                  @mouseenter="handleToothHover(tooth, $event)"
+                                  @mouseleave="handleToothLeave"
+                                  @contextmenu="handleToothRightClick(tooth, $event)"
+                                  class="cursor-pointer text-center relative group transition-all duration-200 hover:-translate-y-1 hover:z-10"
+                                >
+                                  <div class="relative flex flex-col items-center">
+                                    <div
+                                      class="relative w-20 h-24 mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                      :class="getToothCardClasses(tooth)"
+                                    >
+                                      <img
+                                        v-if="toothImageExists[tooth]"
+                                        :src="getToothImagePath(tooth)"
+                                        @error="imageError(tooth)"
+                                        :alt="'Tooth ' + tooth"
+                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+                                      />
+                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">🦷</div>
+                                    </div>
+                                  </div>
+                                  <div class="mt-2 text-center">
+                                    <span class="block text-xs text-gray-700 dark:text-gray-300 font-semibold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ tooth }}</span>
+                                  </div>
+                                  <div class="mt-1 min-h-[18px]">
+                                    <div
+                                      v-if="getToothCurrentCondition(tooth)"
+                                      class="text-xs font-medium px-2 py-0.5 rounded"
+                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))"
+                                    >
+                                      {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </section>
                       </div>
-                      </div>
-                  </div>
-                  
                   <!-- Spacer below dental chart -->
                   <div class="h-4"></div>
 
