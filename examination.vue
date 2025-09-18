@@ -616,6 +616,53 @@ const getConditionDisplayClass = (condition) => {
   return conditionColors[condition] || 'bg-gray-400 text-white';
 };
 
+const getToothConditionBackgroundClass = (toothNumber) => {
+  const condition = getToothCurrentCondition(toothNumber);
+  if (!condition) return '';
+
+  const backgroundColors = {
+    'Healthy': 'bg-emerald-100 dark:bg-emerald-900/30',
+    'Decayed': 'bg-rose-100 dark:bg-rose-900/30',
+    'Filled': 'bg-sky-100 dark:bg-sky-900/30',
+    'Missing': 'bg-slate-200 dark:bg-slate-800/30',
+    'Cracked': 'bg-orange-100 dark:bg-orange-900/30',
+    'Wisdom': 'bg-violet-100 dark:bg-violet-900/30',
+    'Impacted': 'bg-amber-100 dark:bg-amber-900/30',
+    'Fully Decayed': 'bg-rose-200 dark:bg-rose-950/30',
+    'Root Canal Done': 'bg-violet-200 dark:bg-violet-950/30',
+    'Root Canal': 'bg-violet-200 dark:bg-violet-950/30',
+    'root_canal': 'bg-violet-200 dark:bg-violet-950/30',
+    'Removed': 'bg-slate-300 dark:bg-slate-800/40',
+    'Tooth Removed': 'bg-slate-300 dark:bg-slate-800/40',
+    'Crown': 'bg-yellow-100 dark:bg-yellow-900/30',
+    'Bridge': 'bg-teal-100 dark:bg-teal-900/30',
+    'Implant': 'bg-gray-200 dark:bg-gray-700/40',
+    'Stained': 'bg-yellow-100 dark:bg-yellow-900/30',
+    'Worn': 'bg-orange-50 dark:bg-orange-950/30',
+    'Abrasion': 'bg-orange-100 dark:bg-orange-900/30',
+    'Erosion': 'bg-rose-50 dark:bg-rose-950/30',
+    'Chipped': 'bg-amber-50 dark:bg-amber-950/30',
+    'Fractured Cusp': 'bg-orange-200 dark:bg-orange-950/30',
+    'Hypersensitive': 'bg-pink-100 dark:bg-pink-900/30',
+    'Periapical Abscess': 'bg-rose-300 dark:bg-rose-950/30',
+    'Gingivitis': 'bg-pink-50 dark:bg-pink-950/30',
+    'Periodontitis': 'bg-rose-100 dark:bg-rose-900/30',
+    'Pericoronitis': 'bg-pink-100 dark:bg-pink-900/30',
+    'Supernumerary': 'bg-indigo-100 dark:bg-indigo-950/30',
+    'Unerupted Primary': 'bg-slate-200 dark:bg-slate-800/30',
+    'Un-erupted Primary': 'bg-slate-200 dark:bg-slate-800/30',
+    'Retained Primary': 'bg-slate-200 dark:bg-slate-800/30',
+    'Malocclusion': 'bg-indigo-100 dark:bg-indigo-950/30',
+    'Attrition': 'bg-amber-100 dark:bg-amber-900/30',
+    'Enamel Hypoplasia': 'bg-yellow-100 dark:bg-yellow-900/30',
+    'Amelogenesis Imperfecta': 'bg-yellow-100 dark:bg-yellow-900/30',
+    'Dentinogenesis Imperfecta': 'bg-blue-100 dark:bg-blue-900/30',
+    'Gingival Recession': 'bg-pink-100 dark:bg-pink-900/30'
+  };
+
+  return backgroundColors[condition] || 'bg-slate-100 dark:bg-slate-800/30';
+};
+
 const getToothCardClasses = (toothNumber) => {
   const classes = [
     'bg-white',
@@ -843,17 +890,6 @@ const hasCriticalIndicator = (toothNumber) => {
       return treatment.steps.some(step => step?.is_critical || step?.critical_indicator || step?.critical_flag);
     });
   });
-};
-
-const getToothTreatmentCount = (toothNumber) => {
-  return getToothTreatments(toothNumber).length;
-};
-
-const getToothTreatmentCountLabel = (toothNumber) => {
-  const count = getToothTreatmentCount(toothNumber);
-  if (count <= 0) return '';
-  if (count > 99) return '99+';
-  return String(count);
 };
 
 const getQuadrantName = (toothNumber) => {
@@ -1565,8 +1601,8 @@ const handleClose = () => {
                       </div>
                       
                       <!-- Chart view toggle -->
-                      <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-                        <div class="flex-1 flex justify-center">
+                      <div class="mb-6 px-6">
+                        <div class="flex flex-col items-center gap-4">
                           <div class="inline-flex rounded-full border border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-800/60 p-1 shadow-sm">
                             <button
                               type="button"
@@ -1593,9 +1629,7 @@ const handleClose = () => {
                               Children Teeth
                             </button>
                           </div>
-                        </div>
-                        <div class="w-full md:w-auto flex justify-center md:justify-end">
-                          <div class="flex items-center gap-4 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                          <div class="w-full flex flex-wrap justify-center md:justify-start gap-4 text-xs font-semibold text-slate-600 dark:text-slate-300 md:pl-4">
                             <div
                               v-for="legend in treatmentStatusLegend"
                               :key="legend.key"
@@ -1640,15 +1674,13 @@ const handleClose = () => {
                                       :class="getToothCardClasses(tooth)"
                                     >
                                       <div
+                                        v-if="getToothCurrentCondition(tooth)"
+                                        :class="['pointer-events-none absolute inset-0 rounded-xl opacity-60 transition-opacity duration-200', getToothConditionBackgroundClass(tooth)]"
+                                      ></div>
+                                      <div
                                         v-if="hasCriticalIndicator(tooth)"
                                         class="pointer-events-none absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
                                       ></div>
-                                      <div
-                                        v-if="getToothTreatmentCountLabel(tooth)"
-                                        class="pointer-events-none absolute top-1 right-1 min-w-[1.5rem] px-1.5 py-0.5 text-[10px] font-semibold text-white bg-slate-700/90 rounded-full border border-white shadow-sm text-center"
-                                      >
-                                        {{ getToothTreatmentCountLabel(tooth) }}
-                                      </div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
                                         class="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
@@ -1660,11 +1692,11 @@ const handleClose = () => {
                                         v-if="toothImageExists[tooth]"
                                         :src="getToothImagePath(tooth)"
                                         @error="imageError(tooth)"
-                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105 relative z-10"
                                       />
                                       <div
                                         v-else
-                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500"
+                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500 relative z-10"
                                       >
                                         🦷
                                       </div>
@@ -1701,15 +1733,13 @@ const handleClose = () => {
                                       :class="getToothCardClasses(tooth)"
                                     >
                                       <div
+                                        v-if="getToothCurrentCondition(tooth)"
+                                        :class="['pointer-events-none absolute inset-0 rounded-xl opacity-60 transition-opacity duration-200', getToothConditionBackgroundClass(tooth)]"
+                                      ></div>
+                                      <div
                                         v-if="hasCriticalIndicator(tooth)"
                                         class="pointer-events-none absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
                                       ></div>
-                                      <div
-                                        v-if="getToothTreatmentCountLabel(tooth)"
-                                        class="pointer-events-none absolute top-1 right-1 min-w-[1.5rem] px-1.5 py-0.5 text-[10px] font-semibold text-white bg-slate-700/90 rounded-full border border-white shadow-sm text-center"
-                                      >
-                                        {{ getToothTreatmentCountLabel(tooth) }}
-                                      </div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
                                         class="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
@@ -1721,11 +1751,11 @@ const handleClose = () => {
                                         v-if="toothImageExists[tooth]"
                                         :src="getToothImagePath(tooth)"
                                         @error="imageError(tooth)"
-                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105 relative z-10"
                                       />
                                       <div
                                         v-else
-                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500"
+                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500 relative z-10"
                                       >
                                         🦷
                                       </div>
@@ -1785,15 +1815,13 @@ const handleClose = () => {
                                       :class="getToothCardClasses(tooth)"
                                     >
                                       <div
+                                        v-if="getToothCurrentCondition(tooth)"
+                                        :class="['pointer-events-none absolute inset-0 rounded-xl opacity-60 transition-opacity duration-200', getToothConditionBackgroundClass(tooth)]"
+                                      ></div>
+                                      <div
                                         v-if="hasCriticalIndicator(tooth)"
                                         class="pointer-events-none absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
                                       ></div>
-                                      <div
-                                        v-if="getToothTreatmentCountLabel(tooth)"
-                                        class="pointer-events-none absolute top-1 right-1 min-w-[1.5rem] px-1.5 py-0.5 text-[10px] font-semibold text-white bg-slate-700/90 rounded-full border border-white shadow-sm text-center"
-                                      >
-                                        {{ getToothTreatmentCountLabel(tooth) }}
-                                      </div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
                                         class="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
@@ -1806,11 +1834,11 @@ const handleClose = () => {
                                         :src="getToothImagePath(tooth)"
                                         @error="imageError(tooth)"
                                         :alt="'Tooth ' + tooth"
-                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105 relative z-10"
                                       />
                                       <div
                                         v-else
-                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500"
+                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500 relative z-10"
                                       >
                                         🦷
                                       </div>
@@ -1847,15 +1875,13 @@ const handleClose = () => {
                                       :class="getToothCardClasses(tooth)"
                                     >
                                       <div
+                                        v-if="getToothCurrentCondition(tooth)"
+                                        :class="['pointer-events-none absolute inset-0 rounded-xl opacity-60 transition-opacity duration-200', getToothConditionBackgroundClass(tooth)]"
+                                      ></div>
+                                      <div
                                         v-if="hasCriticalIndicator(tooth)"
                                         class="pointer-events-none absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
                                       ></div>
-                                      <div
-                                        v-if="getToothTreatmentCountLabel(tooth)"
-                                        class="pointer-events-none absolute top-1 right-1 min-w-[1.5rem] px-1.5 py-0.5 text-[10px] font-semibold text-white bg-slate-700/90 rounded-full border border-white shadow-sm text-center"
-                                      >
-                                        {{ getToothTreatmentCountLabel(tooth) }}
-                                      </div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
                                         class="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
@@ -1868,11 +1894,11 @@ const handleClose = () => {
                                         :src="getToothImagePath(tooth)"
                                         @error="imageError(tooth)"
                                         :alt="'Tooth ' + tooth"
-                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105 relative z-10"
                                       />
                                       <div
                                         v-else
-                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500"
+                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500 relative z-10"
                                       >
                                         🦷
                                       </div>
@@ -1929,15 +1955,13 @@ const handleClose = () => {
                                       :class="getToothCardClasses(tooth)"
                                     >
                                       <div
+                                        v-if="getToothCurrentCondition(tooth)"
+                                        :class="['pointer-events-none absolute inset-0 rounded-xl opacity-60 transition-opacity duration-200', getToothConditionBackgroundClass(tooth)]"
+                                      ></div>
+                                      <div
                                         v-if="hasCriticalIndicator(tooth)"
                                         class="pointer-events-none absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
                                       ></div>
-                                      <div
-                                        v-if="getToothTreatmentCountLabel(tooth)"
-                                        class="pointer-events-none absolute top-1 right-1 min-w-[1.5rem] px-1.5 py-0.5 text-[10px] font-semibold text-white bg-slate-700/90 rounded-full border border-white shadow-sm text-center"
-                                      >
-                                        {{ getToothTreatmentCountLabel(tooth) }}
-                                      </div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
                                         class="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
@@ -1950,11 +1974,11 @@ const handleClose = () => {
                                         :src="getToothImagePath(tooth)"
                                         @error="imageError(tooth)"
                                         :alt="'Tooth ' + tooth"
-                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105 relative z-10"
                                       />
                                       <div
                                         v-else
-                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500"
+                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500 relative z-10"
                                       >
                                         🦷
                                       </div>
@@ -1991,15 +2015,13 @@ const handleClose = () => {
                                       :class="getToothCardClasses(tooth)"
                                     >
                                       <div
+                                        v-if="getToothCurrentCondition(tooth)"
+                                        :class="['pointer-events-none absolute inset-0 rounded-xl opacity-60 transition-opacity duration-200', getToothConditionBackgroundClass(tooth)]"
+                                      ></div>
+                                      <div
                                         v-if="hasCriticalIndicator(tooth)"
                                         class="pointer-events-none absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
                                       ></div>
-                                      <div
-                                        v-if="getToothTreatmentCountLabel(tooth)"
-                                        class="pointer-events-none absolute top-1 right-1 min-w-[1.5rem] px-1.5 py-0.5 text-[10px] font-semibold text-white bg-slate-700/90 rounded-full border border-white shadow-sm text-center"
-                                      >
-                                        {{ getToothTreatmentCountLabel(tooth) }}
-                                      </div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
                                         class="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
@@ -2012,11 +2034,11 @@ const handleClose = () => {
                                         :src="getToothImagePath(tooth)"
                                         @error="imageError(tooth)"
                                         :alt="'Tooth ' + tooth"
-                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105 relative z-10"
                                       />
                                       <div
                                         v-else
-                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500"
+                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500 relative z-10"
                                       >
                                         🦷
                                       </div>
@@ -2076,15 +2098,13 @@ const handleClose = () => {
                                       :class="getToothCardClasses(tooth)"
                                     >
                                       <div
+                                        v-if="getToothCurrentCondition(tooth)"
+                                        :class="['pointer-events-none absolute inset-0 rounded-xl opacity-60 transition-opacity duration-200', getToothConditionBackgroundClass(tooth)]"
+                                      ></div>
+                                      <div
                                         v-if="hasCriticalIndicator(tooth)"
                                         class="pointer-events-none absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
                                       ></div>
-                                      <div
-                                        v-if="getToothTreatmentCountLabel(tooth)"
-                                        class="pointer-events-none absolute top-1 right-1 min-w-[1.5rem] px-1.5 py-0.5 text-[10px] font-semibold text-white bg-slate-700/90 rounded-full border border-white shadow-sm text-center"
-                                      >
-                                        {{ getToothTreatmentCountLabel(tooth) }}
-                                      </div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
                                         class="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
@@ -2097,11 +2117,11 @@ const handleClose = () => {
                                         :src="getToothImagePath(tooth)"
                                         @error="imageError(tooth)"
                                         :alt="'Tooth ' + tooth"
-                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105 relative z-10"
                                       />
                                       <div
                                         v-else
-                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500"
+                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500 relative z-10"
                                       >
                                         🦷
                                       </div>
@@ -2138,15 +2158,13 @@ const handleClose = () => {
                                       :class="getToothCardClasses(tooth)"
                                     >
                                       <div
+                                        v-if="getToothCurrentCondition(tooth)"
+                                        :class="['pointer-events-none absolute inset-0 rounded-xl opacity-60 transition-opacity duration-200', getToothConditionBackgroundClass(tooth)]"
+                                      ></div>
+                                      <div
                                         v-if="hasCriticalIndicator(tooth)"
                                         class="pointer-events-none absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
                                       ></div>
-                                      <div
-                                        v-if="getToothTreatmentCountLabel(tooth)"
-                                        class="pointer-events-none absolute top-1 right-1 min-w-[1.5rem] px-1.5 py-0.5 text-[10px] font-semibold text-white bg-slate-700/90 rounded-full border border-white shadow-sm text-center"
-                                      >
-                                        {{ getToothTreatmentCountLabel(tooth) }}
-                                      </div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
                                         class="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
@@ -2159,11 +2177,11 @@ const handleClose = () => {
                                         :src="getToothImagePath(tooth)"
                                         @error="imageError(tooth)"
                                         :alt="'Tooth ' + tooth"
-                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
+                                        class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105 relative z-10"
                                       />
                                       <div
                                         v-else
-                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500"
+                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500 relative z-10"
                                       >
                                         🦷
                                       </div>
