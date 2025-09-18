@@ -189,197 +189,197 @@ const searchInput = ref(null);
 // --- STATIC DATA ---
 // Predefined conditions with cartoon tooth images (matching RecordDetailView) - Reversed order (newest first)
 const predefinedConditionsWithImages = [
-  { value: 'Removed', label: 'Removed', color: 'bg-slate-600', image: '/img/cartoon/11_ct.png' },
-  { value: 'Root Canal Done', label: 'Root Canal Done', color: 'bg-violet-600', image: '/img/cartoon/9_ct.png' },
-  { value: 'Tooth Removed', label: 'Tooth Removed', color: 'bg-slate-600', image: '/img/cartoon/11_ct.png' },
-  { value: 'Impacted', label: 'Impacted', color: 'bg-amber-500', image: '/img/cartoon/10_ct.png' },
-  { value: 'Root Canal', label: 'Root Canal', color: 'bg-violet-500', image: '/img/cartoon/9_ct.png' },
-  { value: 'Fully Decayed', label: 'Fully Decayed', color: 'bg-rose-600', image: '/img/cartoon/8_ct.png' },
-  { value: 'Wisdom', label: 'Wisdom', color: 'bg-violet-400', image: '/img/cartoon/6_ct.png' },
-  { value: 'Cracked', label: 'Cracked', color: 'bg-orange-400', image: '/img/cartoon/5_ct.png' },
-  { value: 'Missing', label: 'Missing', color: 'bg-slate-400', image: '/img/cartoon/4_ct.png' },
-  { value: 'Filled', label: 'Filled', color: 'bg-sky-400', image: '/img/cartoon/3_ct.png' },
+  { value: 'Healthy', label: 'Healthy', color: 'bg-emerald-400', image: '/img/cartoon/1_ct.png' },
   { value: 'Decayed', label: 'Decayed', color: 'bg-rose-400', image: '/img/cartoon/2_ct.png' },
-  { value: 'Healthy', label: 'Healthy', color: 'bg-emerald-400', image: '/img/cartoon/1_ct.png' }
+  { value: 'Filled', label: 'Filled', color: 'bg-sky-400', image: '/img/cartoon/3_ct.png' },
+  { value: 'Missing', label: 'Missing', color: 'bg-slate-400', image: '/img/cartoon/4_ct.png' },
+  { value: 'Cracked', label: 'Cracked', color: 'bg-orange-400', image: '/img/cartoon/5_ct.png' },
+  { value: 'Wisdom', label: 'Wisdom', color: 'bg-violet-400', image: '/img/cartoon/6_ct.png' },
+  { value: 'Impacted', label: 'Impacted', color: 'bg-amber-500', image: '/img/cartoon/10_ct.png' },
+  { value: 'Fully Decayed', label: 'Fully Decayed', color: 'bg-rose-600', image: '/img/cartoon/8_ct.png' },
+  { value: 'Root Canal Done', label: 'Root Canal Done', color: 'bg-violet-600', image: '/img/cartoon/9_ct.png' },
+  { value: 'Removed', label: 'Removed', color: 'bg-slate-600', image: '/img/cartoon/11_ct.png' },
+  { value: 'Tooth Removed', label: 'Tooth Removed', color: 'bg-slate-600', image: '/img/cartoon/11_ct.png' },
+  { value: 'Root Canal', label: 'Root Canal', color: 'bg-violet-500', image: '/img/cartoon/9_ct.png' }
 ];
 
 // Additional conditions with images and detailed descriptions (matching RecordDetailView)
 const additionalConditions = [
-  { 
+  {
     number: '12',
-    value: 'Stained', 
-    label: 'Stained', 
+    value: 'Stained',
+    label: 'Stained',
     color: 'bg-yellow-400',
     shortDescription: 'Teeth that look dirty or colored',
     description: 'Teeth that look dirty or colored because of things like coffee, tea, or not brushing well.',
     image: '/img/cartoon/12.png'
   },
-  { 
+  {
     number: '13',
-    value: 'Worn', 
-    label: 'Worn', 
+    value: 'Worn',
+    label: 'Worn',
     color: 'bg-orange-300',
     shortDescription: 'Teeth that look flat or small',
     description: 'Teeth that look flat or small because they have been used a lot over time.',
     image: '/img/cartoon/13.png'
   },
-  { 
+  {
     number: '14',
-    value: 'Abrasion', 
-    label: 'Abrasion', 
+    value: 'Abrasion',
+    label: 'Abrasion',
     color: 'bg-orange-500',
     shortDescription: 'Part of tooth rubbed away',
     description: 'A part of the tooth is rubbed away, usually from brushing too hard.',
     image: '/img/cartoon/14.png'
   },
-  { 
+  {
     number: '15',
-    value: 'Erosion', 
-    label: 'Erosion', 
+    value: 'Erosion',
+    label: 'Erosion',
     color: 'bg-rose-300',
     shortDescription: 'Enamel dissolved by acids',
     description: 'The hard cover of the tooth (enamel) gets slowly dissolved by acids (like from soda or juice).',
     image: '/img/cartoon/15.png'
   },
-  { 
+  {
     number: '16',
-    value: 'Chipped', 
-    label: 'Chipped', 
+    value: 'Chipped',
+    label: 'Chipped',
     color: 'bg-amber-400',
     shortDescription: 'Small piece broken off',
     description: 'A small piece of the tooth is broken off, like when biting something hard.',
     image: '/img/cartoon/16.png'
   },
-  { 
+  {
     number: '18',
-    value: 'Fractured Cusp', 
-    label: 'Fractured Cusp', 
+    value: 'Fractured Cusp',
+    label: 'Fractured Cusp',
     color: 'bg-orange-600',
     shortDescription: 'Corner or point breaks off',
     description: 'A corner or point of the tooth breaks off.',
     image: '/img/cartoon/18.png'
   },
-  { 
+  {
     number: '19',
-    value: 'Hypersensitive', 
-    label: 'Hypersensitive', 
+    value: 'Hypersensitive',
+    label: 'Hypersensitive',
     color: 'bg-pink-400',
     shortDescription: 'Sharp pain with hot/cold',
     description: 'Teeth that hurt or feel sharp pain when you eat hot, cold, or sweet things.',
     image: '/img/cartoon/19.png'
   },
-  { 
+  {
     number: '20',
-    value: 'Periapical Abscess', 
-    label: 'Periapical Abscess', 
+    value: 'Periapical Abscess',
+    label: 'Periapical Abscess',
     color: 'bg-rose-700',
     shortDescription: 'Painful lump at tooth root',
     description: 'A painful lump filled with pus at the tip of the tooth root caused by infection.',
     image: '/img/cartoon/20.png'
   },
-  { 
+  {
     number: '22',
-    value: 'Gingivitis', 
-    label: 'Gingivitis', 
+    value: 'Gingivitis',
+    label: 'Gingivitis',
     color: 'bg-pink-300',
     shortDescription: 'Red, swollen gums',
     description: 'Gums look red, swollen, and may bleed when brushing.',
     image: '/img/cartoon/22.png'
   },
-  { 
+  {
     number: '23',
-    value: 'Periodontitis', 
-    label: 'Periodontitis', 
+    value: 'Periodontitis',
+    label: 'Periodontitis',
     color: 'bg-rose-500',
     shortDescription: 'Serious gum disease',
     description: 'A serious gum disease that makes teeth loose because the bone around them gets weak.',
     image: '/img/cartoon/23.png'
   },
-  { 
+  {
     number: '27',
-    value: 'Pericoronitis', 
-    label: 'Pericoronitis', 
+    value: 'Pericoronitis',
+    label: 'Pericoronitis',
     color: 'bg-pink-500',
     shortDescription: 'Swelling around wisdom teeth',
     description: 'Swelling and pain around a tooth that is half-covered by gum (often wisdom teeth).',
     image: '/img/cartoon/27.png'
   },
-  { 
+  {
     number: '28',
-    value: 'Supernumerary', 
-    label: 'Supernumerary', 
+    value: 'Supernumerary',
+    label: 'Supernumerary',
     color: 'bg-indigo-300',
     shortDescription: 'Extra teeth beyond normal',
     description: 'Extra teeth that grow in addition to the normal set.',
     image: '/img/cartoon/28.png'
   },
-  { 
+  {
     number: '29',
-    value: 'Un-erupted Primary', 
-    label: 'Un-erupted Primary', 
+    value: 'Un-erupted Primary',
+    label: 'Un-erupted Primary',
     color: 'bg-slate-300',
     shortDescription: 'Baby tooth never came out',
     description: 'A baby tooth that never came out through the gums.',
     image: '/img/cartoon/29.png'
   },
-  { 
+  {
     number: '30',
-    value: 'Retained Primary', 
-    label: 'Retained Primary', 
+    value: 'Retained Primary',
+    label: 'Retained Primary',
     color: 'bg-slate-400',
     shortDescription: 'Baby tooth didn\'t fall out',
     description: 'A baby tooth that didn\'t fall out even when the adult tooth should replace it.',
     image: '/img/cartoon/30.png'
   },
-  { 
+  {
     number: '31',
-    value: 'Malocclusion', 
-    label: 'Malocclusion', 
+    value: 'Malocclusion',
+    label: 'Malocclusion',
     color: 'bg-indigo-500',
     shortDescription: 'Teeth don\'t fit properly',
     description: 'Teeth don\'t fit together properly, making the bite look uneven or crowded.',
     image: '/img/cartoon/31.png'
   },
-  { 
-    number: '32',
-    value: 'Attrition', 
-    label: 'Attrition', 
-    color: 'bg-amber-600',
-    shortDescription: 'Teeth wear from grinding',
-    description: 'Teeth wear down because they rub against each other too much (like grinding).',
-    image: '/img/cartoon/32.png'
-  },
-  { 
+  {
     number: '33',
-    value: 'Enamel Hypoplasia', 
-    label: 'Enamel Hypoplasia', 
+    value: 'Enamel Hypoplasia',
+    label: 'Enamel Hypoplasia',
     color: 'bg-yellow-500',
     shortDescription: 'Thin or weak enamel',
     description: 'Teeth that didn\'t grow strong because the enamel (outer cover) is thin or weak.',
     image: '/img/cartoon/33.png'
   },
-  { 
+  {
+    number: '32',
+    value: 'Attrition',
+    label: 'Attrition',
+    color: 'bg-amber-600',
+    shortDescription: 'Teeth wear from grinding',
+    description: 'Teeth wear down because they rub against each other too much (like grinding).',
+    image: '/img/cartoon/32.png'
+  },
+  {
     number: '34',
-    value: 'Amelogenesis Imperfecta', 
-    label: 'Amelogenesis Imperfecta', 
+    value: 'Amelogenesis Imperfecta',
+    label: 'Amelogenesis Imperfecta',
     color: 'bg-yellow-600',
     shortDescription: 'Discolored, fragile teeth',
     description: 'Teeth are discolored and fragile because enamel didn\'t form properly since birth.',
     image: '/img/cartoon/34.png'
   },
-  { 
+  {
     number: '35',
-    value: 'Dentinogenesis Imperfecta', 
-    label: 'Dentinogenesis Imperfecta', 
+    value: 'Dentinogenesis Imperfecta',
+    label: 'Dentinogenesis Imperfecta',
     color: 'bg-blue-400',
     shortDescription: 'Gray/blue, brittle teeth',
     description: 'Teeth look gray or blue and break easily because the inside part (dentin) is weak.',
     image: '/img/cartoon/35.png'
   },
-  { 
+  {
     number: '36',
-    value: 'Gingival Recession', 
-    label: 'Gingival Recession', 
+    value: 'Gingival Recession',
+    label: 'Gingival Recession',
     color: 'bg-pink-600',
     shortDescription: 'Gums recede, roots exposed',
     description: 'Gums move down, making the tooth look longer and roots get exposed.',
