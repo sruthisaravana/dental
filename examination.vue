@@ -771,16 +771,28 @@ const getStatusLabel = (status) => {
   return normalized.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
-const getHoverStatusClass = (status) => {
+const getStatusBadgeClass = (status) => {
   const normalized = normalizeStatus(status);
   const statusClasses = {
-    'initial': 'bg-sky-50 text-sky-700 border-sky-200',
-    'diagnosis_planned': 'bg-purple-50 text-purple-700 border-purple-200',
-    'intreatment': 'bg-amber-50 text-amber-700 border-amber-200',
-    'completed': 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    'new': 'bg-indigo-50 text-indigo-700 border-indigo-200'
+    'initial': 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm',
+    'diagnosis_planned': 'bg-purple-50 text-purple-700 border border-purple-200 shadow-sm',
+    'intreatment': 'bg-amber-50 text-amber-700 border border-amber-200 shadow-sm',
+    'completed': 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm',
+    'new': 'bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-sm'
   };
-  return statusClasses[normalized] || 'bg-gray-50 text-gray-700 border-gray-200';
+  return statusClasses[normalized] || 'bg-gray-50 text-gray-700 border border-gray-200 shadow-sm';
+};
+
+const getStatusHeaderBadgeClass = (status) => {
+  const normalized = normalizeStatus(status);
+  const headerClasses = {
+    'initial': 'bg-sky-100 text-sky-800 border border-sky-200 shadow-sm',
+    'diagnosis_planned': 'bg-purple-100 text-purple-800 border border-purple-200 shadow-sm',
+    'intreatment': 'bg-amber-100 text-amber-800 border border-amber-200 shadow-sm',
+    'completed': 'bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-sm',
+    'new': 'bg-indigo-100 text-indigo-800 border border-indigo-200 shadow-sm'
+  };
+  return headerClasses[normalized] || 'bg-gray-100 text-gray-800 border border-gray-200 shadow-sm';
 };
 
 const getQuadrantName = (toothNumber) => {
@@ -1525,12 +1537,12 @@ const handleClose = () => {
                               <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
                             </span>
                           </div>
-                          <div class="relative max-w-7xl mx-auto px-4 sm:px-6">
+                          <div class="relative max-w-7xl mx-auto px-2 sm:px-4">
                             <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
-                            <div class="pointer-events-none absolute -top-8 left-6 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q2</div>
-                            <div class="pointer-events-none absolute -top-8 right-6 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q1</div>
-                            <div class="relative flex justify-center gap-16 py-10 z-10">
-                              <div class="flex gap-6">
+                            <div class="pointer-events-none absolute top-2 left-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q2</div>
+                            <div class="pointer-events-none absolute top-2 right-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q1</div>
+                            <div class="relative flex justify-center gap-14 py-8 z-10">
+                              <div class="flex gap-5">
                                 <div
                                   v-for="tooth in adultPermanent.upperRight"
                                   :key="`chart-${tooth}`"
@@ -1571,7 +1583,7 @@ const handleClose = () => {
                                   </div>
                                 </div>
                               </div>
-                              <div class="flex gap-6">
+                              <div class="flex gap-5">
                                 <div
                                   v-for="tooth in adultPermanent.upperLeft"
                                   :key="`chart-${tooth}`"
@@ -1616,8 +1628,8 @@ const handleClose = () => {
                           </div>
                         </section>
 
-                        <div class="relative my-4 max-w-5xl mx-auto h-6">
-                          <div class="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 border-t-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
+                        <div class="relative my-3 max-w-7xl mx-auto h-5 px-2 sm:px-4">
+                          <div class="pointer-events-none absolute inset-x-2 sm:inset-x-4 top-1/2 -translate-y-1/2 border-t-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
                           <div class="pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
                         </div>
 
@@ -1630,12 +1642,12 @@ const handleClose = () => {
                               <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
                             </span>
                           </div>
-                          <div class="relative max-w-7xl mx-auto px-4 sm:px-6">
+                          <div class="relative max-w-7xl mx-auto px-2 sm:px-4">
                             <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
-                            <div class="pointer-events-none absolute -bottom-10 left-6 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q3</div>
-                            <div class="pointer-events-none absolute -bottom-10 right-6 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q4</div>
-                            <div class="relative flex justify-center gap-16 py-10 z-10">
-                              <div class="flex gap-6">
+                            <div class="pointer-events-none absolute bottom-2 left-2 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q3</div>
+                            <div class="pointer-events-none absolute bottom-2 right-2 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q4</div>
+                            <div class="relative flex justify-center gap-14 py-8 z-10">
+                              <div class="flex gap-5">
                                 <div
                                   v-for="tooth in adultPermanent.lowerRight.slice().reverse()"
                                   :key="`chart-${tooth}`"
@@ -1675,7 +1687,7 @@ const handleClose = () => {
                                   </div>
                                 </div>
                               </div>
-                              <div class="flex gap-6">
+                              <div class="flex gap-5">
                                 <div
                                   v-for="tooth in adultPermanent.lowerLeft.slice().reverse()"
                                   :key="`chart-${tooth}`"
@@ -1730,12 +1742,12 @@ const handleClose = () => {
                               <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
                             </span>
                           </div>
-                          <div class="relative max-w-5xl mx-auto px-4 sm:px-6">
+                          <div class="relative max-w-5xl mx-auto px-2 sm:px-4">
                             <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
-                            <div class="pointer-events-none absolute -top-8 left-6 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q2</div>
-                            <div class="pointer-events-none absolute -top-8 right-6 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q1</div>
-                            <div class="relative flex justify-center gap-14 py-10 z-10">
-                              <div class="flex gap-6">
+                            <div class="pointer-events-none absolute top-2 left-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q2</div>
+                            <div class="pointer-events-none absolute top-2 right-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q1</div>
+                            <div class="relative flex justify-center gap-12 py-8 z-10">
+                              <div class="flex gap-5">
                                 <div
                                   v-for="tooth in childrenPrimary.upperRight"
                                   :key="`chart-${tooth}`"
@@ -1775,7 +1787,7 @@ const handleClose = () => {
                                   </div>
                                 </div>
                               </div>
-                              <div class="flex gap-6">
+                              <div class="flex gap-5">
                                 <div
                                   v-for="tooth in childrenPrimary.upperLeft"
                                   :key="`chart-${tooth}`"
@@ -1819,8 +1831,8 @@ const handleClose = () => {
                           </div>
                         </section>
 
-                        <div class="relative my-4 max-w-4xl mx-auto h-6">
-                          <div class="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 border-t-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
+                        <div class="relative my-3 max-w-5xl mx-auto h-5 px-2 sm:px-4">
+                          <div class="pointer-events-none absolute inset-x-2 sm:inset-x-4 top-1/2 -translate-y-1/2 border-t-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
                           <div class="pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
                         </div>
 
@@ -1833,12 +1845,12 @@ const handleClose = () => {
                               <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
                             </span>
                           </div>
-                          <div class="relative max-w-5xl mx-auto px-4 sm:px-6">
+                          <div class="relative max-w-5xl mx-auto px-2 sm:px-4">
                             <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
-                            <div class="pointer-events-none absolute -bottom-10 left-6 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q3</div>
-                            <div class="pointer-events-none absolute -bottom-10 right-6 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q4</div>
-                            <div class="relative flex justify-center gap-14 py-10 z-10">
-                              <div class="flex gap-6">
+                            <div class="pointer-events-none absolute bottom-2 left-2 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q3</div>
+                            <div class="pointer-events-none absolute bottom-2 right-2 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q4</div>
+                            <div class="relative flex justify-center gap-12 py-8 z-10">
+                              <div class="flex gap-5">
                                 <div
                                   v-for="tooth in childrenPrimary.lowerRight.slice().reverse()"
                                   :key="`chart-${tooth}`"
@@ -1878,7 +1890,7 @@ const handleClose = () => {
                                   </div>
                                 </div>
                               </div>
-                              <div class="flex gap-6">
+                              <div class="flex gap-5">
                                 <div
                                   v-for="tooth in childrenPrimary.lowerLeft.slice().reverse()"
                                   :key="`chart-${tooth}`"
@@ -2056,116 +2068,100 @@ const handleClose = () => {
 
         <!-- DentalChart-style Floating Tooth Treatment Summary -->
         <Teleport to="body">
-          <div v-if="hoveredTooth && showHoverSummary" 
+          <div v-if="hoveredTooth && showHoverSummary"
                class="fixed bottom-4 right-4 z-50 pointer-events-auto">
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl w-[350px] transition-opacity duration-200">
-              <!-- Compact Header -->
-              <div class="p-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 rounded-t-xl relative">
-                <!-- Status badge positioned at top-right -->
-                <span v-if="getToothStatus(hoveredTooth)" 
-                      :class="getHoverStatusClass(getToothStatus(hoveredTooth))" 
-                      class="absolute top-2 right-2 px-2 py-1 text-xs font-medium rounded-md border">
-                  {{ getStatusLabel(getToothStatus(hoveredTooth)) }}
-                </span>
-                
-                <div class="flex items-center space-x-2 pr-16">
-                  <div class="bg-gray-100 dark:bg-gray-600 p-2 rounded-lg">
-                    <svg class="w-4 h-4 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.5a1.5 1.5 0 011.5 1.5v1a1.5 1.5 0 01-1.5 1.5H9"/>
-                    </svg>
-                  </div>
+            <div class="w-[360px] rounded-2xl border border-slate-200 dark:border-slate-700/70 bg-white/95 dark:bg-slate-900/95 shadow-2xl backdrop-blur-xl overflow-hidden transition-transform duration-200">
+              <div class="px-5 py-4 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-800/80 dark:via-slate-900/80 border-b border-slate-200 dark:border-slate-700/70">
+                <div class="flex items-start justify-between gap-4">
                   <div>
-                    <h4 class="font-medium text-gray-900 dark:text-white text-sm">Tooth {{ hoveredTooth }}</h4>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ getQuadrantName(hoveredTooth) }}</p>
-                  </div>
-                </div>
-                
-                <!-- Condition display below the header -->
-                <div class="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-                  <div class="flex items-center justify-between">
-                    <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Condition:</span>
-                    <div class="inline-flex items-center px-2 py-1 rounded text-xs font-medium" :class="getConditionDisplayClass(getToothCurrentCondition(hoveredTooth))">
-                      {{ getFormattedCondition(getToothCurrentCondition(hoveredTooth)) }}
+                    <p class="text-[11px] uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">Tooth Summary</p>
+                    <div class="mt-1 flex items-baseline gap-3">
+                      <h4 class="text-xl font-semibold leading-tight text-slate-900 dark:text-white">Tooth {{ hoveredTooth }}</h4>
+                      <span class="text-sm text-slate-500 dark:text-slate-300">{{ getQuadrantName(hoveredTooth) }}</span>
                     </div>
+                  </div>
+                  <span
+                    v-if="getToothStatus(hoveredTooth)"
+                    :class="['inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide px-3 py-1.5 rounded-full', getStatusHeaderBadgeClass(getToothStatus(hoveredTooth))]"
+                  >
+                    {{ getStatusLabel(getToothStatus(hoveredTooth)) }}
+                  </span>
+                </div>
+
+                <div class="mt-4 flex items-center justify-between rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 px-3 py-2 shadow-sm">
+                  <span class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">Condition</span>
+                  <div class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm"
+                       :class="getConditionDisplayClass(getToothCurrentCondition(hoveredTooth))">
+                    {{ getFormattedCondition(getToothCurrentCondition(hoveredTooth)) }}
                   </div>
                 </div>
               </div>
-              
-              <!-- Compact content area -->
+
               <div class="max-h-80 overflow-y-auto custom-scrollbar">
-                <div class="p-3 space-y-2">
-                
-                <!-- No treatments state -->
-                <div v-if="getToothTreatments(hoveredTooth).length === 0" 
-                     class="text-center py-3">
-                  <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
-                    <svg class="w-6 h-6 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="p-4 space-y-3">
+                  <div
+                    v-if="getToothTreatments(hoveredTooth).length === 0"
+                    class="rounded-xl border border-dashed border-slate-300 dark:border-slate-600 bg-slate-50/90 dark:bg-slate-800/60 p-5 text-center"
+                  >
+                    <svg class="w-8 h-8 text-slate-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
-                    <h3 class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">No Treatments</h3>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">No recorded treatments</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400 font-medium">Click to add treatment</p>
+                    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200">No recorded treatments yet</h3>
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Add a treatment from the records panel to see its progress here.</p>
                   </div>
-                </div>
-                
-                <!-- Treatments List -->
-                <div v-if="getToothTreatments(hoveredTooth).length > 0" class="space-y-2">
-                  <div v-for="(treatment, index) in getToothTreatments(hoveredTooth)" 
-                       :key="index" 
-                       class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 border border-gray-200 dark:border-gray-600 hover:shadow-sm transition-shadow duration-200">
-                    
-                    <!-- Treatment Header -->
-                    <div class="flex items-center justify-between mb-2">
-                      <h6 class="font-medium text-gray-800 dark:text-gray-200 text-sm flex items-center">
-                        <div class="w-1.5 h-1.5 rounded-full mr-2 bg-sky-400"></div>
-                        {{ getTreatmentTitle(treatment.treatment_type, index, treatment) }}
-                      </h6>
-                      <span :class="getHoverStatusClass(calculateTreatmentStatus(treatment))" 
-                            class="px-2 py-0.5 text-xs font-medium rounded border">
-                        {{ getStatusLabel(calculateTreatmentStatus(treatment)) }}
-                      </span>
-                    </div>
 
-                    <!-- Treatment Notes -->
-                    <div v-if="treatment.notes" class="bg-gray-100 dark:bg-gray-600/30 rounded p-2 mb-2 border border-gray-200 dark:border-gray-600">
-                      <div class="flex items-start">
-                        <svg class="w-3 h-3 text-gray-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
-                        </svg>
-                        <p class="text-gray-700 dark:text-gray-300 text-xs leading-relaxed">{{ treatment.notes }}</p>
+                  <div v-if="getToothTreatments(hoveredTooth).length > 0" class="space-y-3">
+                    <div
+                      v-for="(treatment, index) in getToothTreatments(hoveredTooth)"
+                      :key="index"
+                      class="rounded-xl border border-slate-200 dark:border-slate-700/70 bg-white dark:bg-slate-900/60 p-4 shadow-sm hover:shadow-md transition-shadow duration-200"
+                    >
+                      <div class="flex items-start justify-between gap-3">
+                        <div>
+                          <p class="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span class="inline-flex h-2 w-2 rounded-full bg-sky-400"></span>
+                            {{ getTreatmentTitle(treatment.treatment_type, index, treatment) }}
+                          </p>
+                          <p v-if="treatment.treatment_type" class="mt-1 text-[11px] uppercase tracking-wide text-slate-400 dark:text-slate-400">{{ treatment.treatment_type.replace(/_/g, ' ') }}</p>
+                        </div>
+                        <span
+                          :class="['inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full', getStatusBadgeClass(calculateTreatmentStatus(treatment))]"
+                        >
+                          {{ getStatusLabel(calculateTreatmentStatus(treatment)) }}
+                        </span>
                       </div>
-                    </div>
 
-                    <!-- Treatment Steps -->
-                    <div v-if="treatment.steps && treatment.steps.length > 0" class="mb-2">
-                      <div class="bg-white dark:bg-gray-800 rounded p-2 border border-gray-200 dark:border-gray-600">
-                        <div class="space-y-2">
-                          <div v-for="(step, stepIndex) in treatment.steps" :key="stepIndex" 
-                               class="flex items-start text-xs bg-gray-50 dark:bg-gray-700/30 rounded p-2"
-                               :class="{'border-l-2 border-red-400 bg-red-50 dark:bg-red-900/20': step.is_critical}">
-                            <div class="flex-shrink-0 mr-2 mt-1">
-                              <div class="w-1 h-1 rounded-full bg-gray-400"></div>
-                            </div>
-                            <div class="flex-1">
-                              <div class="text-gray-700 dark:text-gray-300">{{ step.description || step.step_name }}</div>
-                              <div v-if="step.status" class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                Status: {{ getStatusLabel(step.status) }}
-                              </div>
-                            </div>
+                      <div v-if="treatment.notes" class="mt-3 rounded-lg border border-slate-200 dark:border-slate-700/60 bg-slate-50 dark:bg-slate-800/50 p-3">
+                        <div class="flex items-start gap-2">
+                          <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                          </svg>
+                          <p class="text-xs leading-relaxed text-slate-600 dark:text-slate-300">{{ treatment.notes }}</p>
+                        </div>
+                      </div>
+
+                      <div
+                        v-if="treatment.steps && treatment.steps.length"
+                        class="mt-3 border-t border-slate-200 dark:border-slate-700/60 pt-3"
+                      >
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300 mb-2">Treatment Steps</p>
+                        <div class="space-y-1.5">
+                          <div
+                            v-for="(step, stepIndex) in treatment.steps"
+                            :key="stepIndex"
+                            class="flex items-center justify-between gap-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 px-3 py-2"
+                          >
+                            <span class="text-xs font-medium text-slate-700 dark:text-slate-200">{{ step.description || `Step ${stepIndex + 1}` }}</span>
+                            <span
+                              :class="['inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide px-2 py-1 rounded-full', getStatusBadgeClass(step.status)]"
+                            >
+                              {{ getStatusLabel(step.status) }}
+                            </span>
                           </div>
                         </div>
                       </div>
                     </div>
-
-                    <!-- Cost and Payment Info -->
-                    <div v-if="treatment.cost" class="flex justify-between items-center text-xs text-gray-600 dark:text-gray-400 pt-2 border-t border-gray-200 dark:border-gray-600">
-                      <span>Cost: ${{ treatment.cost }}</span>
-                      <span v-if="treatment.payments && treatment.payments.length > 0">
-                        Paid: ${{ treatment.payments.reduce((sum, p) => sum + Number(p.amount), 0) }}
-                      </span>
-                    </div>
                   </div>
-                </div>
                 </div>
               </div>
             </div>
