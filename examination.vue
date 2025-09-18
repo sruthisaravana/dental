@@ -515,13 +515,22 @@ const getToothHistoryFromExaminations = (toothNumber) => {
     .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date, newest first
 };
 
+const getToothRecordedCondition = (toothNumber) => {
+  return toothConditions.value[String(toothNumber)]?.condition || null;
+};
+
+const getToothPendingCondition = (toothNumber) => {
+  if (mode.value !== 'create') return null;
+  return newExaminationData.condition_of_teeth[toothNumber] || null;
+};
+
 const getToothCurrentCondition = (toothNumber) => {
-  const pendingCondition = newExaminationData.condition_of_teeth[toothNumber];
-  if (mode.value === 'create' && pendingCondition) {
+  const pendingCondition = getToothPendingCondition(toothNumber);
+  if (pendingCondition) {
     return pendingCondition;
   }
 
-  const recordCondition = toothConditions.value[String(toothNumber)]?.condition;
+  const recordCondition = getToothRecordedCondition(toothNumber);
   if (recordCondition) {
     return recordCondition;
   }
@@ -1543,9 +1552,9 @@ const handleClose = () => {
                           </div>
                           <div class="relative max-w-7xl mx-auto px-1 sm:px-3">
                             <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
-                            <div class="pointer-events-none absolute top-0 left-0 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-lg shadow-sm">Q2</div>
-                            <div class="pointer-events-none absolute top-0 right-0 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-lg shadow-sm">Q1</div>
-                            <div class="relative flex justify-center gap-8 pt-6 pb-3 z-10">
+                            <div class="pointer-events-none absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 text-xs font-bold text-indigo-600 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900 px-2.5 py-1 rounded-lg shadow-sm">Q2</div>
+                            <div class="pointer-events-none absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 text-xs font-bold text-indigo-600 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900 px-2.5 py-1 rounded-lg shadow-sm">Q1</div>
+                            <div class="relative flex justify-center gap-8 pt-4 pb-3 z-10">
                               <div class="flex gap-3.5">
                                 <div
                                   v-for="tooth in adultPermanent.upperRight"
@@ -1562,13 +1571,23 @@ const handleClose = () => {
                                       class="relative w-[70px] h-[88px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
                                       :class="getToothCardClasses(tooth)"
                                     >
+                                      <div
+                                        v-if="getToothPendingCondition(tooth)"
+                                        class="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
+                                        :class="getConditionDisplayClass(getToothPendingCondition(tooth))"
+                                      >
+                                        {{ getConditionDisplayLabel(getToothPendingCondition(tooth)) }}
+                                      </div>
                                       <img
                                         v-if="toothImageExists[tooth]"
                                         :src="getToothImagePath(tooth)"
                                         @error="imageError(tooth)"
                                         class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
                                       />
-                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">
+                                      <div
+                                        v-else
+                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500"
+                                      >
                                         🦷
                                       </div>
                                     </div>
@@ -1578,11 +1597,11 @@ const handleClose = () => {
                                   </div>
                                   <div class="mt-1 min-h-[18px]">
                                     <div
-                                      v-if="getToothCurrentCondition(tooth)"
+                                      v-if="getToothRecordedCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
-                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))"
+                                      :class="getConditionDisplayClass(getToothRecordedCondition(tooth))"
                                     >
-                                      {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                      {{ getConditionDisplayLabel(getToothRecordedCondition(tooth)) }}
                                     </div>
                                   </div>
                                 </div>
@@ -1603,13 +1622,23 @@ const handleClose = () => {
                                       class="relative w-[70px] h-[88px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
                                       :class="getToothCardClasses(tooth)"
                                     >
+                                      <div
+                                        v-if="getToothPendingCondition(tooth)"
+                                        class="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
+                                        :class="getConditionDisplayClass(getToothPendingCondition(tooth))"
+                                      >
+                                        {{ getConditionDisplayLabel(getToothPendingCondition(tooth)) }}
+                                      </div>
                                       <img
                                         v-if="toothImageExists[tooth]"
                                         :src="getToothImagePath(tooth)"
                                         @error="imageError(tooth)"
                                         class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
                                       />
-                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">
+                                      <div
+                                        v-else
+                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500"
+                                      >
                                         🦷
                                       </div>
                                     </div>
@@ -1619,11 +1648,11 @@ const handleClose = () => {
                                   </div>
                                   <div class="mt-1 min-h-[18px]">
                                     <div
-                                      v-if="getToothCurrentCondition(tooth)"
+                                      v-if="getToothRecordedCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
-                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))"
+                                      :class="getConditionDisplayClass(getToothRecordedCondition(tooth))"
                                     >
-                                      {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                      {{ getConditionDisplayLabel(getToothRecordedCondition(tooth)) }}
                                     </div>
                                   </div>
                                 </div>
@@ -1648,8 +1677,8 @@ const handleClose = () => {
                           </div>
                           <div class="relative max-w-7xl mx-auto px-1 sm:px-3">
                             <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
-                            <div class="pointer-events-none absolute bottom-0 left-0 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2.5 py-1 rounded-lg shadow-sm">Q3</div>
-                            <div class="pointer-events-none absolute bottom-0 right-0 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2.5 py-1 rounded-lg shadow-sm">Q4</div>
+                            <div class="pointer-events-none absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2 text-xs font-bold text-indigo-600 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900 px-2.5 py-1 rounded-lg shadow-sm">Q3</div>
+                            <div class="pointer-events-none absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 text-xs font-bold text-indigo-600 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900 px-2.5 py-1 rounded-lg shadow-sm">Q4</div>
                             <div class="relative flex justify-center gap-8 pt-3 pb-6 z-10">
                               <div class="flex gap-3.5">
                                 <div
@@ -1667,6 +1696,13 @@ const handleClose = () => {
                                       class="relative w-[70px] h-[88px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
                                       :class="getToothCardClasses(tooth)"
                                     >
+                                      <div
+                                        v-if="getToothPendingCondition(tooth)"
+                                        class="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
+                                        :class="getConditionDisplayClass(getToothPendingCondition(tooth))"
+                                      >
+                                        {{ getConditionDisplayLabel(getToothPendingCondition(tooth)) }}
+                                      </div>
                                       <img
                                         v-if="toothImageExists[tooth]"
                                         :src="getToothImagePath(tooth)"
@@ -1674,7 +1710,12 @@ const handleClose = () => {
                                         :alt="'Tooth ' + tooth"
                                         class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
                                       />
-                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">🦷</div>
+                                      <div
+                                        v-else
+                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500"
+                                      >
+                                        🦷
+                                      </div>
                                     </div>
                                   </div>
                                   <div class="mt-2 text-center">
@@ -1682,11 +1723,11 @@ const handleClose = () => {
                                   </div>
                                   <div class="mt-1 min-h-[18px]">
                                     <div
-                                      v-if="getToothCurrentCondition(tooth)"
+                                      v-if="getToothRecordedCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
-                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))"
+                                      :class="getConditionDisplayClass(getToothRecordedCondition(tooth))"
                                     >
-                                      {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                      {{ getConditionDisplayLabel(getToothRecordedCondition(tooth)) }}
                                     </div>
                                   </div>
                                 </div>
@@ -1707,6 +1748,13 @@ const handleClose = () => {
                                       class="relative w-[70px] h-[88px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
                                       :class="getToothCardClasses(tooth)"
                                     >
+                                      <div
+                                        v-if="getToothPendingCondition(tooth)"
+                                        class="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
+                                        :class="getConditionDisplayClass(getToothPendingCondition(tooth))"
+                                      >
+                                        {{ getConditionDisplayLabel(getToothPendingCondition(tooth)) }}
+                                      </div>
                                       <img
                                         v-if="toothImageExists[tooth]"
                                         :src="getToothImagePath(tooth)"
@@ -1714,7 +1762,12 @@ const handleClose = () => {
                                         :alt="'Tooth ' + tooth"
                                         class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
                                       />
-                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">🦷</div>
+                                      <div
+                                        v-else
+                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500"
+                                      >
+                                        🦷
+                                      </div>
                                     </div>
                                   </div>
                                   <div class="mt-2 text-center">
@@ -1722,11 +1775,11 @@ const handleClose = () => {
                                   </div>
                                   <div class="mt-1 min-h-[18px]">
                                     <div
-                                      v-if="getToothCurrentCondition(tooth)"
+                                      v-if="getToothRecordedCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
-                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))"
+                                      :class="getConditionDisplayClass(getToothRecordedCondition(tooth))"
                                     >
-                                      {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                      {{ getConditionDisplayLabel(getToothRecordedCondition(tooth)) }}
                                     </div>
                                   </div>
                                 </div>
@@ -1748,9 +1801,9 @@ const handleClose = () => {
                           </div>
                           <div class="relative max-w-5xl mx-auto px-1.5 sm:px-3">
                             <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
-                            <div class="pointer-events-none absolute top-0 left-0 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-lg shadow-sm">Q2</div>
-                            <div class="pointer-events-none absolute top-0 right-0 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-lg shadow-sm">Q1</div>
-                            <div class="relative flex justify-center gap-7 pt-6 pb-3 z-10">
+                            <div class="pointer-events-none absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 text-xs font-bold text-indigo-600 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900 px-2.5 py-1 rounded-lg shadow-sm">Q2</div>
+                            <div class="pointer-events-none absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 text-xs font-bold text-indigo-600 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900 px-2.5 py-1 rounded-lg shadow-sm">Q1</div>
+                            <div class="relative flex justify-center gap-7 pt-4 pb-3 z-10">
                               <div class="flex gap-3">
                                 <div
                                   v-for="tooth in childrenPrimary.upperRight"
@@ -1767,6 +1820,13 @@ const handleClose = () => {
                                       class="relative w-[68px] h-[84px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
                                       :class="getToothCardClasses(tooth)"
                                     >
+                                      <div
+                                        v-if="getToothPendingCondition(tooth)"
+                                        class="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
+                                        :class="getConditionDisplayClass(getToothPendingCondition(tooth))"
+                                      >
+                                        {{ getConditionDisplayLabel(getToothPendingCondition(tooth)) }}
+                                      </div>
                                       <img
                                         v-if="toothImageExists[tooth]"
                                         :src="getToothImagePath(tooth)"
@@ -1774,7 +1834,12 @@ const handleClose = () => {
                                         :alt="'Tooth ' + tooth"
                                         class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
                                       />
-                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">🦷</div>
+                                      <div
+                                        v-else
+                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500"
+                                      >
+                                        🦷
+                                      </div>
                                     </div>
                                   </div>
                                   <div class="mt-2 text-center">
@@ -1782,11 +1847,11 @@ const handleClose = () => {
                                   </div>
                                   <div class="mt-1 min-h-[18px]">
                                     <div
-                                      v-if="getToothCurrentCondition(tooth)"
+                                      v-if="getToothRecordedCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
-                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))"
+                                      :class="getConditionDisplayClass(getToothRecordedCondition(tooth))"
                                     >
-                                      {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                      {{ getConditionDisplayLabel(getToothRecordedCondition(tooth)) }}
                                     </div>
                                   </div>
                                 </div>
@@ -1807,6 +1872,13 @@ const handleClose = () => {
                                       class="relative w-[68px] h-[84px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
                                       :class="getToothCardClasses(tooth)"
                                     >
+                                      <div
+                                        v-if="getToothPendingCondition(tooth)"
+                                        class="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
+                                        :class="getConditionDisplayClass(getToothPendingCondition(tooth))"
+                                      >
+                                        {{ getConditionDisplayLabel(getToothPendingCondition(tooth)) }}
+                                      </div>
                                       <img
                                         v-if="toothImageExists[tooth]"
                                         :src="getToothImagePath(tooth)"
@@ -1814,7 +1886,12 @@ const handleClose = () => {
                                         :alt="'Tooth ' + tooth"
                                         class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
                                       />
-                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">🦷</div>
+                                      <div
+                                        v-else
+                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500"
+                                      >
+                                        🦷
+                                      </div>
                                     </div>
                                   </div>
                                   <div class="mt-2 text-center">
@@ -1822,11 +1899,11 @@ const handleClose = () => {
                                   </div>
                                   <div class="mt-1 min-h-[18px]">
                                     <div
-                                      v-if="getToothCurrentCondition(tooth)"
+                                      v-if="getToothRecordedCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
-                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))"
+                                      :class="getConditionDisplayClass(getToothRecordedCondition(tooth))"
                                     >
-                                      {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                      {{ getConditionDisplayLabel(getToothRecordedCondition(tooth)) }}
                                     </div>
                                   </div>
                                 </div>
@@ -1851,8 +1928,8 @@ const handleClose = () => {
                           </div>
                           <div class="relative max-w-5xl mx-auto px-1.5 sm:px-3">
                             <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
-                            <div class="pointer-events-none absolute bottom-0 left-0 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2.5 py-1 rounded-lg shadow-sm">Q3</div>
-                            <div class="pointer-events-none absolute bottom-0 right-0 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2.5 py-1 rounded-lg shadow-sm">Q4</div>
+                            <div class="pointer-events-none absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2 text-xs font-bold text-indigo-600 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900 px-2.5 py-1 rounded-lg shadow-sm">Q3</div>
+                            <div class="pointer-events-none absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 text-xs font-bold text-indigo-600 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900 px-2.5 py-1 rounded-lg shadow-sm">Q4</div>
                             <div class="relative flex justify-center gap-7 pt-3 pb-6 z-10">
                               <div class="flex gap-3">
                                 <div
@@ -1870,6 +1947,13 @@ const handleClose = () => {
                                       class="relative w-[68px] h-[84px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
                                       :class="getToothCardClasses(tooth)"
                                     >
+                                      <div
+                                        v-if="getToothPendingCondition(tooth)"
+                                        class="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
+                                        :class="getConditionDisplayClass(getToothPendingCondition(tooth))"
+                                      >
+                                        {{ getConditionDisplayLabel(getToothPendingCondition(tooth)) }}
+                                      </div>
                                       <img
                                         v-if="toothImageExists[tooth]"
                                         :src="getToothImagePath(tooth)"
@@ -1877,7 +1961,12 @@ const handleClose = () => {
                                         :alt="'Tooth ' + tooth"
                                         class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
                                       />
-                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">🦷</div>
+                                      <div
+                                        v-else
+                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500"
+                                      >
+                                        🦷
+                                      </div>
                                     </div>
                                   </div>
                                   <div class="mt-2 text-center">
@@ -1885,11 +1974,11 @@ const handleClose = () => {
                                   </div>
                                   <div class="mt-1 min-h-[18px]">
                                     <div
-                                      v-if="getToothCurrentCondition(tooth)"
+                                      v-if="getToothRecordedCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
-                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))"
+                                      :class="getConditionDisplayClass(getToothRecordedCondition(tooth))"
                                     >
-                                      {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                      {{ getConditionDisplayLabel(getToothRecordedCondition(tooth)) }}
                                     </div>
                                   </div>
                                 </div>
@@ -1910,6 +1999,13 @@ const handleClose = () => {
                                       class="relative w-[68px] h-[84px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
                                       :class="getToothCardClasses(tooth)"
                                     >
+                                      <div
+                                        v-if="getToothPendingCondition(tooth)"
+                                        class="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
+                                        :class="getConditionDisplayClass(getToothPendingCondition(tooth))"
+                                      >
+                                        {{ getConditionDisplayLabel(getToothPendingCondition(tooth)) }}
+                                      </div>
                                       <img
                                         v-if="toothImageExists[tooth]"
                                         :src="getToothImagePath(tooth)"
@@ -1917,7 +2013,12 @@ const handleClose = () => {
                                         :alt="'Tooth ' + tooth"
                                         class="w-full h-full object-contain transition-all duration-200 group-hover:scale-105"
                                       />
-                                      <div v-else class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500">🦷</div>
+                                      <div
+                                        v-else
+                                        class="flex items-center justify-center w-full h-full text-3xl text-gray-400 dark:text-gray-500"
+                                      >
+                                        🦷
+                                      </div>
                                     </div>
                                   </div>
                                   <div class="mt-2 text-center">
@@ -1925,11 +2026,11 @@ const handleClose = () => {
                                   </div>
                                   <div class="mt-1 min-h-[18px]">
                                     <div
-                                      v-if="getToothCurrentCondition(tooth)"
+                                      v-if="getToothRecordedCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
-                                      :class="getConditionDisplayClass(getToothCurrentCondition(tooth))"
+                                      :class="getConditionDisplayClass(getToothRecordedCondition(tooth))"
                                     >
-                                      {{ getConditionDisplayLabel(getToothCurrentCondition(tooth)) }}
+                                      {{ getConditionDisplayLabel(getToothRecordedCondition(tooth)) }}
                                     </div>
                                   </div>
                                 </div>
