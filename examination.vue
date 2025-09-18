@@ -1531,7 +1531,7 @@ const handleClose = () => {
                         </div>
                       </div>
 
-                      <div v-if="activeChartTab === 'adult'" class="space-y-8">
+                      <div v-if="activeChartTab === 'adult'" class="space-y-6">
                         <!-- Adult Upper Jaw -->
                         <section>
                           <div class="text-center mb-4">
@@ -1541,12 +1541,12 @@ const handleClose = () => {
                               <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
                             </span>
                           </div>
-                          <div class="relative max-w-7xl mx-auto px-2 sm:px-4">
+                          <div class="relative max-w-7xl mx-auto px-1 sm:px-3">
                             <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
-                            <div class="pointer-events-none absolute top-3 left-6 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q2</div>
-                            <div class="pointer-events-none absolute top-3 right-6 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q1</div>
-                            <div class="relative flex justify-center gap-10 pt-8 pb-4 z-10">
-                              <div class="flex gap-4">
+                            <div class="pointer-events-none absolute top-1 left-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-lg shadow-sm">Q2</div>
+                            <div class="pointer-events-none absolute top-1 right-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-lg shadow-sm">Q1</div>
+                            <div class="relative flex justify-center gap-8 pt-6 pb-3 z-10">
+                              <div class="flex gap-3.5">
                                 <div
                                   v-for="tooth in adultPermanent.upperRight"
                                   :key="`chart-${tooth}`"
@@ -1559,7 +1559,7 @@ const handleClose = () => {
                                 >
                                   <div class="relative flex flex-col items-center">
                                     <div
-                                      class="relative w-[77px] h-[93px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                      class="relative w-[70px] h-[88px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
                                       :class="getToothCardClasses(tooth)"
                                     >
                                       <img
@@ -1587,7 +1587,7 @@ const handleClose = () => {
                                   </div>
                                 </div>
                               </div>
-                              <div class="flex gap-4">
+                              <div class="flex gap-3.5">
                                 <div
                                   v-for="tooth in adultPermanent.upperLeft"
                                   :key="`chart-${tooth}`"
@@ -1600,7 +1600,7 @@ const handleClose = () => {
                                 >
                                   <div class="relative flex flex-col items-center">
                                     <div
-                                      class="relative w-[77px] h-[93px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                      class="relative w-[70px] h-[88px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
                                       :class="getToothCardClasses(tooth)"
                                     >
                                       <img
@@ -1632,8 +1632,8 @@ const handleClose = () => {
                           </div>
                         </section>
 
-                        <div class="relative my-2 max-w-7xl mx-auto h-4 px-2 sm:px-4">
-                          <div class="pointer-events-none absolute inset-x-2 sm:inset-x-4 top-1/2 -translate-y-1/2 border-t-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
+                        <div class="relative my-1.5 max-w-7xl mx-auto h-3 px-1.5 sm:px-3">
+                          <div class="pointer-events-none absolute inset-x-1.5 sm:inset-x-3 top-1/2 -translate-y-1/2 border-t-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
                           <div class="pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
                         </div>
 
@@ -1646,12 +1646,12 @@ const handleClose = () => {
                               <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
                             </span>
                           </div>
-                          <div class="relative max-w-7xl mx-auto px-2 sm:px-4">
+                          <div class="relative max-w-7xl mx-auto px-1 sm:px-3">
                             <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
-                            <div class="pointer-events-none absolute bottom-3 left-6 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q3</div>
-                            <div class="pointer-events-none absolute bottom-3 right-6 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q4</div>
-                            <div class="relative flex justify-center gap-10 pt-4 pb-8 z-10">
-                              <div class="flex gap-4">
+                            <div class="pointer-events-none absolute bottom-1 left-2 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2.5 py-1 rounded-lg shadow-sm">Q3</div>
+                            <div class="pointer-events-none absolute bottom-1 right-2 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2.5 py-1 rounded-lg shadow-sm">Q4</div>
+                            <div class="relative flex justify-center gap-8 pt-3 pb-6 z-10">
+                              <div class="flex gap-3.5">
                                 <div
                                   v-for="tooth in adultPermanent.lowerRight.slice().reverse()"
                                   :key="`chart-${tooth}`"
@@ -1664,7 +1664,7 @@ const handleClose = () => {
                                 >
                                   <div class="relative flex flex-col items-center">
                                     <div
-                                      class="relative w-[77px] h-[93px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                      class="relative w-[70px] h-[88px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
                                       :class="getToothCardClasses(tooth)"
                                     >
                                       <img
@@ -1691,7 +1691,7 @@ const handleClose = () => {
                                   </div>
                                 </div>
                               </div>
-                              <div class="flex gap-4">
+                              <div class="flex gap-3.5">
                                 <div
                                   v-for="tooth in adultPermanent.lowerLeft.slice().reverse()"
                                   :key="`chart-${tooth}`"
@@ -1704,7 +1704,7 @@ const handleClose = () => {
                                 >
                                   <div class="relative flex flex-col items-center">
                                     <div
-                                      class="relative w-[77px] h-[93px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                      class="relative w-[70px] h-[88px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
                                       :class="getToothCardClasses(tooth)"
                                     >
                                       <img
@@ -1736,7 +1736,7 @@ const handleClose = () => {
                         </section>
                       </div>
 
-                      <div v-else class="space-y-8">
+                      <div v-else class="space-y-6">
                         <!-- Children Upper Jaw -->
                         <section>
                           <div class="text-center mb-4">
@@ -1746,12 +1746,12 @@ const handleClose = () => {
                               <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
                             </span>
                           </div>
-                          <div class="relative max-w-5xl mx-auto px-2 sm:px-4">
+                          <div class="relative max-w-5xl mx-auto px-1.5 sm:px-3">
                             <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
-                            <div class="pointer-events-none absolute top-3 left-6 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q2</div>
-                            <div class="pointer-events-none absolute top-3 right-6 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-3 py-1.5 rounded-lg shadow-sm">Q1</div>
-                            <div class="relative flex justify-center gap-9 pt-8 pb-4 z-10">
-                              <div class="flex gap-4">
+                            <div class="pointer-events-none absolute top-1 left-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-lg shadow-sm">Q2</div>
+                            <div class="pointer-events-none absolute top-1 right-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-lg shadow-sm">Q1</div>
+                            <div class="relative flex justify-center gap-7 pt-6 pb-3 z-10">
+                              <div class="flex gap-3">
                                 <div
                                   v-for="tooth in childrenPrimary.upperRight"
                                   :key="`chart-${tooth}`"
@@ -1764,7 +1764,7 @@ const handleClose = () => {
                                 >
                                   <div class="relative flex flex-col items-center">
                                     <div
-                                      class="relative w-[77px] h-[93px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                      class="relative w-[68px] h-[84px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
                                       :class="getToothCardClasses(tooth)"
                                     >
                                       <img
@@ -1791,7 +1791,7 @@ const handleClose = () => {
                                   </div>
                                 </div>
                               </div>
-                              <div class="flex gap-4">
+                              <div class="flex gap-3">
                                 <div
                                   v-for="tooth in childrenPrimary.upperLeft"
                                   :key="`chart-${tooth}`"
@@ -1804,7 +1804,7 @@ const handleClose = () => {
                                 >
                                   <div class="relative flex flex-col items-center">
                                     <div
-                                      class="relative w-[77px] h-[93px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                      class="relative w-[68px] h-[84px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
                                       :class="getToothCardClasses(tooth)"
                                     >
                                       <img
@@ -1835,8 +1835,8 @@ const handleClose = () => {
                           </div>
                         </section>
 
-                        <div class="relative my-2 max-w-5xl mx-auto h-4 px-2 sm:px-4">
-                          <div class="pointer-events-none absolute inset-x-2 sm:inset-x-4 top-1/2 -translate-y-1/2 border-t-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
+                        <div class="relative my-1.5 max-w-5xl mx-auto h-3 px-1.5 sm:px-3">
+                          <div class="pointer-events-none absolute inset-x-1.5 sm:inset-x-3 top-1/2 -translate-y-1/2 border-t-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
                           <div class="pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
                         </div>
 
@@ -1849,12 +1849,12 @@ const handleClose = () => {
                               <span class="w-2 h-2 bg-slate-600 rounded-full"></span>
                             </span>
                           </div>
-                          <div class="relative max-w-5xl mx-auto px-2 sm:px-4">
+                          <div class="relative max-w-5xl mx-auto px-1.5 sm:px-3">
                             <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
-                            <div class="pointer-events-none absolute bottom-3 left-6 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q3</div>
-                            <div class="pointer-events-none absolute bottom-3 right-6 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-3 py-1.5 rounded-lg shadow-sm">Q4</div>
-                            <div class="relative flex justify-center gap-9 pt-4 pb-8 z-10">
-                              <div class="flex gap-4">
+                            <div class="pointer-events-none absolute bottom-1 left-2 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2.5 py-1 rounded-lg shadow-sm">Q3</div>
+                            <div class="pointer-events-none absolute bottom-1 right-2 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2.5 py-1 rounded-lg shadow-sm">Q4</div>
+                            <div class="relative flex justify-center gap-7 pt-3 pb-6 z-10">
+                              <div class="flex gap-3">
                                 <div
                                   v-for="tooth in childrenPrimary.lowerRight.slice().reverse()"
                                   :key="`chart-${tooth}`"
@@ -1867,7 +1867,7 @@ const handleClose = () => {
                                 >
                                   <div class="relative flex flex-col items-center">
                                     <div
-                                      class="relative w-[77px] h-[93px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                      class="relative w-[68px] h-[84px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
                                       :class="getToothCardClasses(tooth)"
                                     >
                                       <img
@@ -1894,7 +1894,7 @@ const handleClose = () => {
                                   </div>
                                 </div>
                               </div>
-                              <div class="flex gap-4">
+                              <div class="flex gap-3">
                                 <div
                                   v-for="tooth in childrenPrimary.lowerLeft.slice().reverse()"
                                   :key="`chart-${tooth}`"
@@ -1907,7 +1907,7 @@ const handleClose = () => {
                                 >
                                   <div class="relative flex flex-col items-center">
                                     <div
-                                      class="relative w-[77px] h-[93px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
+                                      class="relative w-[68px] h-[84px] mx-auto flex items-center justify-center rounded-xl transition-all duration-200"
                                       :class="getToothCardClasses(tooth)"
                                     >
                                       <img
