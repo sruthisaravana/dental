@@ -1543,8 +1543,8 @@ const handleClose = () => {
                           </div>
                           <div class="relative max-w-7xl mx-auto px-1 sm:px-3">
                             <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
-                            <div class="pointer-events-none absolute top-1 left-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-lg shadow-sm">Q2</div>
-                            <div class="pointer-events-none absolute top-1 right-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-lg shadow-sm">Q1</div>
+                            <div class="pointer-events-none absolute top-0 left-0 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-lg shadow-sm">Q2</div>
+                            <div class="pointer-events-none absolute top-0 right-0 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-lg shadow-sm">Q1</div>
                             <div class="relative flex justify-center gap-8 pt-6 pb-3 z-10">
                               <div class="flex gap-3.5">
                                 <div
@@ -1648,8 +1648,8 @@ const handleClose = () => {
                           </div>
                           <div class="relative max-w-7xl mx-auto px-1 sm:px-3">
                             <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
-                            <div class="pointer-events-none absolute bottom-1 left-2 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2.5 py-1 rounded-lg shadow-sm">Q3</div>
-                            <div class="pointer-events-none absolute bottom-1 right-2 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2.5 py-1 rounded-lg shadow-sm">Q4</div>
+                            <div class="pointer-events-none absolute bottom-0 left-0 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2.5 py-1 rounded-lg shadow-sm">Q3</div>
+                            <div class="pointer-events-none absolute bottom-0 right-0 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2.5 py-1 rounded-lg shadow-sm">Q4</div>
                             <div class="relative flex justify-center gap-8 pt-3 pb-6 z-10">
                               <div class="flex gap-3.5">
                                 <div
@@ -1748,8 +1748,8 @@ const handleClose = () => {
                           </div>
                           <div class="relative max-w-5xl mx-auto px-1.5 sm:px-3">
                             <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
-                            <div class="pointer-events-none absolute top-1 left-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-lg shadow-sm">Q2</div>
-                            <div class="pointer-events-none absolute top-1 right-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-lg shadow-sm">Q1</div>
+                            <div class="pointer-events-none absolute top-0 left-0 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-lg shadow-sm">Q2</div>
+                            <div class="pointer-events-none absolute top-0 right-0 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2.5 py-1 rounded-lg shadow-sm">Q1</div>
                             <div class="relative flex justify-center gap-7 pt-6 pb-3 z-10">
                               <div class="flex gap-3">
                                 <div
@@ -1851,8 +1851,8 @@ const handleClose = () => {
                           </div>
                           <div class="relative max-w-5xl mx-auto px-1.5 sm:px-3">
                             <div class="pointer-events-none absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 border-l-2 border-dashed border-gray-400 dark:border-gray-500 z-30"></div>
-                            <div class="pointer-events-none absolute bottom-1 left-2 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2.5 py-1 rounded-lg shadow-sm">Q3</div>
-                            <div class="pointer-events-none absolute bottom-1 right-2 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2.5 py-1 rounded-lg shadow-sm">Q4</div>
+                            <div class="pointer-events-none absolute bottom-0 left-0 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2.5 py-1 rounded-lg shadow-sm">Q3</div>
+                            <div class="pointer-events-none absolute bottom-0 right-0 text-xs font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2.5 py-1 rounded-lg shadow-sm">Q4</div>
                             <div class="relative flex justify-center gap-7 pt-3 pb-6 z-10">
                               <div class="flex gap-3">
                                 <div
