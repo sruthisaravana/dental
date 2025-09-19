@@ -616,11 +616,23 @@ const getConditionDisplayClass = (condition) => {
   return conditionColors[condition] || 'bg-gray-400 text-white';
 };
 
-const getToothNumberBadgeClass = (toothNumber) => {
-  const condition = getToothCurrentCondition(toothNumber);
+const statusNumberBadgeClasses = {
+  'initial': 'bg-sky-100 text-sky-700 border border-sky-200',
+  'diagnosis_planned': 'bg-violet-100 text-violet-700 border border-violet-200',
+  'intreatment': 'bg-amber-100 text-amber-700 border border-amber-200',
+  'completed': 'bg-emerald-100 text-emerald-700 border border-emerald-200',
+  'new': 'bg-indigo-100 text-indigo-700 border border-indigo-200'
+};
 
-  if (condition) {
-    return `${getConditionDisplayClass(condition)} shadow-sm border border-transparent`;
+const getToothNumberBadgeClass = (toothNumber) => {
+  const status = getToothStatus(toothNumber);
+
+  if (status) {
+    const normalized = normalizeStatus(status);
+    const statusClass = statusNumberBadgeClasses[normalized];
+    if (statusClass) {
+      return `${statusClass} shadow-sm`;
+    }
   }
 
   return 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-sm';
@@ -697,6 +709,18 @@ const getToothTreatments = (toothNumber) => {
 
   return treatments;
 };
+
+const statusOptions = [
+  { value: 'initial', label: 'Initial' },
+  { value: 'diagnosis_planned', label: 'Diagnosis Planned' },
+  { value: 'intreatment', label: 'In Treatment' },
+  { value: 'completed', label: 'Completed' }
+];
+
+const statusLabelMap = statusOptions.reduce((acc, option) => {
+  acc[option.value] = option.label;
+  return acc;
+}, { new: 'New Condition' });
 
 const normalizeStatus = (status) => {
   if (!status) return null;
@@ -776,15 +800,8 @@ const getToothStatus = (toothNumber) => {
 
 const getStatusLabel = (status) => {
   const normalized = normalizeStatus(status);
-  const statusLabels = {
-    'initial': 'Initial',
-    'diagnosis_planned': 'Planned',
-    'intreatment': 'In Treatment',
-    'completed': 'Complete',
-    'new': 'New Condition'
-  };
-  if (normalized && statusLabels[normalized]) {
-    return statusLabels[normalized];
+  if (normalized && statusLabelMap[normalized]) {
+    return statusLabelMap[normalized];
   }
 
   if (!normalized) {
@@ -830,12 +847,18 @@ const getHoverStatusClass = (status) => {
   return statusClasses[normalized] || 'bg-gray-50 text-gray-700 border border-gray-200';
 };
 
-const treatmentStatusLegend = [
-  { key: 'initial', label: 'Initial', colorClass: 'bg-sky-400' },
-  { key: 'diagnosis_planned', label: 'Diagnosed', colorClass: 'bg-purple-400' },
-  { key: 'intreatment', label: 'Treatment', colorClass: 'bg-amber-400' },
-  { key: 'completed', label: 'Complete', colorClass: 'bg-emerald-400' }
-];
+const statusLegendColors = {
+  'initial': 'bg-sky-400',
+  'diagnosis_planned': 'bg-violet-400',
+  'intreatment': 'bg-amber-400',
+  'completed': 'bg-emerald-400'
+};
+
+const treatmentStatusLegend = statusOptions.map(({ value, label }) => ({
+  key: value,
+  label,
+  colorClass: statusLegendColors[value] || 'bg-slate-400'
+}));
 
 const hasCriticalIndicator = (toothNumber) => {
   const toothRecords = props.records.filter(record => String(record.tooth_number) === String(toothNumber));
@@ -1638,7 +1661,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
+                                        class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -1700,7 +1723,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
+                                        class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -1785,7 +1808,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
+                                        class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -1848,7 +1871,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
+                                        class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -1931,7 +1954,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
+                                        class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -1994,7 +2017,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
+                                        class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -2080,7 +2103,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
+                                        class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -2143,7 +2166,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute top-1 left-1 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
+                                        class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
