@@ -199,7 +199,6 @@ const predefinedConditionsWithImages = [
   { value: 'Fully Decayed', label: 'Fully Decayed', color: 'bg-rose-600', image: '/img/cartoon/8_ct.png' },
   { value: 'Root Canal Done', label: 'Root Canal Done', color: 'bg-violet-600', image: '/img/cartoon/9_ct.png' },
   { value: 'Removed', label: 'Removed', color: 'bg-slate-600', image: '/img/cartoon/11_ct.png' },
-  { value: 'Tooth Removed', label: 'Tooth Removed', color: 'bg-slate-600', image: '/img/cartoon/11_ct.png' },
   { value: 'Root Canal', label: 'Root Canal', color: 'bg-violet-500', image: '/img/cartoon/9_ct.png' }
 ];
 
@@ -1661,7 +1660,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
+                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -1684,7 +1683,7 @@ const handleClose = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="mt-2 text-center">
+                                  <div class="mt-2 mb-1 text-center">
                                     <span
                                       :class="[
                                         'inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 text-[11px] font-semibold rounded-md transition-all duration-200',
@@ -1694,7 +1693,7 @@ const handleClose = () => {
                                       {{ tooth }}
                                     </span>
                                   </div>
-                                  <div class="mt-1 min-h-[18px]">
+                                  <div class="mt-2 min-h-[18px]">
                                     <div
                                       v-if="getToothRecordedCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -1723,7 +1722,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
+                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -1746,7 +1745,7 @@ const handleClose = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="mt-2 text-center">
+                                  <div class="mt-2 mb-1 text-center">
                                     <span
                                       :class="[
                                         'inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 text-[11px] font-semibold rounded-md transition-all duration-200',
@@ -1756,7 +1755,7 @@ const handleClose = () => {
                                       {{ tooth }}
                                     </span>
                                   </div>
-                                  <div class="mt-1 min-h-[18px]">
+                                  <div class="mt-2 min-h-[18px]">
                                     <div
                                       v-if="getToothRecordedCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -1808,7 +1807,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
+                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -1832,7 +1831,7 @@ const handleClose = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="mt-2 text-center">
+                                  <div class="mt-2 mb-1 text-center">
                                     <span
                                       :class="[
                                         'inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 text-[11px] font-semibold rounded-md transition-all duration-200',
@@ -1842,7 +1841,7 @@ const handleClose = () => {
                                       {{ tooth }}
                                     </span>
                                   </div>
-                                  <div class="mt-1 min-h-[18px]">
+                                  <div class="mt-2 min-h-[18px]">
                                     <div
                                       v-if="getToothRecordedCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -1871,7 +1870,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
+                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -1895,7 +1894,7 @@ const handleClose = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="mt-2 text-center">
+                                  <div class="mt-2 mb-1 text-center">
                                     <span
                                       :class="[
                                         'inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 text-[11px] font-semibold rounded-md transition-all duration-200',
@@ -1905,7 +1904,7 @@ const handleClose = () => {
                                       {{ tooth }}
                                     </span>
                                   </div>
-                                  <div class="mt-1 min-h-[18px]">
+                                  <div class="mt-2 min-h-[18px]">
                                     <div
                                       v-if="getToothRecordedCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -1954,7 +1953,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
+                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -1978,7 +1977,7 @@ const handleClose = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="mt-2 text-center">
+                                  <div class="mt-2 mb-1 text-center">
                                     <span
                                       :class="[
                                         'inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 text-[11px] font-semibold rounded-md transition-all duration-200',
@@ -1988,7 +1987,7 @@ const handleClose = () => {
                                       {{ tooth }}
                                     </span>
                                   </div>
-                                  <div class="mt-1 min-h-[18px]">
+                                  <div class="mt-2 min-h-[18px]">
                                     <div
                                       v-if="getToothRecordedCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -2017,7 +2016,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
+                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -2041,7 +2040,7 @@ const handleClose = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="mt-2 text-center">
+                                  <div class="mt-2 mb-1 text-center">
                                     <span
                                       :class="[
                                         'inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 text-[11px] font-semibold rounded-md transition-all duration-200',
@@ -2051,7 +2050,7 @@ const handleClose = () => {
                                       {{ tooth }}
                                     </span>
                                   </div>
-                                  <div class="mt-1 min-h-[18px]">
+                                  <div class="mt-2 min-h-[18px]">
                                     <div
                                       v-if="getToothRecordedCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -2103,7 +2102,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
+                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -2127,7 +2126,7 @@ const handleClose = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="mt-2 text-center">
+                                  <div class="mt-2 mb-1 text-center">
                                     <span
                                       :class="[
                                         'inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 text-[11px] font-semibold rounded-md transition-all duration-200',
@@ -2137,7 +2136,7 @@ const handleClose = () => {
                                       {{ tooth }}
                                     </span>
                                   </div>
-                                  <div class="mt-1 min-h-[18px]">
+                                  <div class="mt-2 min-h-[18px]">
                                     <div
                                       v-if="getToothRecordedCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -2166,7 +2165,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm"
+                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -2190,7 +2189,7 @@ const handleClose = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="mt-2 text-center">
+                                  <div class="mt-2 mb-1 text-center">
                                     <span
                                       :class="[
                                         'inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 text-[11px] font-semibold rounded-md transition-all duration-200',
@@ -2200,7 +2199,7 @@ const handleClose = () => {
                                       {{ tooth }}
                                     </span>
                                   </div>
-                                  <div class="mt-1 min-h-[18px]">
+                                  <div class="mt-2 min-h-[18px]">
                                     <div
                                       v-if="getToothRecordedCondition(tooth)"
                                       class="text-xs font-medium px-2 py-0.5 rounded"
