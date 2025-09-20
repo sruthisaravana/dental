@@ -648,7 +648,7 @@ const getToothCardClasses = (toothNumber) => {
   const recordCondition = toothConditions.value[String(toothNumber)]?.condition;
   const pendingCondition = newExaminationData.condition_of_teeth[toothNumber];
   const hasPendingHighlight =
-    mode.value === 'create' && pendingCondition && pendingCondition !== recordCondition;
+    mode.value === 'create' && pendingCondition;
 
   if (hasPendingHighlight) {
     const ringClass = getConditionRingClass(pendingCondition) || 'ring-indigo-400';
