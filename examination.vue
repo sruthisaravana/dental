@@ -172,6 +172,7 @@ const newExaminationData = reactive(createNewExaminationObject());
 const selectedCondition = ref('Healthy');
 const otherConditionText = ref('');
 const toothImageExists = reactive({});
+const conditionImageStatus = reactive({});
 const newCustomCondition = ref('');
 const showInstructions = ref(true); // Show instructions initially, hide after 5 seconds
 const activeChartTab = ref('adult');
@@ -499,6 +500,8 @@ const initializeImageStates = () => {
   allChildrenTeeth.forEach(num => { toothImageExists[num] = true; });
 };
 const imageError = (toothNumber) => { toothImageExists[toothNumber] = false; };
+const handleConditionImageError = (conditionValue) => { conditionImageStatus[conditionValue] = false; };
+const handleConditionImageLoad = (conditionValue) => { conditionImageStatus[conditionValue] = true; };
 
 // Tooth history methods
 const getToothHistoryFromExaminations = (toothNumber) => {
@@ -1487,7 +1490,22 @@ const handleClose = () => {
                         @click="selectedCondition = cond.value"
                         :class="['rounded-2xl border-2 flex items-center justify-center h-28 transition-all duration-200 overflow-hidden', selectedCondition === cond.value ? `${cond.color} border-transparent shadow-lg` : 'bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 hover:scale-102']"
                       >
-                        <img :src="cond.image" :alt="cond.label" class="w-full h-full object-contain rounded-2xl" @error="(e) => e.target.style.display = 'none'" />
+                        <div class="w-full h-full">
+                          <img
+                            v-if="conditionImageStatus[cond.value] !== false"
+                            :src="cond.image"
+                            :alt="cond.label"
+                            class="w-full h-full object-contain rounded-2xl"
+                            @error="handleConditionImageError(cond.value)"
+                            @load="handleConditionImageLoad(cond.value)"
+                          />
+                          <div
+                            v-else
+                            class="w-full h-full bg-white/70 dark:bg-gray-800/80 backdrop-blur-sm flex items-center justify-center px-3 text-center text-sm font-semibold text-slate-600 dark:text-slate-200"
+                          >
+                            {{ cond.label }}
+                          </div>
+                        </div>
                       </button>
                     </div>
 
@@ -1500,18 +1518,21 @@ const handleClose = () => {
                         :class="['rounded-2xl border-2 flex items-center justify-center h-28 transition-all duration-200 overflow-hidden', selectedCondition === cond.value ? `${cond.color} border-transparent shadow-lg` : 'bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 hover:scale-102']"
                         :title="cond.shortDescription"
                       >
-                        <img
-                          v-if="cond.image"
-                          :src="cond.image"
-                          :alt="cond.label"
-                          class="w-full h-full object-contain rounded-2xl"
-                          @error="(e) => e.target.style.display = 'none'"
-                        />
-                        <div
-                          v-else
-                          class="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 rounded-2xl flex items-center justify-center text-2xl"
-                        >
-                          🦷
+                        <div class="w-full h-full">
+                          <img
+                            v-if="cond.image && conditionImageStatus[cond.value] !== false"
+                            :src="cond.image"
+                            :alt="cond.label"
+                            class="w-full h-full object-contain rounded-2xl"
+                            @error="handleConditionImageError(cond.value)"
+                            @load="handleConditionImageLoad(cond.value)"
+                          />
+                          <div
+                            v-else
+                            class="w-full h-full bg-white/70 dark:bg-gray-800/80 backdrop-blur-sm flex items-center justify-center px-3 text-center text-sm font-semibold text-slate-600 dark:text-slate-200"
+                          >
+                            <span class="leading-snug">{{ cond.label }}</span>
+                          </div>
                         </div>
                       </button>
                     </div>
