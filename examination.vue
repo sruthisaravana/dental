@@ -1716,7 +1716,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-0 flex justify-center"
+                                    class="mt-1 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -1780,7 +1780,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-0 flex justify-center"
+                                    class="mt-1 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -1868,7 +1868,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-0 flex justify-center"
+                                    class="mt-1 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -1933,7 +1933,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-0 flex justify-center"
+                                    class="mt-1 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -2018,7 +2018,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-0 flex justify-center"
+                                    class="mt-1 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -2083,7 +2083,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-0 flex justify-center"
+                                    class="mt-1 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -2171,7 +2171,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-0 flex justify-center"
+                                    class="mt-1 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -2236,7 +2236,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-0 flex justify-center"
+                                    class="mt-1 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
