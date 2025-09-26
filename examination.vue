@@ -1483,7 +1483,7 @@ const handleClose = () => {
                     </div>
                     
                     <!-- Conditions with Images -->
-                    <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="grid grid-cols-3 gap-1 mb-4">
                       <button
                         v-for="cond in filteredPredefinedConditions"
                         :key="cond.value"
@@ -1510,7 +1510,7 @@ const handleClose = () => {
                     </div>
 
                     <!-- Additional Conditions with Images (same layout as predefined) -->
-                    <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="grid grid-cols-3 gap-1 mb-4">
                       <button
                         v-for="cond in filteredAdditionalConditions"
                         :key="cond.value"
@@ -1685,7 +1685,7 @@ const handleClose = () => {
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
-                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
+                                        class="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
                                         :class="getConditionDisplayClass(getToothPendingCondition(tooth))"
                                       >
                                         {{ getConditionDisplayLabel(getToothPendingCondition(tooth)) }}
@@ -1716,7 +1716,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-1 flex justify-center"
+                                    class="mt-0 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -1749,7 +1749,7 @@ const handleClose = () => {
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
-                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
+                                        class="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
                                         :class="getConditionDisplayClass(getToothPendingCondition(tooth))"
                                       >
                                         {{ getConditionDisplayLabel(getToothPendingCondition(tooth)) }}
@@ -1780,7 +1780,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-1 flex justify-center"
+                                    class="mt-0 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -1836,7 +1836,7 @@ const handleClose = () => {
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
-                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
+                                        class="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
                                         :class="getConditionDisplayClass(getToothPendingCondition(tooth))"
                                       >
                                         {{ getConditionDisplayLabel(getToothPendingCondition(tooth)) }}
@@ -1868,7 +1868,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-1 flex justify-center"
+                                    class="mt-0 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -1901,7 +1901,7 @@ const handleClose = () => {
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
-                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
+                                        class="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
                                         :class="getConditionDisplayClass(getToothPendingCondition(tooth))"
                                       >
                                         {{ getConditionDisplayLabel(getToothPendingCondition(tooth)) }}
@@ -1933,7 +1933,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-1 flex justify-center"
+                                    class="mt-0 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -1986,7 +1986,7 @@ const handleClose = () => {
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
-                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
+                                        class="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
                                         :class="getConditionDisplayClass(getToothPendingCondition(tooth))"
                                       >
                                         {{ getConditionDisplayLabel(getToothPendingCondition(tooth)) }}
@@ -2018,7 +2018,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-1 flex justify-center"
+                                    class="mt-0 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -2051,7 +2051,7 @@ const handleClose = () => {
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
-                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
+                                        class="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
                                         :class="getConditionDisplayClass(getToothPendingCondition(tooth))"
                                       >
                                         {{ getConditionDisplayLabel(getToothPendingCondition(tooth)) }}
@@ -2083,7 +2083,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-1 flex justify-center"
+                                    class="mt-0 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -2139,7 +2139,7 @@ const handleClose = () => {
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
-                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
+                                        class="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
                                         :class="getConditionDisplayClass(getToothPendingCondition(tooth))"
                                       >
                                         {{ getConditionDisplayLabel(getToothPendingCondition(tooth)) }}
@@ -2171,7 +2171,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-1 flex justify-center"
+                                    class="mt-0 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -2204,7 +2204,7 @@ const handleClose = () => {
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
-                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
+                                        class="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-sm"
                                         :class="getConditionDisplayClass(getToothPendingCondition(tooth))"
                                       >
                                         {{ getConditionDisplayLabel(getToothPendingCondition(tooth)) }}
@@ -2236,7 +2236,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-1 flex justify-center"
+                                    class="mt-0 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
