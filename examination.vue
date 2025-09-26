@@ -2,7 +2,6 @@
 import { ref, reactive, onMounted, onBeforeUnmount, watch, computed } from 'vue';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import keywordsData from '@/assets/keywords_ortho_updated.json';
 import RecordDetailNew from './recorddetail_new.vue';
 import {
   LoaderCircle,
@@ -19,7 +18,6 @@ import {
   Info,
   Save,
   X,
-  Search,
   Trash2,
   Plus
 } from 'lucide-vue-next';
@@ -207,16 +205,6 @@ const conditionImageStatus = reactive({});
 const newCustomCondition = ref('');
 const showInstructions = ref(true); // Show instructions initially, hide after 5 seconds
 const activeChartTab = ref('adult');
-
-// Search functionality state
-const searchQuery = ref('');
-const showSearchDropdown = ref(false);
-const showOtherConditionDropdown = ref(false);
-const otherConditionQuery = ref('');
-const otherConditionFocusedIndex = ref(-1);
-const searchFocusedIndex = ref(-1);
-const otherConditionInput = ref(null);
-const searchInput = ref(null);
 
 // --- STATIC DATA ---
 // Predefined conditions with cartoon tooth images (matching RecordDetailView) - Reversed order (newest first)
@@ -418,7 +406,7 @@ const additionalConditions = [
   }
 ];
 
-const conditions = ref([...predefinedConditionsWithImages, ...additionalConditions, { value: 'other', label: 'Other', color: 'bg-slate-500' }]);
+const conditionTiles = computed(() => [...predefinedConditionsWithImages, ...additionalConditions]);
 
 const adultPermanent = {
   upperRight: [18, 17, 16, 15, 14, 13, 12, 11],
@@ -450,71 +438,6 @@ const toothConditions = computed(() => {
   });
   return conditions;
 });
-
-// Search and filter functionality
-const filteredPredefinedConditions = computed(() => {
-  if (!searchQuery.value) return predefinedConditionsWithImages;
-  const query = searchQuery.value.toLowerCase();
-  return predefinedConditionsWithImages.filter(condition =>
-    condition.label.toLowerCase().includes(query)
-  );
-});
-
-const primaryConditionGridItems = computed(() => {
-  const baseConditions = filteredPredefinedConditions.value;
-  const hasOtherOption = baseConditions.some(condition => condition.value === 'other');
-  return hasOtherOption
-    ? baseConditions
-    : [...baseConditions, { value: 'other', label: 'Other Condition', color: 'bg-slate-500' }];
-});
-
-const filteredAdditionalConditions = computed(() => {
-  if (!searchQuery.value) return additionalConditions;
-  const query = searchQuery.value.toLowerCase();
-  return additionalConditions.filter(condition => 
-    condition.label.toLowerCase().includes(query) ||
-    (condition.shortDescription && condition.shortDescription.toLowerCase().includes(query))
-  );
-});
-
-// Other condition suggestions
-const otherConditionSuggestions = computed(() => {
-  if (!otherConditionQuery.value || otherConditionQuery.value.length < 1) return [];
-  
-  const query = otherConditionQuery.value.toLowerCase().trim();
-  const allKeywords = Array.isArray(keywordsData) ? keywordsData : [];
-  
-  // Filter keywords based on search query
-  const filtered = allKeywords.filter(keyword => 
-    keyword.toLowerCase().includes(query) || 
-    keyword.toLowerCase().split(' ').some(word => word.startsWith(query))
-  );
-  
-  return filtered.slice(0, 8).map(keyword => ({
-    text: keyword,
-    value: keyword,
-    category: 'Medical Terms'
-  }));
-});
-
-// Search dropdown suggestions (for main search)
-const searchDropdownSuggestions = computed(() => {
-  if (!searchQuery.value || searchQuery.value.length < 1) return [];
-  
-  const query = searchQuery.value.toLowerCase();
-  const allConditions = [...predefinedConditionsWithImages, ...additionalConditions];
-  
-  return allConditions.filter(condition => 
-    condition.label.toLowerCase().includes(query) ||
-    (condition.shortDescription && condition.shortDescription.toLowerCase().includes(query))
-  ).slice(0, 6).map(condition => ({
-    text: condition.label,
-    value: condition.value,
-    description: condition.shortDescription || condition.label,
-    category: 'Conditions'
-  }));
-});
-
 
 // --- HELPER FUNCTIONS ---
 const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A';
@@ -1051,104 +974,15 @@ const removeCustomCondition = (index) => {
   newExaminationData.custom_conditions.splice(index, 1);
 };
 
-// Search functionality methods
-const onSearchInput = () => {
-  showSearchDropdown.value = searchQuery.value.length > 0;
-  searchFocusedIndex.value = -1;
-};
-
-const onSearchFocus = () => {
-  if (searchQuery.value.length > 0) {
-    showSearchDropdown.value = true;
-  }
-};
-
-const onSearchBlur = () => {
-  setTimeout(() => {
-    showSearchDropdown.value = false;
-  }, 150);
-};
-
-const onSearchKeydown = (event) => {
-  if (!showSearchDropdown.value || searchDropdownSuggestions.value.length === 0) return;
-  
-  if (event.key === 'ArrowDown') {
-    event.preventDefault();
-    searchFocusedIndex.value = Math.min(searchFocusedIndex.value + 1, searchDropdownSuggestions.value.length - 1);
-  } else if (event.key === 'ArrowUp') {
-    event.preventDefault();
-    searchFocusedIndex.value = Math.max(searchFocusedIndex.value - 1, -1);
-  } else if (event.key === 'Enter' && searchFocusedIndex.value >= 0) {
-    event.preventDefault();
-    selectSearchSuggestion(searchDropdownSuggestions.value[searchFocusedIndex.value]);
-  } else if (event.key === 'Escape') {
-    showSearchDropdown.value = false;
-    searchFocusedIndex.value = -1;
-  }
-};
-
-const selectSearchSuggestion = (suggestion) => {
-  selectedCondition.value = suggestion.value;
-  searchQuery.value = ''; // Clear search after selection
-  showSearchDropdown.value = false;
-  searchFocusedIndex.value = -1;
-};
-
-// Other condition search methods
-const onOtherConditionInput = () => {
-  otherConditionText.value = otherConditionQuery.value;
-  showOtherConditionDropdown.value = otherConditionQuery.value.length > 0;
-  otherConditionFocusedIndex.value = -1;
-};
-
-const onOtherConditionFocus = () => {
-  if (otherConditionQuery.value.length > 0) {
-    showOtherConditionDropdown.value = true;
-  }
-};
-
-const onOtherConditionBlur = () => {
-  setTimeout(() => {
-    showOtherConditionDropdown.value = false;
-  }, 150);
-};
-
-const onOtherConditionKeydown = (event) => {
-  if (!showOtherConditionDropdown.value || otherConditionSuggestions.value.length === 0) return;
-  
-  if (event.key === 'ArrowDown') {
-    event.preventDefault();
-    otherConditionFocusedIndex.value = Math.min(otherConditionFocusedIndex.value + 1, otherConditionSuggestions.value.length - 1);
-  } else if (event.key === 'ArrowUp') {
-    event.preventDefault();
-    otherConditionFocusedIndex.value = Math.max(otherConditionFocusedIndex.value - 1, -1);
-  } else if (event.key === 'Enter' && otherConditionFocusedIndex.value >= 0) {
-    event.preventDefault();
-    selectOtherConditionSuggestion(otherConditionSuggestions.value[otherConditionFocusedIndex.value]);
-  } else if (event.key === 'Escape') {
-    showOtherConditionDropdown.value = false;
-    otherConditionFocusedIndex.value = -1;
-  }
-};
-
-const selectOtherConditionSuggestion = (suggestion) => {
-  otherConditionQuery.value = suggestion.text;
-  otherConditionText.value = suggestion.text;
-  showOtherConditionDropdown.value = false;
-  otherConditionFocusedIndex.value = -1;
-};
-
-// Watch for condition changes to clear search
-watch(selectedCondition, () => {
-  if (selectedCondition.value !== 'other') {
-    searchQuery.value = '';
-    showSearchDropdown.value = false;
+watch(selectedCondition, (value) => {
+  if (value !== 'other') {
+    otherConditionText.value = '';
   }
 });
 
 const handleToothClick = (toothNumber) => {
   // Use single click logic for both create and view modes
-  // Single click: condition application (create mode) or nothing (view mode)  
+  // Single click: condition application (create mode) or nothing (view mode)
   // Double click: open popup in both modes
   handleToothSingleClick(toothNumber);
 };
@@ -1486,130 +1320,18 @@ const handleClose = () => {
                       Select Condition
                     </h4>
                     
-                    <!-- Search Box -->
-                    <div class="mb-4 relative">
-                      <div class="search-input-wrapper">
-                        <input 
-                          ref="searchInput"
-                          type="text" 
-                          v-model="searchQuery"
-                          @input="onSearchInput"
-                          @keydown="onSearchKeydown"
-                          @focus="onSearchFocus"
-                          @blur="onSearchBlur"
-                          class="condition-search-input w-full" 
-                          placeholder="Search conditions..."
-                          autocomplete="off"
-                        />
-                        <Search class="search-icon" :size="18" />
-                      </div>
-                      
-                      <!-- Search Dropdown -->
-                      <div v-if="showSearchDropdown && searchDropdownSuggestions.length > 0" class="search-dropdown">
-                        <div
-                          v-for="(suggestion, index) in searchDropdownSuggestions"
-                          :key="suggestion.value + index"
-                          :class="['search-dropdown-item', { 'focused': index === searchFocusedIndex }]"
-                          @mousedown.prevent="selectSearchSuggestion(suggestion)"
-                          @mouseenter="searchFocusedIndex = index"
-                        >
-                          <div class="dropdown-condition-info">
-                            <div class="dropdown-condition-name">{{ suggestion.text }}</div>
-                            <div class="dropdown-condition-description">{{ suggestion.description }}</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <!-- Conditions with Images -->
+                    <!-- Condition Tiles -->
                     <div class="grid grid-cols-3 gap-1 mb-4">
                       <button
-                        v-for="cond in primaryConditionGridItems"
+                        v-for="cond in conditionTiles"
                         :key="cond.value"
                         @click="selectedCondition = cond.value"
                         :class="[
                           'rounded-2xl border-2 flex items-center justify-center h-28 transition-all duration-200 overflow-hidden',
-                          cond.value === 'other'
-                            ? selectedCondition === 'other'
-                              ? 'bg-slate-500 border-transparent text-white shadow-lg'
-                              : 'bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-slate-700 dark:text-slate-200 hover:border-indigo-400 dark:hover:border-indigo-500 hover:scale-102'
-                            : selectedCondition === cond.value
+                          selectedCondition === cond.value
                             ? `${cond.color} border-transparent shadow-lg`
                             : 'bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 hover:scale-102'
                         ]"
-                      >
-                        <template v-if="cond.value === 'other'">
-                          <div class="flex flex-col items-center justify-center gap-2">
-                            <Plus :class="['w-5 h-5', selectedCondition === 'other' ? 'text-white' : 'text-slate-600 dark:text-slate-200']" />
-                            <span :class="['text-sm font-semibold text-center px-2', selectedCondition === 'other' ? 'text-white' : 'text-slate-700 dark:text-slate-200']">
-                              {{ cond.label }}
-                            </span>
-                          </div>
-                        </template>
-                        <template v-else>
-                          <div class="w-full h-full">
-                            <img
-                              v-if="conditionImageStatus[cond.value] !== false"
-                              :src="cond.image"
-                              :alt="cond.label"
-                              class="w-full h-full object-contain rounded-2xl"
-                              @error="handleConditionImageError(cond.value)"
-                              @load="handleConditionImageLoad(cond.value)"
-                            />
-                            <div
-                              v-else
-                              class="w-full h-full bg-white/70 dark:bg-gray-800/80 backdrop-blur-sm flex items-center justify-center px-3 text-center text-sm font-semibold text-slate-600 dark:text-slate-200"
-                            >
-                              {{ cond.label }}
-                            </div>
-                          </div>
-                        </template>
-                      </button>
-                    </div>
-
-                    <div v-if="selectedCondition === 'other'" class="space-y-2 mb-4">
-                      <div class="other-condition-search-container">
-                        <div class="search-input-wrapper">
-                          <input
-                            ref="otherConditionInput"
-                            type="text"
-                            v-model="otherConditionQuery"
-                            @input="onOtherConditionInput"
-                            @keydown="onOtherConditionKeydown"
-                            @focus="onOtherConditionFocus"
-                            @blur="onOtherConditionBlur"
-                            placeholder="Search medical terms and describe condition..."
-                            class="condition-search-input w-full"
-                            autocomplete="off"
-                          />
-                          <Search class="search-icon" :size="16" />
-                        </div>
-
-                        <!-- Other Condition Search Dropdown -->
-                        <div v-if="showOtherConditionDropdown && otherConditionSuggestions.length > 0" class="search-dropdown">
-                          <div
-                            v-for="(suggestion, index) in otherConditionSuggestions"
-                            :key="suggestion.value + index"
-                            :class="['search-dropdown-item', { 'focused': index === otherConditionFocusedIndex }]"
-                            @mousedown.prevent="selectOtherConditionSuggestion(suggestion)"
-                            @mouseenter="otherConditionFocusedIndex = index"
-                          >
-                            <div class="dropdown-condition-info">
-                              <div class="dropdown-condition-name">{{ suggestion.text }}</div>
-                              <div class="dropdown-condition-description">{{ suggestion.category }}</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Additional Conditions with Images (same layout as predefined) -->
-                    <div class="grid grid-cols-3 gap-1 mb-4">
-                      <button
-                        v-for="cond in filteredAdditionalConditions"
-                        :key="cond.value"
-                        @click="selectedCondition = cond.value"
-                        :class="['rounded-2xl border-2 flex items-center justify-center h-28 transition-all duration-200 overflow-hidden', selectedCondition === cond.value ? `${cond.color} border-transparent shadow-lg` : 'bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 hover:scale-102']"
                         :title="cond.shortDescription"
                       >
                         <div class="w-full h-full">
@@ -1625,10 +1347,35 @@ const handleClose = () => {
                             v-else
                             class="w-full h-full bg-white/70 dark:bg-gray-800/80 backdrop-blur-sm flex items-center justify-center px-3 text-center text-sm font-semibold text-slate-600 dark:text-slate-200"
                           >
-                            <span class="leading-snug">{{ cond.label }}</span>
+                            {{ cond.label }}
                           </div>
                         </div>
                       </button>
+                      <button
+                        @click="selectedCondition = 'other'"
+                        :class="[
+                          'rounded-2xl border-2 flex flex-col items-center justify-center h-28 gap-2 transition-all duration-200',
+                          selectedCondition === 'other'
+                            ? 'bg-slate-500 border-transparent text-white shadow-lg'
+                            : 'bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-slate-700 dark:text-slate-200 hover:border-indigo-400 dark:hover:border-indigo-500 hover:scale-102'
+                        ]"
+                      >
+                        <Plus :class="['w-5 h-5', selectedCondition === 'other' ? 'text-white' : 'text-slate-600 dark:text-slate-200']" />
+                        <span :class="['text-sm font-semibold text-center px-2', selectedCondition === 'other' ? 'text-white' : 'text-slate-700 dark:text-slate-200']">
+                          Other Condition
+                        </span>
+                      </button>
+                    </div>
+
+                    <div v-if="selectedCondition === 'other'" class="space-y-2 mb-4">
+                      <label class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">Custom condition</label>
+                      <input
+                        type="text"
+                        v-model="otherConditionText"
+                        placeholder="Enter condition name"
+                        class="w-full px-3 py-2 border-2 rounded-lg bg-white dark:bg-gray-700 border-slate-300 dark:border-slate-600 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-500/40"
+                      />
+                      <p class="text-xs text-slate-500 dark:text-slate-400">Click a tooth to apply this custom condition.</p>
                     </div>
                   </div>
                 </div>
@@ -1730,7 +1477,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
+                                        class="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -1753,7 +1500,7 @@ const handleClose = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="mt-2 mb-1 text-center">
+                                  <div class="mt-2 mb-3 text-center">
                                     <span
                                       :class="[
                                         'inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 text-[11px] font-semibold rounded-md transition-all duration-200',
@@ -1765,7 +1512,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-[6px] flex justify-center"
+                                    class="mt-2 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -1794,7 +1541,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
+                                        class="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -1817,7 +1564,7 @@ const handleClose = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="mt-2 mb-1 text-center">
+                                  <div class="mt-2 mb-3 text-center">
                                     <span
                                       :class="[
                                         'inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 text-[11px] font-semibold rounded-md transition-all duration-200',
@@ -1829,7 +1576,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-[6px] flex justify-center"
+                                    class="mt-2 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -1881,7 +1628,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
+                                        class="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -1905,7 +1652,7 @@ const handleClose = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="mt-2 mb-1 text-center">
+                                  <div class="mt-2 mb-3 text-center">
                                     <span
                                       :class="[
                                         'inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 text-[11px] font-semibold rounded-md transition-all duration-200',
@@ -1917,7 +1664,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-[6px] flex justify-center"
+                                    class="mt-2 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -1946,7 +1693,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
+                                        class="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -1970,7 +1717,7 @@ const handleClose = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="mt-2 mb-1 text-center">
+                                  <div class="mt-2 mb-3 text-center">
                                     <span
                                       :class="[
                                         'inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 text-[11px] font-semibold rounded-md transition-all duration-200',
@@ -1982,7 +1729,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-[6px] flex justify-center"
+                                    class="mt-2 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -2031,7 +1778,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
+                                        class="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -2055,7 +1802,7 @@ const handleClose = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="mt-2 mb-1 text-center">
+                                  <div class="mt-2 mb-3 text-center">
                                     <span
                                       :class="[
                                         'inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 text-[11px] font-semibold rounded-md transition-all duration-200',
@@ -2067,7 +1814,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-[6px] flex justify-center"
+                                    class="mt-2 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -2096,7 +1843,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
+                                        class="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -2120,7 +1867,7 @@ const handleClose = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="mt-2 mb-1 text-center">
+                                  <div class="mt-2 mb-3 text-center">
                                     <span
                                       :class="[
                                         'inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 text-[11px] font-semibold rounded-md transition-all duration-200',
@@ -2132,7 +1879,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-[6px] flex justify-center"
+                                    class="mt-2 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -2184,7 +1931,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
+                                        class="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -2208,7 +1955,7 @@ const handleClose = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="mt-2 mb-1 text-center">
+                                  <div class="mt-2 mb-3 text-center">
                                     <span
                                       :class="[
                                         'inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 text-[11px] font-semibold rounded-md transition-all duration-200',
@@ -2220,7 +1967,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-[6px] flex justify-center"
+                                    class="mt-2 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -2249,7 +1996,7 @@ const handleClose = () => {
                                     >
                                       <div
                                         v-if="hasCriticalIndicator(tooth)"
-                                        class="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
+                                        class="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-rose-500 border-2 border-white shadow-sm z-30"
                                       ></div>
                                       <div
                                         v-if="getToothPendingCondition(tooth)"
@@ -2273,7 +2020,7 @@ const handleClose = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="mt-2 mb-1 text-center">
+                                  <div class="mt-2 mb-3 text-center">
                                     <span
                                       :class="[
                                         'inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 text-[11px] font-semibold rounded-md transition-all duration-200',
@@ -2285,7 +2032,7 @@ const handleClose = () => {
                                   </div>
                                   <div
                                     v-if="getToothRecordedCondition(tooth)"
-                                    class="mt-[6px] flex justify-center"
+                                    class="mt-2 flex justify-center"
                                   >
                                     <div
                                       class="text-xs font-medium px-2 py-0.5 rounded"
@@ -2781,155 +2528,6 @@ button, input, select, textarea {
 .dark .condition-image-loading {
   background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
   background-size: 200% 100%;
-}
-
-/* Search functionality styles */
-.search-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.condition-search-input {
-  width: 100%;
-  padding: 12px 40px 12px 16px;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 14px;
-  line-height: 1.5;
-  background-color: white;
-  transition: all 0.2s ease-in-out;
-}
-
-.condition-search-input:focus {
-  outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
-.dark .condition-search-input {
-  background-color: #374151;
-  border-color: #4b5563;
-  color: #f9fafb;
-}
-
-.dark .condition-search-input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
-.search-icon {
-  position: absolute;
-  right: 12px;
-  color: #6b7280;
-  pointer-events: none;
-}
-
-.dark .search-icon {
-  color: #9ca3af;
-}
-
-.search-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  z-index: 50;
-  max-height: 200px;
-  overflow-y: auto;
-  margin-top: 4px;
-}
-
-.dark .search-dropdown {
-  background: #374151;
-  border-color: #4b5563;
-}
-
-.search-dropdown-item {
-  padding: 12px 16px;
-  cursor: pointer;
-  border-bottom: 1px solid #f3f4f6;
-  transition: background-color 0.15s ease-in-out;
-}
-
-.search-dropdown-item:last-child {
-  border-bottom: none;
-}
-
-.search-dropdown-item:hover,
-.search-dropdown-item.focused {
-  background-color: #f9fafb;
-}
-
-.dark .search-dropdown-item {
-  border-bottom-color: #4b5563;
-}
-
-.dark .search-dropdown-item:hover,
-.dark .search-dropdown-item.focused {
-  background-color: #4b5563;
-}
-
-.dropdown-condition-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.dropdown-condition-name {
-  font-weight: 500;
-  font-size: 14px;
-  color: #1f2937;
-  margin-bottom: 2px;
-}
-
-.dark .dropdown-condition-name {
-  color: #f9fafb;
-}
-
-.dropdown-condition-description {
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.dark .dropdown-condition-description {
-  color: #9ca3af;
-}
-
-/* Other condition search specific styles */
-.other-condition-search-container {
-  position: relative;
-}
-
-.other-condition-search-container .condition-search-input {
-  padding: 10px 36px 10px 12px;
-  font-size: 13px;
-}
-
-.other-condition-search-container .search-icon {
-  right: 10px;
-}
-
-.other-condition-search-container .search-dropdown {
-  font-size: 13px;
-}
-
-.other-condition-search-container .search-dropdown-item {
-  padding: 10px 12px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .search-dropdown {
-    max-height: 150px;
-  }
-  
-  .condition-search-input {
-    font-size: 16px; /* Prevent zoom on iOS */
-  }
 }
 
 /* Tooth history tooltip styles */
