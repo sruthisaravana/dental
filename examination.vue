@@ -112,6 +112,37 @@ const globalConditionFields = [
   'nutritional_deficiency_signs'
 ];
 
+const defaultCustomConditionTemplates = [
+  { id: 'default-smoking', name: 'Smoking', checked: false },
+  { id: 'default-drinking', name: 'Drinking', checked: false },
+  { id: 'default-tobacco-usage', name: 'Tobacco Usage (Pan)', checked: false }
+];
+
+const getDefaultCustomConditions = () =>
+  defaultCustomConditionTemplates.map(condition => ({ ...condition }));
+
+const ensureDefaultCustomConditions = (conditions = []) => {
+  const normalized = Array.isArray(conditions)
+    ? conditions.map((condition, index) => ({
+        id:
+          condition.id ||
+          `loaded-${(condition.name || condition.label || `condition-${index + 1}`).toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+        name: condition.name || condition.label || `Condition ${index + 1}`,
+        checked: Boolean(condition.checked)
+      }))
+    : [];
+
+  const existingNames = new Set(normalized.map(condition => condition.name.toLowerCase()));
+
+  defaultCustomConditionTemplates.forEach(template => {
+    if (!existingNames.has(template.name.toLowerCase())) {
+      normalized.push({ ...template });
+    }
+  });
+
+  return normalized;
+};
+
 // Factory for creating a clean examination object
 const createNewExaminationObject = () => ({
   exam_date: new Date().toISOString().split('T')[0],
@@ -163,7 +194,7 @@ const createNewExaminationObject = () => ({
   tobacco_stains: false,
   medication_related_changes: false,
   nutritional_deficiency_signs: false,
-  custom_conditions: [],
+  custom_conditions: getDefaultCustomConditions(),
   global_conditions_notes: ''
 });
 
@@ -424,9 +455,17 @@ const toothConditions = computed(() => {
 const filteredPredefinedConditions = computed(() => {
   if (!searchQuery.value) return predefinedConditionsWithImages;
   const query = searchQuery.value.toLowerCase();
-  return predefinedConditionsWithImages.filter(condition => 
+  return predefinedConditionsWithImages.filter(condition =>
     condition.label.toLowerCase().includes(query)
   );
+});
+
+const primaryConditionGridItems = computed(() => {
+  const baseConditions = filteredPredefinedConditions.value;
+  const hasOtherOption = baseConditions.some(condition => condition.value === 'other');
+  return hasOtherOption
+    ? baseConditions
+    : [...baseConditions, { value: 'other', label: 'Other Condition', color: 'bg-slate-500' }];
 });
 
 const filteredAdditionalConditions = computed(() => {
@@ -1226,7 +1265,7 @@ const formatPayload = (data) => {
           return acc;
         }, {}),
     // Add global conditions
-    custom_conditions: data.custom_conditions || [],
+    custom_conditions: ensureDefaultCustomConditions(data.custom_conditions),
     global_conditions_notes: data.global_conditions_notes || ''
   };
 
@@ -1485,28 +1524,83 @@ const handleClose = () => {
                     <!-- Conditions with Images -->
                     <div class="grid grid-cols-3 gap-1 mb-4">
                       <button
-                        v-for="cond in filteredPredefinedConditions"
+                        v-for="cond in primaryConditionGridItems"
                         :key="cond.value"
                         @click="selectedCondition = cond.value"
-                        :class="['rounded-2xl border-2 flex items-center justify-center h-28 transition-all duration-200 overflow-hidden', selectedCondition === cond.value ? `${cond.color} border-transparent shadow-lg` : 'bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 hover:scale-102']"
+                        :class="[
+                          'rounded-2xl border-2 flex items-center justify-center h-28 transition-all duration-200 overflow-hidden',
+                          cond.value === 'other'
+                            ? selectedCondition === 'other'
+                              ? 'bg-slate-500 border-transparent text-white shadow-lg'
+                              : 'bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-slate-700 dark:text-slate-200 hover:border-indigo-400 dark:hover:border-indigo-500 hover:scale-102'
+                            : selectedCondition === cond.value
+                            ? `${cond.color} border-transparent shadow-lg`
+                            : 'bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:border-indigo-400 dark:hover:border-indigo-500 hover:scale-102'
+                        ]"
                       >
-                        <div class="w-full h-full">
-                          <img
-                            v-if="conditionImageStatus[cond.value] !== false"
-                            :src="cond.image"
-                            :alt="cond.label"
-                            class="w-full h-full object-contain rounded-2xl"
-                            @error="handleConditionImageError(cond.value)"
-                            @load="handleConditionImageLoad(cond.value)"
+                        <template v-if="cond.value === 'other'">
+                          <div class="flex flex-col items-center justify-center gap-2">
+                            <Plus :class="['w-5 h-5', selectedCondition === 'other' ? 'text-white' : 'text-slate-600 dark:text-slate-200']" />
+                            <span :class="['text-sm font-semibold text-center px-2', selectedCondition === 'other' ? 'text-white' : 'text-slate-700 dark:text-slate-200']">
+                              {{ cond.label }}
+                            </span>
+                          </div>
+                        </template>
+                        <template v-else>
+                          <div class="w-full h-full">
+                            <img
+                              v-if="conditionImageStatus[cond.value] !== false"
+                              :src="cond.image"
+                              :alt="cond.label"
+                              class="w-full h-full object-contain rounded-2xl"
+                              @error="handleConditionImageError(cond.value)"
+                              @load="handleConditionImageLoad(cond.value)"
+                            />
+                            <div
+                              v-else
+                              class="w-full h-full bg-white/70 dark:bg-gray-800/80 backdrop-blur-sm flex items-center justify-center px-3 text-center text-sm font-semibold text-slate-600 dark:text-slate-200"
+                            >
+                              {{ cond.label }}
+                            </div>
+                          </div>
+                        </template>
+                      </button>
+                    </div>
+
+                    <div v-if="selectedCondition === 'other'" class="space-y-2 mb-4">
+                      <div class="other-condition-search-container">
+                        <div class="search-input-wrapper">
+                          <input
+                            ref="otherConditionInput"
+                            type="text"
+                            v-model="otherConditionQuery"
+                            @input="onOtherConditionInput"
+                            @keydown="onOtherConditionKeydown"
+                            @focus="onOtherConditionFocus"
+                            @blur="onOtherConditionBlur"
+                            placeholder="Search medical terms and describe condition..."
+                            class="condition-search-input w-full"
+                            autocomplete="off"
                           />
+                          <Search class="search-icon" :size="16" />
+                        </div>
+
+                        <!-- Other Condition Search Dropdown -->
+                        <div v-if="showOtherConditionDropdown && otherConditionSuggestions.length > 0" class="search-dropdown">
                           <div
-                            v-else
-                            class="w-full h-full bg-white/70 dark:bg-gray-800/80 backdrop-blur-sm flex items-center justify-center px-3 text-center text-sm font-semibold text-slate-600 dark:text-slate-200"
+                            v-for="(suggestion, index) in otherConditionSuggestions"
+                            :key="suggestion.value + index"
+                            :class="['search-dropdown-item', { 'focused': index === otherConditionFocusedIndex }]"
+                            @mousedown.prevent="selectOtherConditionSuggestion(suggestion)"
+                            @mouseenter="otherConditionFocusedIndex = index"
                           >
-                            {{ cond.label }}
+                            <div class="dropdown-condition-info">
+                              <div class="dropdown-condition-name">{{ suggestion.text }}</div>
+                              <div class="dropdown-condition-description">{{ suggestion.category }}</div>
+                            </div>
                           </div>
                         </div>
-                      </button>
+                      </div>
                     </div>
 
                     <!-- Additional Conditions with Images (same layout as predefined) -->
@@ -1535,51 +1629,6 @@ const handleClose = () => {
                           </div>
                         </div>
                       </button>
-                    </div>
-
-                    <!-- Other Condition -->
-                    <div class="space-y-2">
-                      <button
-                        @click="selectedCondition = 'other'"
-                        :class="['w-full p-2 text-sm font-medium rounded-lg border-2', selectedCondition === 'other' ? 'bg-slate-500 text-white border-transparent shadow' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300']"
-                      >
-                        Other Condition
-                      </button>
-                      <div v-if="selectedCondition === 'other'" class="mt-2 relative">
-                        <div class="other-condition-search-container">
-                          <div class="search-input-wrapper">
-                            <input 
-                              ref="otherConditionInput"
-                              type="text" 
-                              v-model="otherConditionQuery"
-                              @input="onOtherConditionInput"
-                              @keydown="onOtherConditionKeydown"
-                              @focus="onOtherConditionFocus"
-                              @blur="onOtherConditionBlur"
-                              placeholder="Search medical terms and describe condition..." 
-                              class="condition-search-input w-full"
-                              autocomplete="off"
-                            />
-                            <Search class="search-icon" :size="16" />
-                          </div>
-                          
-                          <!-- Other Condition Search Dropdown -->
-                          <div v-if="showOtherConditionDropdown && otherConditionSuggestions.length > 0" class="search-dropdown">
-                            <div
-                              v-for="(suggestion, index) in otherConditionSuggestions"
-                              :key="suggestion.value + index"
-                              :class="['search-dropdown-item', { 'focused': index === otherConditionFocusedIndex }]"
-                              @mousedown.prevent="selectOtherConditionSuggestion(suggestion)"
-                              @mouseenter="otherConditionFocusedIndex = index"
-                            >
-                              <div class="dropdown-condition-info">
-                                <div class="dropdown-condition-name">{{ suggestion.text }}</div>
-                                <div class="dropdown-condition-description">{{ suggestion.category }}</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </div>
