@@ -293,10 +293,11 @@
             pixelsPerHour > 48 ? 'timeline-scrollable' : 'timeline-autoheight'
           ]"
           :style="pixelsPerHour > 48 ? 'max-height: 700px; min-height: 80vh; overflow-y: auto;' : 'min-height: 80vh; max-height: none; overflow-y: visible;'"
+          @dragenter.prevent="handleDragEnter"
           @dragover.prevent="handleDragOver"
-          @dragleave="handleDragLeave" 
+          @dragleave="handleDragLeave"
           @drop="handleDrop"
-          @wheel="handleTimelineWheel">
+          @wheel.prevent="handleTimelineWheel">
                 
                 <!-- Time Grid - FIXED with proper spacing -->
                 <div class="absolute left-0 top-0 w-20 h-full">
@@ -378,15 +379,15 @@
                                 :class="getStatusBadgeClass(appointment.status)">
                             {{ appointment.status }}
                           </span>
-                          <div class="flex items-center gap-2">
-                            <button v-if="appointment.status !== 'completed'"
-                                    @click.stop="startAppointment(appointment)"
-                                    class="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm transition-all sm:text-sm"
-                                    :class="timing && activeAppointment?.id === appointment.id
-                                      ? 'bg-rose-500 text-white hover:bg-rose-600'
-                                      : 'bg-emerald-500 text-white hover:bg-emerald-600'">
-                              {{ timing && activeAppointment?.id === appointment.id ? 'Stop' : 'Start' }}
-                            </button>
+                            <div class="flex items-center gap-2">
+                              <button v-if="appointment.status !== 'completed'"
+                                      @click.stop="toggleAppointmentTimer(appointment)"
+                                      class="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm transition-all sm:text-sm"
+                                      :class="timing && activeAppointment?.id === appointment.id
+                                        ? 'bg-rose-500 text-white hover:bg-rose-600'
+                                        : 'bg-emerald-500 text-white hover:bg-emerald-600'">
+                                {{ timing && activeAppointment?.id === appointment.id ? 'Stop' : 'Start' }}
+                              </button>
                             <button v-if="appointment.status === 'completed'"
                                     @click.stop="showTimeEditModal(appointment)"
                                     class="inline-flex items-center rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-semibold text-blue-700 transition-all hover:bg-blue-200">
@@ -416,7 +417,7 @@
                 </div>
 
                 <!-- Zoom Controls -->
-                <div class="pointer-events-auto absolute bottom-4 right-4 z-40 flex flex-col gap-2">
+                  <div class="pointer-events-auto fixed bottom-6 right-6 z-40 flex flex-col gap-2">
                   <button type="button"
                           class="rounded-full border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-600 shadow-sm transition-all hover:border-blue-400 hover:text-blue-600"
                           @click.stop="zoomIn"
@@ -497,7 +498,15 @@
                       </div>
                     </div>
                     <!-- Actions -->
-                    <div class="flex flex-col items-end ml-2 space-y-1">
+                    <div class="flex flex-col items-end ml-2 space-y-2">
+                      <button v-if="appointment.status !== 'completed'"
+                              @click.stop="toggleAppointmentTimer(appointment)"
+                              class="px-2.5 py-1 text-[11px] font-semibold rounded-full transition-colors"
+                              :class="activeAppointment?.id === appointment.id && timing
+                                ? 'bg-rose-500 text-white hover:bg-rose-600'
+                                : 'bg-emerald-500 text-white hover:bg-emerald-600'">
+                        {{ activeAppointment?.id === appointment.id && timing ? 'Stop' : 'Start' }}
+                      </button>
                       <button @click.stop="deleteAppointment(appointment.id)"
                               class="p-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full"
                               title="Delete appointment from queue (removes everywhere)">
@@ -948,17 +957,49 @@ const getAppointmentPosition = (appointment) => {
 // FIXED: Drop position calculation
 const calculateDropPosition = (event) => {
   if (!timelineContainer.value) return 9 * 60
-  
+
   const rect = timelineContainer.value.getBoundingClientRect()
   const y = event.clientY - rect.top - 8 // Account for padding
   const hourPosition = Math.max(0, y / pixelsPerHour.value)
   const timeMinutes = (9 * 60) + (hourPosition * 60)
-  
+
   // Snap to 15-minute intervals
   const snapInterval = 15
   const snappedMinutes = Math.round(timeMinutes / snapInterval) * snapInterval
-  
+
   return Math.max(snappedMinutes, 9 * 60)
+}
+
+const updateDragPreviewForMinutes = (dropMinutes, event = null) => {
+  if (!draggedItem.value) return
+
+  const startHour = Math.floor(dropMinutes / 60)
+  const startMin = dropMinutes % 60
+  const endMinutes = dropMinutes + (draggedItem.value.duration || 30)
+  const endHour = Math.floor(endMinutes / 60)
+  const endMin = endMinutes % 60
+
+  const startPeriod = startHour >= 12 ? 'PM' : 'AM'
+  const endPeriod = endHour >= 12 ? 'PM' : 'AM'
+  const displayStartHour = startHour > 12 ? startHour - 12 : startHour === 0 ? 12 : startHour
+  const displayEndHour = endHour > 12 ? endHour - 12 : endHour === 0 ? 12 : endHour
+
+  const startTime = `${displayStartHour}:${startMin.toString().padStart(2, '0')} ${startPeriod}`
+  const endTime = `${displayEndHour}:${endMin.toString().padStart(2, '0')} ${endPeriod}`
+
+  dragPreview.value.timeRange = `${startTime} - ${endTime}`
+
+  if (timelineContainer.value && event) {
+    const rect = timelineContainer.value.getBoundingClientRect()
+    const y = event.clientY - (rect?.top || 0) - 8
+    dropIndicator.value.top = Math.max(0, y)
+  } else if (timelineContainer.value) {
+    const rect = timelineContainer.value.getBoundingClientRect()
+    dropIndicator.value.top = Math.max(0, ((dropMinutes - 9 * 60) / 60) * pixelsPerHour.value)
+  }
+
+  dropIndicator.value.label = `${startTime}`
+  dropIndicator.value.visible = true
 }
 
 // Determine if a timeline card is very tight with neighbors: collapse details
@@ -1264,20 +1305,29 @@ const fetchDailySchedule = async (date = null) => {
       } : null
     })
     
-    if (inProgressAppointment) {
-      // Check if we need to resume or continue timing
-      const shouldResume = !activeAppointment.value || 
-                          activeAppointment.value.id !== inProgressAppointment.id ||
-                          !timing.value
-      
-      if (shouldResume) {
-        // Found an in-progress appointment - resume timing
-        activeAppointment.value = inProgressAppointment
-        
-        // Calculate elapsed time since start
-        const startTime = new Date(inProgressAppointment.actual_start_at)
-        const currentTime = new Date()
-        const elapsedMs = Math.max(0, currentTime.getTime() - startTime.getTime())
+  if (inProgressAppointment) {
+    // Check if we need to resume or continue timing
+    const shouldResume = !activeAppointment.value ||
+                        activeAppointment.value.id !== inProgressAppointment.id ||
+                        !timing.value
+
+    if (shouldResume) {
+      // Found an in-progress appointment - resume timing
+      const timelineMatch = timelineAppointments.value.find(apt => apt.id === inProgressAppointment.id)
+      if (timelineMatch) {
+        Object.assign(timelineMatch, inProgressAppointment)
+      }
+      const queueMatch = queueAppointments.value.find(apt => apt.id === inProgressAppointment.id)
+      if (queueMatch) {
+        Object.assign(queueMatch, inProgressAppointment)
+      }
+
+      activeAppointment.value = timelineMatch || queueMatch || inProgressAppointment
+
+      // Calculate elapsed time since start
+      const startTime = new Date(inProgressAppointment.actual_start_at)
+      const currentTime = new Date()
+      const elapsedMs = Math.max(0, currentTime.getTime() - startTime.getTime())
         const elapsedSeconds = Math.floor(elapsedMs / 1000)
         
         // Set timer display to current elapsed time
@@ -1391,6 +1441,15 @@ const selectAppointment = (appointment) => {
   selectedAppointment.value = appointment
 }
 
+const toggleAppointmentTimer = async (appointment) => {
+  if (activeAppointment.value?.id === appointment.id && timing.value) {
+    await completeAppointment()
+    return
+  }
+
+  await startAppointment(appointment)
+}
+
 // Enhanced Timer Functions with auto-sync capability
 const startTimer = (resumeFromMinutes = 0, resumeFromSeconds = 0) => {
   if (timerInterval.value) {
@@ -1459,17 +1518,21 @@ const startAppointment = async (appointment) => {
     if (appointment.status === 'completed' || appointment.actual_end_at) {
       return
     }
-    
+
+    if (activeAppointment.value?.id === appointment.id && timing.value) {
+      return
+    }
+
     // If already timing, stop current
     if (timing.value && activeAppointment.value) {
       await completeAppointment()
     }
-    
+
     // Determine current time as actual start immediately for responsive UI
     const nowIso = new Date().toISOString()
     const timezone_offset = new Date().getTimezoneOffset() * -1
     // Optimistically set locally so the card moves right away
-    const updated = { ...appointment, actual_start_at: nowIso, status: 'in-progress' }
+    const updated = { ...appointment, actual_start_at: nowIso, status: 'in-progress', timeline_added: true }
     // Reflect in both active state and the timeline list
     activeAppointment.value = updated
     // Ensure the appointment exists on the timeline; if not, add it
@@ -1584,35 +1647,30 @@ const startDrag = (event, appointment) => {
   event.dataTransfer.setData('text/plain', appointment.id.toString())
 }
 
+const handleDragEnter = (event) => {
+  event.preventDefault()
+  isDragOver.value = true
+
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'move'
+  }
+
+  if (!draggedItem.value || !timelineContainer.value) return
+
+  const dropMinutes = calculateDropPosition(event)
+  updateDragPreviewForMinutes(dropMinutes, event)
+}
+
 const handleDragOver = (event) => {
   event.preventDefault()
-  event.dataTransfer.dropEffect = 'move'
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'move'
+  }
   isDragOver.value = true
-  
+
   if (draggedItem.value) {
     const dropMinutes = calculateDropPosition(event)
-    const startHour = Math.floor(dropMinutes / 60)
-    const startMin = dropMinutes % 60
-    const endMinutes = dropMinutes + (draggedItem.value.duration || 30)
-    const endHour = Math.floor(endMinutes / 60)
-    const endMin = endMinutes % 60
-    
-    const startPeriod = startHour >= 12 ? 'PM' : 'AM'
-    const endPeriod = endHour >= 12 ? 'PM' : 'AM'
-    const displayStartHour = startHour > 12 ? startHour - 12 : startHour === 0 ? 12 : startHour
-    const displayEndHour = endHour > 12 ? endHour - 12 : endHour === 0 ? 12 : endHour
-    
-    const startTime = `${displayStartHour}:${startMin.toString().padStart(2, '0')} ${startPeriod}`
-    const endTime = `${displayEndHour}:${endMin.toString().padStart(2, '0')} ${endPeriod}`
-    
-    dragPreview.value.timeRange = `${startTime} - ${endTime}`
-
-    // Update drop indicator position and label
-    const rect = timelineContainer.value?.getBoundingClientRect()
-    const y = event.clientY - (rect?.top || 0) - 8
-    dropIndicator.value.top = Math.max(0, y)
-    dropIndicator.value.label = `${startTime}`
-    dropIndicator.value.visible = true
+    updateDragPreviewForMinutes(dropMinutes, event)
   }
 }
 
@@ -1711,6 +1769,12 @@ const handleDrop = (event) => {
       queueAppointments.value = previousQueue
     })
 
+  queueDragState.value = {
+    draggedIndex: -1,
+    draggedItem: null,
+    isDragging: false
+  }
+  dragDropIndicator.value.visible = false
   draggedItem.value = null
   dragPreview.value.visible = false
 }
@@ -1746,7 +1810,23 @@ const startQueueDrag = (event, appointment, index) => {
     duration: appointment.duration || 30
   }
 
-  event.dataTransfer.effectAllowed = 'move'
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/plain', String(appointment.id))
+
+    // Use a transparent drag image so the custom preview is all that shows
+    const dragImage = document.createElement('div')
+    dragImage.style.width = '1px'
+    dragImage.style.height = '1px'
+    dragImage.style.opacity = '0'
+    document.body.appendChild(dragImage)
+    event.dataTransfer.setDragImage(dragImage, 0, 0)
+    requestAnimationFrame(() => {
+      if (dragImage.parentNode) {
+        dragImage.parentNode.removeChild(dragImage)
+      }
+    })
+  }
 }
 
 const endQueueDrag = () => {
