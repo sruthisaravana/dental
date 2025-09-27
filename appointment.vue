@@ -336,85 +336,104 @@
                          @mouseenter="onTimelineCardEnter($event, appointment)"
                          @mouseleave="hideOverlapPopover">
                       
-                      <!-- COMPACT Timeline Card Content -->
-                      <div class="flex flex-col h-full justify-between">
-                        <!-- Header: Name + Status in one line -->
-                        <div class="flex justify-between items-start mb-2">
-                          <div class="flex-1">
-                            <div class="flex items-center space-x-2">
-                              <h3 class="font-bold text-slate-900 text-sm truncate">
-                                {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
-                              </h3>
-                              <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
-                                {{ appointment.patient.phone || 'No phone' }}
-                              </span>
-
-
-                                                     <div class="flex justify-center items-center mt-2 space-x-2">
-                          <button v-if="appointment.status !== 'completed'"
-                                  @click.stop="startAppointment(appointment)"
-                                  class="px-4 py-2 text-sm rounded-full font-semibold transition-all shadow-sm"
-                                  :class="timing && activeAppointment?.id === appointment.id 
-                                    ? 'bg-red-500 text-white hover:bg-red-600' 
-                                    : 'bg-green-600 text-white hover:bg-green-700'">
-                            {{ timing && activeAppointment?.id === appointment.id ? 'Stop' : 'Start' }}
-                          </button>
-                          <button v-if="appointment.status === 'completed'" 
-                                  @click.stop="showTimeEditModal(appointment)"
-                                  class="px-3 py-1.5 text-xs bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 font-semibold transition-all">
-                            Edit
-                          </button>
-                          <button @click.stop="removeFromTimeline(appointment.id)"
-                                  class="px-2 py-1 text-xs bg-slate-100 text-slate-600 rounded-md hover:bg-slate-200 transition-all"
-                                  title="Remove from timeline">
-                            <X class="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                            </div>
-                            <p v-if="!isTightCard(appointment)" class="text-xs text-slate-600 mt-1 truncate">{{ appointment.reason || appointment.treatment || 'Checkup' }}</p>
-                            <!-- <div v-if="isTightCard(appointment)" class="mt-1">
-                              <span class="inline-block text-[11px] font-semibold text-blue-700 bg-blue-50 rounded px-1.5 py-0.5">{{ getDisplayTimeRange(appointment) }}</span>
-                            </div> -->
+                      <!-- Refined Timeline Card Content -->
+                      <div class="flex h-full flex-col justify-between gap-3">
+                        <div class="space-y-2">
+                          <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:text-sm">
+                            <h3 class="font-semibold text-slate-900 text-sm sm:text-base truncate max-w-[12rem]">
+                              {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
+                            </h3>
+                            <span v-if="appointment.patient.phone" class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-medium text-slate-600">
+                              {{ appointment.patient.phone }}
+                            </span>
+                            <span v-else class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-medium text-slate-500">
+                              No phone
+                            </span>
+                            <span class="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700">
+                              {{ getDisplayTimeRange(appointment) }}
+                            </span>
+                            <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
+                              {{ appointment.duration || 30 }}m
+                            </span>
                           </div>
-                          
-                          <!-- Status Badge -->
-                          <span class="text-xs px-2 py-1 rounded-full font-bold uppercase tracking-wide ml-2"
+                          <p v-if="appointment.reason || appointment.treatment"
+                             :class="isTightCard(appointment)
+                               ? 'text-[11px] font-medium text-slate-500 truncate'
+                               : 'text-xs leading-relaxed text-slate-600 line-clamp-2'">
+                            {{ appointment.reason || appointment.treatment }}
+                          </p>
+                          <p v-else :class="isTightCard(appointment)
+                              ? 'text-[11px] font-medium text-slate-400 truncate'
+                              : 'text-xs leading-relaxed text-slate-500'">
+                            General checkup
+                          </p>
+                        </div>
+
+                        <div v-if="appointment.status === 'completed' && appointment.actual_end_at" class="text-[11px] font-semibold text-purple-600">
+                          Duration: {{ getActualDuration(appointment) }} min
+                        </div>
+
+                        <div class="mt-auto flex items-center justify-between gap-2 border-t border-slate-200/80 pt-2">
+                          <span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide"
                                 :class="getStatusBadgeClass(appointment.status)">
                             {{ appointment.status }}
                           </span>
-                        </div>
-                        
-                        <!-- Time Range (prefers actual when started/completed) -->
-                        <div class="space-y-1">
-                          <div class="text-sm font-semibold text-blue-600">
-                            {{ getDisplayTimeRange(appointment) }}
+                          <div class="flex items-center gap-2">
+                            <button v-if="appointment.status !== 'completed'"
+                                    @click.stop="startAppointment(appointment)"
+                                    class="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm transition-all sm:text-sm"
+                                    :class="timing && activeAppointment?.id === appointment.id
+                                      ? 'bg-rose-500 text-white hover:bg-rose-600'
+                                      : 'bg-emerald-500 text-white hover:bg-emerald-600'">
+                              {{ timing && activeAppointment?.id === appointment.id ? 'Stop' : 'Start' }}
+                            </button>
+                            <button v-if="appointment.status === 'completed'"
+                                    @click.stop="showTimeEditModal(appointment)"
+                                    class="inline-flex items-center rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-semibold text-blue-700 transition-all hover:bg-blue-200">
+                              Edit
+                            </button>
+                            <button @click.stop="removeFromTimeline(appointment.id)"
+                                    class="inline-flex items-center justify-center rounded-lg bg-slate-100 p-1.5 text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700"
+                                    title="Remove from timeline">
+                              <X class="h-3.5 w-3.5" />
+                            </button>
                           </div>
-                          <div v-if="appointment.status === 'completed' && appointment.actual_end_at" class="text-xs text-purple-700 font-medium">
-                            Duration: {{ getActualDuration(appointment) }}min
-                          </div>
                         </div>
-                        
-                        <!-- Action Buttons - Centered primary action -->
- 
                       </div>
                     </div>
                   </TransitionGroup>
                   <!-- Overlap Popover -->
-                  <div v-if="overlapPopover.visible" class="absolute z-40 bg-white border border-slate-200 rounded-xl shadow-xl p-3 text-xs w-[280px]" :style="{ top: overlapPopover.y + 'px', left: overlapPopover.x + 'px' }" @mouseenter="keepOverlapPopover" @mouseleave="hideOverlapPopover">
-                    <div class="font-semibold text-slate-700 mb-2">Overlapping appointments</div>
-                    <div class="space-y-2">
-                      <div v-for="apt in overlapPopover.items" :key="apt.id" class="p-2 rounded-lg bg-slate-50 border border-slate-200">
-                        <div class="font-bold text-slate-900 truncate">{{ apt.patient.first_name }} {{ apt.patient.last_name }}</div>
-                        <div class="text-blue-700 font-medium">{{ getDisplayTimeRange(apt) }}</div>
-                        <div class="text-slate-600 truncate">{{ apt.reason || apt.treatment || 'Checkup' }}</div>
-                        <div class="text-[10px] uppercase tracking-wide mt-1 inline-block px-2 py-0.5 rounded-full" :class="getStatusBadgeClass(apt.status)">{{ apt.status }}</div>
-                      </div>
+                <div v-if="overlapPopover.visible" class="absolute z-40 bg-white border border-slate-200 rounded-xl shadow-xl p-3 text-xs w-[280px]" :style="{ top: overlapPopover.y + 'px', left: overlapPopover.x + 'px' }" @mouseenter="keepOverlapPopover" @mouseleave="hideOverlapPopover">
+                  <div class="font-semibold text-slate-700 mb-2">Overlapping appointments</div>
+                  <div class="space-y-2">
+                    <div v-for="apt in overlapPopover.items" :key="apt.id" class="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                      <div class="font-bold text-slate-900 truncate">{{ apt.patient.first_name }} {{ apt.patient.last_name }}</div>
+                      <div class="text-blue-700 font-medium">{{ getDisplayTimeRange(apt) }}</div>
+                      <div class="text-slate-600 truncate">{{ apt.reason || apt.treatment || 'Checkup' }}</div>
+                      <div class="text-[10px] uppercase tracking-wide mt-1 inline-block px-2 py-0.5 rounded-full" :class="getStatusBadgeClass(apt.status)">{{ apt.status }}</div>
                     </div>
                   </div>
                 </div>
 
-                <!-- Empty State -->
-                <div v-if="timelineAppointments.length === 0" 
+                <!-- Zoom Controls -->
+                <div class="pointer-events-auto absolute bottom-4 right-4 z-40 flex flex-col gap-2">
+                  <button type="button"
+                          class="rounded-full border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-600 shadow-sm transition-all hover:border-blue-400 hover:text-blue-600"
+                          @click.stop="zoomIn"
+                          title="Zoom in">
+                    ＋
+                  </button>
+                  <button type="button"
+                          class="rounded-full border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-600 shadow-sm transition-all hover:border-blue-400 hover:text-blue-600"
+                          @click.stop="zoomOut"
+                          title="Zoom out">
+                    －
+                  </button>
+                </div>
+              </div>
+
+              <!-- Empty State -->
+              <div v-if="timelineAppointments.length === 0"
                      class="flex flex-col items-center justify-center h-64 text-slate-400 ml-20">
                   <CalendarClock class="w-16 h-16 mb-4 text-slate-300" />
                   <p class="text-xl font-bold text-slate-500">No appointments scheduled</p>
@@ -644,6 +663,7 @@ const dropIndicator = ref({ visible: false, top: 0, label: '' })
 const pixelsPerHour = ref(48)
 const minPixelsPerHour = 32
 const maxPixelsPerHour = 300 // Increased for better zoom capability
+let zoomAnimationFrame = null
 
 // Overlap popover
 const overlapPopover = ref({ visible: false, x: 0, y: 0, items: [] })
@@ -682,6 +702,7 @@ const dragPreview = ref({
   patientName: '',
   duration: 0
 })
+let previewAnimationFrame = null
 
 // Duration options
 const selectedDuration = ref({ label: '30min', value: 30 })
@@ -820,6 +841,8 @@ const clearMessages = () => {
   error.value = null
   successMessage.value = null
 }
+
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 
 const updateTime = () => {
   currentTime.value = new Date().toLocaleTimeString('en-US', {
@@ -983,33 +1006,44 @@ const hideOverlapPopover = () => {
   overlapPopover.value.visible = false
 }
 
+const applyZoomStep = (direction, anchorRatio = 0.5, intensity = 1) => {
+  if (!direction) return
+
+  const normalizedIntensity = clamp(intensity || 1, 0.5, 3)
+  const step = 6 * normalizedIntensity
+  const previous = pixelsPerHour.value
+  const next = clamp(previous - direction * step, minPixelsPerHour, maxPixelsPerHour)
+  if (next === previous) return
+
+  const ratio = clamp(anchorRatio, 0, 1)
+  const container = timelineContainer.value
+  const previousScroll = container?.scrollTop ?? 0
+
+  pixelsPerHour.value = next
+
+  if (!container) return
+
+  if (zoomAnimationFrame) cancelAnimationFrame(zoomAnimationFrame)
+  zoomAnimationFrame = requestAnimationFrame(() => {
+    const delta = (next - previous) * 6
+    container.scrollTop = Math.max(0, previousScroll + delta * ratio)
+  })
+}
+
 // Scroll to zoom handler
 const handleTimelineWheel = (e) => {
-  if (!e.ctrlKey && !e.metaKey) return // require Ctrl/Cmd to zoom; normal scroll remains page scroll
   e.preventDefault()
-  const delta = e.deltaY
-  const step = 8
-  const next = Math.min(maxPixelsPerHour, Math.max(minPixelsPerHour, pixelsPerHour.value - Math.sign(delta) * step))
-  if (next === pixelsPerHour.value) return
-  // Optional: anchor zoom around cursor Y so content appears to zoom centered
   const container = timelineContainer.value
-  if (container) {
-    const rect = container.getBoundingClientRect()
-    const cursorOffset = e.clientY - rect.top
-    const ratio = cursorOffset / (rect.height || 1)
-    // Adjust scroll by ratio of change to keep cursor-aligned content in place
-    const prevPx = pixelsPerHour.value
-    pixelsPerHour.value = next
-    // Force reflow after value change, then scroll
-    requestAnimationFrame(() => {
-      const newRect = container.getBoundingClientRect()
-      const deltaPx = (next - prevPx) * 8 // approximate per 8 hours visible baseline
-      container.scrollTop = Math.max(0, container.scrollTop + deltaPx * ratio)
-    })
-  } else {
-    pixelsPerHour.value = next
-  }
+  const rect = container?.getBoundingClientRect()
+  const anchorRatio = rect ? (e.clientY - rect.top) / (rect.height || 1) : 0.5
+  const direction = Math.sign(e.deltaY)
+  const normalization = e.deltaMode === 1 ? 6 : 120
+  const intensity = normalization ? Math.abs(e.deltaY) / normalization : Math.abs(e.deltaY) / 120
+  applyZoomStep(direction, anchorRatio, intensity)
 }
+
+const zoomIn = () => applyZoomStep(-1)
+const zoomOut = () => applyZoomStep(1)
 
 // Display helper: Prefer actual time range
 const getDisplayTimeRange = (appointment) => {
@@ -1590,64 +1624,95 @@ const handleDragLeave = (event) => {
   }
 }
 
-const handleDrop = async (event) => {
+const handleDrop = (event) => {
   event.preventDefault()
   isDragOver.value = false
   isDragging.value = false
-  
-  // Capture the dragged item locally to avoid race with dragend clearing global state
-  const item = draggedItem.value
-  if (!item) return
-  
-  try {
-    clearMessages()
-    
-    const dropMinutes = calculateDropPosition(event)
-    const dropTime = new Date(selectedDate.value)
-    dropTime.setHours(Math.floor(dropMinutes / 60))
-    dropTime.setMinutes(dropMinutes % 60)
-    dropTime.setSeconds(0)
-    dropTime.setMilliseconds(0)
 
-    // Build a local datetime string without timezone to avoid server shifting time
-    const toLocalSql = (d) => {
-      const y = d.getFullYear()
-      const m = String(d.getMonth() + 1).padStart(2, '0')
-      const day = String(d.getDate()).padStart(2, '0')
-      const hh = String(d.getHours()).padStart(2, '0')
-      const mm = String(d.getMinutes()).padStart(2, '0')
-      const ss = '00'
-      return `${y}-${m}-${day} ${hh}:${mm}:${ss}`
-    }
-    const approximate_time = toLocalSql(dropTime)
-    
-    console.log('Dropping appointment at:', dropTime.toISOString())
-    
-    const response = await makeApiCall('PUT', `/appointments/${item.id}/set-timeline-time`, {
-      approximate_time
-    })
-    
-    const startHour = Math.floor(dropMinutes / 60)
-    const startMin = dropMinutes % 60
-    const period = startHour >= 12 ? 'PM' : 'AM'
-    const displayHour = startHour > 12 ? startHour - 12 : startHour === 0 ? 12 : startHour
-    const timeString = `${displayHour}:${startMin.toString().padStart(2, '0')} ${period}`
-    
-    const first = item.patient?.first_name || 'Patient'
-    const last = item.patient?.last_name || ''
-    successMessage.value = `${first} ${last}`.trim() + ` scheduled for ${timeString}`
-    setTimeout(() => successMessage.value = null, 3000)
-    
-    await fetchDailySchedule()
-    
-  } catch (err) {
-    console.error('Drop error:', err)
-    error.value = err.data?.error || 'Failed to schedule appointment'
-  } finally {
-    draggedItem.value = null
+  const item = draggedItem.value
+  if (!item) {
     dragPreview.value.visible = false
     dropIndicator.value.visible = false
+    return
   }
+
+  clearMessages()
+
+  const dropMinutes = calculateDropPosition(event)
+  const dropTime = new Date(selectedDate.value)
+  dropTime.setHours(Math.floor(dropMinutes / 60))
+  dropTime.setMinutes(dropMinutes % 60)
+  dropTime.setSeconds(0)
+  dropTime.setMilliseconds(0)
+
+  const toLocalSql = (d) => {
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    const hh = String(d.getHours()).padStart(2, '0')
+    const mm = String(d.getMinutes()).padStart(2, '0')
+    const ss = '00'
+    return `${y}-${m}-${day} ${hh}:${mm}:${ss}`
+  }
+
+  const approximate_time = toLocalSql(dropTime)
+  const scheduledIso = dropTime.toISOString()
+
+  const previousTimeline = [...timelineAppointments.value]
+  const previousQueue = [...queueAppointments.value]
+
+  const updatedFields = {
+    scheduled_at: scheduledIso,
+    approximate_time,
+    timeline_added: true
+  }
+
+  const existingTimelineIndex = timelineAppointments.value.findIndex(a => a.id === item.id)
+  if (existingTimelineIndex !== -1) {
+    timelineAppointments.value = timelineAppointments.value.map(apt =>
+      apt.id === item.id ? { ...apt, ...updatedFields } : apt
+    )
+  } else {
+    timelineAppointments.value = [...timelineAppointments.value, { ...item, ...updatedFields }]
+  }
+
+  queueAppointments.value = queueAppointments.value.map(apt =>
+    apt.id === item.id ? { ...apt, ...updatedFields } : apt
+  )
+
+  dropIndicator.value.visible = false
+
+  const startHour = Math.floor(dropMinutes / 60)
+  const startMin = dropMinutes % 60
+  const period = startHour >= 12 ? 'PM' : 'AM'
+  const displayHour = startHour > 12 ? startHour - 12 : startHour === 0 ? 12 : startHour
+  const timeString = `${displayHour}:${startMin.toString().padStart(2, '0')} ${period}`
+  const displayName = `${item.patient?.first_name || 'Patient'} ${item.patient?.last_name || ''}`.trim()
+
+  makeApiCall('PUT', `/appointments/${item.id}/set-timeline-time`, { approximate_time })
+    .then((response) => {
+      const scheduledFromServer = response?.scheduled_at || response?.actual_start_at
+      if (scheduledFromServer) {
+        timelineAppointments.value = timelineAppointments.value.map(apt =>
+          apt.id === item.id ? { ...apt, scheduled_at: scheduledFromServer } : apt
+        )
+        queueAppointments.value = queueAppointments.value.map(apt =>
+          apt.id === item.id ? { ...apt, scheduled_at: scheduledFromServer } : apt
+        )
+      }
+      successMessage.value = `${displayName} scheduled for ${timeString}`
+      setTimeout(() => successMessage.value = null, 3000)
+      fetchDailySchedule().catch(err => console.error('Refresh error after drop:', err))
+    })
+    .catch((err) => {
+      console.error('Drop error:', err)
+      error.value = err?.data?.error || 'Failed to schedule appointment'
+      timelineAppointments.value = previousTimeline
+      queueAppointments.value = previousQueue
+    })
+
+  draggedItem.value = null
+  dragPreview.value.visible = false
 }
 
 // Queue reordering functions
@@ -1737,128 +1802,111 @@ const handleQueueDragOver = (event) => {
  
  
  
-const handleQueueDrop = async (event) => {
+const handleQueueDrop = (event) => {
   event.preventDefault()
-  
+
   if (!queueDragState.value.isDragging) return
-  
-  try {
-    const container = event.currentTarget
-    const rect = container.getBoundingClientRect()
-    const y = event.clientY - rect.top
-    
-    // Find the position to insert
-    const items = container.querySelectorAll('.queue-item')
-    let newPosition = 0
-    
-    for (let i = 0; i < items.length; i++) {
-      const itemRect = items[i].getBoundingClientRect()
-      const itemY = itemRect.top - rect.top + itemRect.height / 2
-      
-      if (y < itemY) {
-        newPosition = i
-        break
-      }
-      newPosition = i + 1
+
+  clearMessages()
+
+  const container = event.currentTarget
+  const rect = container.getBoundingClientRect()
+  const y = event.clientY - rect.top
+
+  const items = container.querySelectorAll('.queue-item')
+  let newPosition = 0
+
+  for (let i = 0; i < items.length; i++) {
+    const itemRect = items[i].getBoundingClientRect()
+    const itemY = itemRect.top - rect.top + itemRect.height / 2
+
+    if (y < itemY) {
+      newPosition = i
+      break
     }
-    
-    const oldIndex = queueDragState.value.draggedIndex
-    
-    // Don't do anything if dropping in same position
-    if (newPosition === oldIndex || newPosition === oldIndex + 1) {
-      endQueueDrag()
-      return
-    }
-    
-    // Calculate the actual array position (account for removed item)
-    const targetIndex = newPosition > oldIndex ? newPosition - 1 : newPosition
-    
-    // Create new order array
-    const newOrder = [...queueAppointments.value]
-    const [movedItem] = newOrder.splice(oldIndex, 1)
-    newOrder.splice(targetIndex, 0, movedItem)
-    
-    // Update UI immediately (optimistic)
-    queueAppointments.value = newOrder
-    
-    // Save to server using the reorder API
-    const appointmentOrder = newOrder.map(apt => apt.id)
-    await makeApiCall('POST', `/daily-schedule`, {
-      schedule_date: selectedDate.value,
-      appointment_order: appointmentOrder
-    })
-    
-    successMessage.value = `Moved ${movedItem.patient.first_name} ${movedItem.patient.last_name} to position ${targetIndex + 1}`
-    setTimeout(() => successMessage.value = null, 2000)
-    
-    // Refresh to ensure consistency
-    await fetchDailySchedule()
-    
-  } catch (err) {
-    console.error('Error reordering queue:', err)
-    error.value = err.data?.error || err.message || 'Failed to reorder appointment'
-    // Revert optimistic UI on failure
-    await fetchDailySchedule()
-  } finally {
-    endQueueDrag()
+    newPosition = i + 1
   }
+
+  const oldIndex = queueDragState.value.draggedIndex
+
+  if (newPosition === oldIndex || newPosition === oldIndex + 1) {
+    endQueueDrag()
+    return
+  }
+
+  const targetIndex = newPosition > oldIndex ? newPosition - 1 : newPosition
+
+  const previousOrder = [...queueAppointments.value]
+  const newOrder = [...queueAppointments.value]
+  const [movedItem] = newOrder.splice(oldIndex, 1)
+  newOrder.splice(targetIndex, 0, movedItem)
+
+  queueAppointments.value = newOrder
+  endQueueDrag()
+
+  const appointmentOrder = newOrder.map(apt => apt.id)
+
+  makeApiCall('POST', `/daily-schedule`, {
+    schedule_date: selectedDate.value,
+    appointment_order: appointmentOrder
+  })
+    .then(() => {
+      successMessage.value = `Moved ${movedItem.patient.first_name} ${movedItem.patient.last_name} to position ${targetIndex + 1}`
+      setTimeout(() => successMessage.value = null, 2000)
+      fetchDailySchedule().catch(err => console.error('Refresh error after queue drop:', err))
+    })
+    .catch((err) => {
+      console.error('Error reordering queue:', err)
+      error.value = err?.data?.error || err?.message || 'Failed to reorder appointment'
+      queueAppointments.value = previousOrder
+    })
 }
 
 // Queue Management - FIXED WITH DEBUG AND IMPROVED REORDER
-const reorderInQueue = async (appointmentId, direction) => {
-  try {
-    clearMessages()
-    console.log('Reordering appointment:', appointmentId, 'direction:', direction)
-    
-    const currentIndex = queueAppointments.value.findIndex(apt => apt.id === appointmentId)
-    if (currentIndex === -1) {
-      console.error('Appointment not found in queue')
-      return
-    }
-    
-    let newIndex
-    if (direction === 'up' && currentIndex > 0) {
-      newIndex = currentIndex - 1
-    } else if (direction === 'down' && currentIndex < queueAppointments.value.length - 1) {
-      newIndex = currentIndex + 1
-    } else {
-      console.log('No reordering needed')
-      return // No change needed
-    }
-    
-    console.log('Moving from index', currentIndex, 'to index', newIndex)
-    
-    // Create new order array (optimistic UI)
-    const prevOrder = [...queueAppointments.value]
-    const newOrder = [...queueAppointments.value]
-    const [movedItem] = newOrder.splice(currentIndex, 1)
-    newOrder.splice(newIndex, 0, movedItem)
-    
-    // Update UI immediately (optimistic)
-    queueAppointments.value = newOrder
-    
-    // Extract appointment IDs in new order for API
-    const appointmentOrder = newOrder.map(apt => apt.id)
-    console.log('New appointment order:', appointmentOrder)
-    
-    // Save to server
-    await makeApiCall('POST', `/daily-schedule`, {
-      schedule_date: selectedDate.value,
-      appointment_order: appointmentOrder
-    })
-    
-    successMessage.value = `Moved ${movedItem.patient.first_name} ${movedItem.patient.last_name} ${direction}`
-    setTimeout(() => successMessage.value = null, 2000)
-    
-    // Refresh to ensure consistency
-    await fetchDailySchedule()
-    
-  } catch (err) {
-    console.error('Error reordering queue:', err)
-    error.value = err.data?.error || err.message || 'Failed to reorder appointment'
-    // revert optimistic UI on failure
-    await fetchDailySchedule()
+const reorderInQueue = (appointmentId, direction) => {
+  clearMessages()
+  console.log('Reordering appointment:', appointmentId, 'direction:', direction)
+
+  const currentIndex = queueAppointments.value.findIndex(apt => apt.id === appointmentId)
+  if (currentIndex === -1) {
+    console.error('Appointment not found in queue')
+    return
   }
+
+  let newIndex
+  if (direction === 'up' && currentIndex > 0) {
+    newIndex = currentIndex - 1
+  } else if (direction === 'down' && currentIndex < queueAppointments.value.length - 1) {
+    newIndex = currentIndex + 1
+  } else {
+    console.log('No reordering needed')
+    return
+  }
+
+  const previousOrder = [...queueAppointments.value]
+  const newOrder = [...queueAppointments.value]
+  const [movedItem] = newOrder.splice(currentIndex, 1)
+  newOrder.splice(newIndex, 0, movedItem)
+
+  queueAppointments.value = newOrder
+
+  const appointmentOrder = newOrder.map(apt => apt.id)
+  console.log('New appointment order:', appointmentOrder)
+
+  makeApiCall('POST', `/daily-schedule`, {
+    schedule_date: selectedDate.value,
+    appointment_order: appointmentOrder
+  })
+    .then(() => {
+      successMessage.value = `Moved ${movedItem.patient.first_name} ${movedItem.patient.last_name} ${direction}`
+      setTimeout(() => successMessage.value = null, 2000)
+      fetchDailySchedule().catch(err => console.error('Refresh error after reorder:', err))
+    })
+    .catch((err) => {
+      console.error('Error reordering queue:', err)
+      error.value = err?.data?.error || err?.message || 'Failed to reorder appointment'
+      queueAppointments.value = previousOrder
+    })
 }
 
 const removeFromQueue = async (appointmentId) => {
@@ -1912,58 +1960,58 @@ const deleteAppointment = async (appointmentId) => {
 }
 
 // Move item to top/bottom in queue and persist - IMPROVED
-const moveToTop = async (appointmentId) => {
-  try {
-    const idx = queueAppointments.value.findIndex(a => a.id === appointmentId)
-    if (idx <= 0) return
-    
-    const newOrder = [...queueAppointments.value]
-    const [item] = newOrder.splice(idx, 1)
-    newOrder.unshift(item)
-    
-    // Update UI immediately (optimistic)
-    queueAppointments.value = newOrder
-    
-    await makeApiCall('POST', `/daily-schedule`, {
-      schedule_date: selectedDate.value,
-      appointment_order: newOrder.map(a => a.id)
+const moveToTop = (appointmentId) => {
+  const idx = queueAppointments.value.findIndex(a => a.id === appointmentId)
+  if (idx <= 0) return
+
+  const previousOrder = [...queueAppointments.value]
+  const newOrder = [...queueAppointments.value]
+  const [item] = newOrder.splice(idx, 1)
+  newOrder.unshift(item)
+
+  queueAppointments.value = newOrder
+
+  makeApiCall('POST', `/daily-schedule`, {
+    schedule_date: selectedDate.value,
+    appointment_order: newOrder.map(a => a.id)
+  })
+    .then(() => {
+      successMessage.value = `Moved ${item.patient.first_name} to top`
+      setTimeout(() => successMessage.value = null, 2000)
+      fetchDailySchedule().catch(err => console.error('Refresh error after moveToTop:', err))
     })
-    
-    successMessage.value = `Moved ${item.patient.first_name} to top`
-    setTimeout(() => successMessage.value = null, 2000)
-    
-    await fetchDailySchedule()
-  } catch (err) {
-    error.value = 'Failed to move to top'
-    await fetchDailySchedule() // revert on error
-  }
+    .catch((err) => {
+      console.error('Failed to move to top', err)
+      error.value = err?.data?.error || err?.message || 'Failed to move to top'
+      queueAppointments.value = previousOrder
+    })
 }
 
-const moveToBottom = async (appointmentId) => {
-  try {
-    const idx = queueAppointments.value.findIndex(a => a.id === appointmentId)
-    if (idx === -1 || idx === queueAppointments.value.length - 1) return
-    
-    const newOrder = [...queueAppointments.value]
-    const [item] = newOrder.splice(idx, 1)
-    newOrder.push(item)
-    
-    // Update UI immediately (optimistic)
-    queueAppointments.value = newOrder
-    
-    await makeApiCall('POST', `/daily-schedule`, {
-      schedule_date: selectedDate.value,
-      appointment_order: newOrder.map(a => a.id)
+const moveToBottom = (appointmentId) => {
+  const idx = queueAppointments.value.findIndex(a => a.id === appointmentId)
+  if (idx === -1 || idx === queueAppointments.value.length - 1) return
+
+  const previousOrder = [...queueAppointments.value]
+  const newOrder = [...queueAppointments.value]
+  const [item] = newOrder.splice(idx, 1)
+  newOrder.push(item)
+
+  queueAppointments.value = newOrder
+
+  makeApiCall('POST', `/daily-schedule`, {
+    schedule_date: selectedDate.value,
+    appointment_order: newOrder.map(a => a.id)
+  })
+    .then(() => {
+      successMessage.value = `Moved ${item.patient.first_name} to bottom`
+      setTimeout(() => successMessage.value = null, 2000)
+      fetchDailySchedule().catch(err => console.error('Refresh error after moveToBottom:', err))
     })
-    
-    successMessage.value = `Moved ${item.patient.first_name} to bottom`
-    setTimeout(() => successMessage.value = null, 2000)
-    
-    await fetchDailySchedule()
-  } catch (err) {
-    error.value = 'Failed to move to bottom'
-    await fetchDailySchedule() // revert on error
-  }
+    .catch((err) => {
+      console.error('Failed to move to bottom', err)
+      error.value = err?.data?.error || err?.message || 'Failed to move to bottom'
+      queueAppointments.value = previousOrder
+    })
 }
 
 // Time Edit Functions
@@ -2045,10 +2093,14 @@ const saveManualTimes = async () => {
 
 // Mouse event handlers for drag preview
 const handleMouseMove = (event) => {
-  if (isDragging.value && draggedItem.value) {
-    dragPreview.value.x = event.clientX + 15
-    dragPreview.value.y = event.clientY - 15
-  }
+  if (!isDragging.value || !draggedItem.value) return
+
+  if (previewAnimationFrame) cancelAnimationFrame(previewAnimationFrame)
+  const { clientX, clientY } = event
+  previewAnimationFrame = requestAnimationFrame(() => {
+    dragPreview.value.x = clientX + 15
+    dragPreview.value.y = clientY - 15
+  })
 }
 
 const navigateToCreatePatient = () => {
@@ -2125,6 +2177,14 @@ onMounted(async () => {
     clearInterval(interval)
     document.removeEventListener('mousemove', handleMouseMove)
     document.removeEventListener('click', handleClickOutside)
+    if (previewAnimationFrame) {
+      cancelAnimationFrame(previewAnimationFrame)
+      previewAnimationFrame = null
+    }
+    if (zoomAnimationFrame) {
+      cancelAnimationFrame(zoomAnimationFrame)
+      zoomAnimationFrame = null
+    }
     if (timerInterval.value) {
       clearInterval(timerInterval.value)
     }
