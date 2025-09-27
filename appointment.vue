@@ -376,18 +376,30 @@
 
                         <div class="mt-auto flex items-center justify-between gap-2 border-t border-slate-200/80 pt-2">
                           <span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide"
-                                :class="getStatusBadgeClass(appointment.status)">
-                            {{ appointment.status }}
+                                :class="getStatusBadgeClass(getTimelineStatusLabel(appointment))">
+                            {{ getTimelineStatusLabel(appointment) }}
                           </span>
-                            <div class="flex items-center gap-2">
-                              <button v-if="appointment.status !== 'completed'"
-                                      @click.stop="toggleAppointmentTimer(appointment)"
-                                      class="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm transition-all sm:text-sm"
-                                      :class="timing && activeAppointment?.id === appointment.id
-                                        ? 'bg-rose-500 text-white hover:bg-rose-600'
-                                        : 'bg-emerald-500 text-white hover:bg-emerald-600'">
-                                {{ timing && activeAppointment?.id === appointment.id ? 'Stop' : 'Start' }}
-                              </button>
+                          <div class="flex items-center gap-2">
+                            <button v-if="shouldShowStartButton(appointment)"
+                                    @click.stop="startAppointment(appointment)"
+                                    class="inline-flex items-center rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-emerald-600 sm:text-sm">
+                              Start
+                            </button>
+                            <button v-if="shouldShowResumeButton(appointment)"
+                                    @click.stop="resumeAppointment(appointment)"
+                                    class="inline-flex items-center rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-emerald-600 sm:text-sm">
+                              Resume
+                            </button>
+                            <button v-if="shouldShowPauseButton(appointment)"
+                                    @click.stop="pauseAppointment(appointment)"
+                                    class="inline-flex items-center rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-amber-600 sm:text-sm">
+                              Pause
+                            </button>
+                            <button v-if="appointment.actual_start_at && appointment.status !== 'completed'"
+                                    @click.stop="completeFromTimeline(appointment)"
+                                    class="inline-flex items-center rounded-lg bg-rose-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-rose-600 sm:text-sm">
+                              Complete
+                            </button>
                             <button v-if="appointment.status === 'completed'"
                                     @click.stop="showTimeEditModal(appointment)"
                                     class="inline-flex items-center rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-semibold text-blue-700 transition-all hover:bg-blue-200">
@@ -474,9 +486,9 @@
                        draggable="true"
                        @dragstart="startQueueDrag($event, appointment, index)"
                        @dragend="endQueueDrag"
-                       class="queue-item group border rounded-lg p-2 cursor-move hover:shadow transition-all bg-white hover:bg-slate-25 relative flex items-center"
+                       class="queue-item group border rounded-lg p-2 cursor-move hover:shadow transition-all relative flex items-center"
                        :class="[getQueueItemClass(appointment), queueDragState.draggedIndex === index ? 'opacity-50' : '']"
-                       @click="selectAppointment(appointment)">
+                       @click="handleQueueItemClick(appointment)">
                     <!-- Position & Status -->
                     <div class="flex flex-col items-center mr-2">
                       <div class="w-5 h-5 rounded flex items-center justify-center text-xs font-bold"
@@ -498,21 +510,12 @@
                       </div>
                     </div>
                     <!-- Actions -->
-                    <div class="flex flex-col items-end ml-2 space-y-2">
-                      <button v-if="appointment.status !== 'completed'"
-                              @click.stop="toggleAppointmentTimer(appointment)"
-                              class="px-2.5 py-1 text-[11px] font-semibold rounded-full transition-colors"
-                              :class="activeAppointment?.id === appointment.id && timing
-                                ? 'bg-rose-500 text-white hover:bg-rose-600'
-                                : 'bg-emerald-500 text-white hover:bg-emerald-600'">
-                        {{ activeAppointment?.id === appointment.id && timing ? 'Stop' : 'Start' }}
-                      </button>
-                      <button @click.stop="deleteAppointment(appointment.id)"
-                              class="p-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full"
-                              title="Delete appointment from queue (removes everywhere)">
-                        <Trash2 class="w-4 h-4" />
-                      </button>
-                      <div class="flex space-x-1">
+                    <div class="flex items-center ml-2 space-x-2">
+                      <span class="inline-flex items-center rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                            :class="getStatusBadgeClass(isAppointmentPaused(appointment) ? 'paused' : (appointment.status || 'pending'))">
+                        {{ isAppointmentPaused(appointment) ? 'paused' : (appointment.status || 'pending') }}
+                      </span>
+                      <div class="flex items-center space-x-1">
                         <button @click.stop="reorderInQueue(appointment.id, 'up')"
                                 :disabled="index === 0"
                                 class="p-1 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded disabled:opacity-30"
@@ -526,9 +529,11 @@
                           <ChevronDown class="w-3 h-3" />
                         </button>
                       </div>
-                      <div class="text-[11px] leading-tight text-slate-500 text-right min-w-[60px]">
-                        <div class="font-medium capitalize">{{ appointment.status || 'pending' }}</div>
-                      </div>
+                      <button @click.stop="deleteAppointment(appointment.id)"
+                              class="p-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full"
+                              title="Delete appointment from queue (removes everywhere)">
+                        <Trash2 class="w-4 h-4" />
+                      </button>
                     </div>
                     <!-- Active Treatment Indicator -->
                     <div v-if="activeAppointment?.id === appointment.id && timing"
@@ -631,7 +636,6 @@ import {
   ChevronRight,
   Trash2,
   Users,
-  GripVertical,
   ChevronUp,
   ChevronDown
 } from 'lucide-vue-next'
@@ -659,6 +663,8 @@ const timing = ref(false)
 const timerMinutes = ref(0)
 const timerSeconds = ref(0)
 const timerInterval = ref(null)
+const pausedAppointmentId = ref(null)
+const pausedElapsedSeconds = ref(0)
 
 // UI State
 const isDragOver = ref(false)
@@ -1153,18 +1159,30 @@ const getScheduledTimeForAppointment = (appointmentId) => {
 
 const getQueueItemClass = (appointment) => {
   const isOnTimeline = isAppointmentOnTimeline(appointment.id)
-  
+
   if (selectedAppointment.value?.id === appointment.id) {
-    return isOnTimeline 
-      ? 'border-green-400 bg-green-50 shadow-green-200 ring-2 ring-green-200' 
+    return isOnTimeline
+      ? 'border-green-400 bg-green-50 shadow-green-200 ring-2 ring-green-200'
       : 'border-blue-400 bg-blue-50 shadow-blue-200 ring-2 ring-blue-200'
   }
-  
+
   if (isOnTimeline) {
     return 'border-green-300 bg-gradient-to-r from-green-25 to-green-50 hover:border-green-400 shadow-green-100 ring-1 ring-green-200'
   }
-  
-  return 'border-slate-200 bg-white hover:border-slate-300 shadow-slate-100 hover:bg-slate-25'
+
+  return 'border-slate-200 bg-slate-100 text-slate-700 hover:border-slate-300 hover:bg-slate-200 shadow-none'
+}
+
+const mergeIntoCollections = (appointmentId, updates) => {
+  const tIdx = timelineAppointments.value.findIndex(a => a.id === appointmentId)
+  if (tIdx !== -1) {
+    timelineAppointments.value[tIdx] = { ...timelineAppointments.value[tIdx], ...updates }
+  }
+
+  const qIdx = queueAppointments.value.findIndex(a => a.id === appointmentId)
+  if (qIdx !== -1) {
+    queueAppointments.value[qIdx] = { ...queueAppointments.value[qIdx], ...updates }
+  }
 }
 
 const getStatusBadgeClass = (status) => {
@@ -1172,6 +1190,8 @@ const getStatusBadgeClass = (status) => {
     case 'completed':
       return 'bg-purple-100 text-purple-800'
     case 'in-progress':
+      return 'bg-amber-100 text-amber-800'
+    case 'paused':
       return 'bg-amber-100 text-amber-800'
     case 'scheduled':
       return 'bg-green-100 text-green-800'
@@ -1279,11 +1299,14 @@ const fetchDailySchedule = async (date = null) => {
     // FIXED: Queue should show ALL appointments with proper indicators
     // Combine all appointments for the queue display
     const allAppointments = [...unscheduledAppointments, ...appointments]
-    queueAppointments.value = allAppointments
-    
-  // Timeline shows only scheduled appointments
+  queueAppointments.value = allAppointments
+
+// Timeline shows only scheduled appointments
   timelineAppointments.value = appointments.filter(apt => apt.timeline_added && (apt.scheduled_at || apt.actual_start_at))
-  
+
+    pausedAppointmentId.value = null
+    pausedElapsedSeconds.value = 0
+
     // Enhanced auto-resume timer for in-progress appointments
     // Check both regular appointments and unscheduled ones for in-progress status
     const allAptsToCheck = [...appointments, ...unscheduledAppointments]
@@ -1437,17 +1460,33 @@ const addPatientToQueue = async () => {
   }
 }
 
-const selectAppointment = (appointment) => {
-  selectedAppointment.value = appointment
+const isAppointmentRunning = (appointment) => timing.value && activeAppointment.value?.id === appointment.id
+
+const isAppointmentPaused = (appointment) => pausedAppointmentId.value === appointment.id && !timing.value
+
+const hasAppointmentStarted = (appointment) => Boolean(appointment.actual_start_at)
+
+const shouldShowStartButton = (appointment) => !hasAppointmentStarted(appointment) && appointment.status !== 'completed'
+
+const shouldShowResumeButton = (appointment) => {
+  if (appointment.status === 'completed') return false
+  if (!hasAppointmentStarted(appointment)) return false
+
+  if (isAppointmentPaused(appointment)) return true
+
+  return !isAppointmentRunning(appointment) && (!timing.value || activeAppointment.value?.id === appointment.id)
 }
 
-const toggleAppointmentTimer = async (appointment) => {
-  if (activeAppointment.value?.id === appointment.id && timing.value) {
-    await completeAppointment()
-    return
-  }
+const shouldShowPauseButton = (appointment) => isAppointmentRunning(appointment)
 
-  await startAppointment(appointment)
+const getTimelineStatusLabel = (appointment) => {
+  if (isAppointmentRunning(appointment)) return 'in-progress'
+  if (isAppointmentPaused(appointment)) return 'paused'
+  if (appointment.status === 'in-progress' && activeAppointment.value?.id === appointment.id && !timing.value) {
+    return 'paused'
+  }
+  if (appointment.status) return appointment.status
+  return hasAppointmentStarted(appointment) ? 'scheduled' : 'pending'
 }
 
 // Enhanced Timer Functions with auto-sync capability
@@ -1514,64 +1553,148 @@ const stopTimer = () => {
 const startAppointment = async (appointment) => {
   try {
     clearMessages()
-    // Prevent starting a completed appointment
+
     if (appointment.status === 'completed' || appointment.actual_end_at) {
       return
     }
 
-    if (activeAppointment.value?.id === appointment.id && timing.value) {
+    if (timing.value) {
+      if (activeAppointment.value?.id === appointment.id) {
+        return
+      }
+      error.value = 'Please pause or complete the active appointment before starting another.'
       return
     }
 
-    // If already timing, stop current
-    if (timing.value && activeAppointment.value) {
-      await completeAppointment()
+    if (pausedAppointmentId.value && pausedAppointmentId.value !== appointment.id) {
+      error.value = 'Resume or complete the paused appointment before starting another.'
+      return
     }
 
-    // Determine current time as actual start immediately for responsive UI
+    if (appointment.actual_start_at) {
+      resumeAppointment(appointment)
+      return
+    }
+
     const nowIso = new Date().toISOString()
     const timezone_offset = new Date().getTimezoneOffset() * -1
-    // Optimistically set locally so the card moves right away
     const updated = { ...appointment, actual_start_at: nowIso, status: 'in-progress', timeline_added: true }
-    // Reflect in both active state and the timeline list
+
     activeAppointment.value = updated
-    // Ensure the appointment exists on the timeline; if not, add it
-    const idx = timelineAppointments.value.findIndex(a => a.id === appointment.id)
-    if (idx === -1) {
+    pausedAppointmentId.value = null
+    pausedElapsedSeconds.value = 0
+
+    const existingTimelineIndex = timelineAppointments.value.findIndex(a => a.id === appointment.id)
+    if (existingTimelineIndex === -1) {
       timelineAppointments.value.push(updated)
-    } else {
-      timelineAppointments.value[idx] = { ...timelineAppointments.value[idx], ...updated }
     }
-    // Also update the queue reference
-    const qIdx = queueAppointments.value.findIndex(a => a.id === appointment.id)
-    if (qIdx !== -1) {
-      queueAppointments.value[qIdx] = { ...queueAppointments.value[qIdx], ...updated }
-    }
-    // Notify backend (non-blocking) but await to keep state consistent
+
+    mergeIntoCollections(appointment.id, updated)
+
+    timing.value = true
+    startTimer()
+
     const response = await makeApiCall('POST', `/appointments/${appointment.id}/start`, {
       timezone_offset,
       actual_start_at: nowIso
     })
-    // If backend returns canonical values, merge them back
+
     if (response) {
       const merged = { ...updated, ...response }
       activeAppointment.value = merged
-      const t2 = timelineAppointments.value.findIndex(a => a.id === appointment.id)
-      if (t2 !== -1) timelineAppointments.value[t2] = { ...timelineAppointments.value[t2], ...merged }
-      const q2 = queueAppointments.value.findIndex(a => a.id === appointment.id)
-      if (q2 !== -1) queueAppointments.value[q2] = { ...queueAppointments.value[q2], ...merged }
+      mergeIntoCollections(appointment.id, merged)
     }
-    timing.value = true
-    startTimer() // Start from 0 for new appointments
-    
+
     successMessage.value = `Treatment started for ${appointment.patient.first_name} ${appointment.patient.last_name}`
     setTimeout(() => successMessage.value = null, 3000)
-    // Re-sort/layout happens via computed props; optionally refresh later
-    // await fetchDailySchedule()
-    
   } catch (err) {
-    error.value = 'Failed to start appointment'
+    timing.value = false
+    if (timerInterval.value) {
+      clearInterval(timerInterval.value)
+      timerInterval.value = null
+    }
+    activeAppointment.value = null
+    pausedAppointmentId.value = null
+    pausedElapsedSeconds.value = 0
+    await fetchDailySchedule().catch(() => {})
+    error.value = err?.data?.error || 'Failed to start appointment'
   }
+}
+
+const calculateElapsedSecondsSinceStart = (appointment) => {
+  if (!appointment.actual_start_at) return 0
+  const startTime = new Date(appointment.actual_start_at)
+  const now = new Date()
+  return Math.max(0, Math.floor((now.getTime() - startTime.getTime()) / 1000))
+}
+
+const resumeAppointment = (appointment) => {
+  if (appointment.status === 'completed') return
+
+  clearMessages()
+
+  const updated = { ...appointment, status: 'in-progress' }
+  activeAppointment.value = updated
+  mergeIntoCollections(appointment.id, updated)
+
+  let totalSeconds = 0
+  if (pausedAppointmentId.value === appointment.id && pausedElapsedSeconds.value > 0) {
+    totalSeconds = pausedElapsedSeconds.value
+  } else {
+    totalSeconds = calculateElapsedSecondsSinceStart(updated)
+  }
+
+  const resumeMinutes = Math.floor(totalSeconds / 60)
+  const resumeSeconds = totalSeconds % 60
+
+  pausedAppointmentId.value = null
+  pausedElapsedSeconds.value = 0
+
+  timing.value = true
+  startTimer(resumeMinutes, resumeSeconds)
+
+  successMessage.value = `Resumed treatment for ${appointment.patient.first_name} ${appointment.patient.last_name}`
+  setTimeout(() => successMessage.value = null, 3000)
+}
+
+const pauseAppointment = (appointment) => {
+  if (!isAppointmentRunning(appointment)) return
+
+  const elapsedSeconds = timerMinutes.value * 60 + timerSeconds.value
+  pausedAppointmentId.value = appointment.id
+  pausedElapsedSeconds.value = elapsedSeconds
+
+  stopTimer()
+  timing.value = false
+
+  const updated = { ...appointment, status: 'paused' }
+  activeAppointment.value = updated
+  mergeIntoCollections(appointment.id, updated)
+
+  successMessage.value = `${appointment.patient.first_name} ${appointment.patient.last_name}'s treatment paused`
+  setTimeout(() => successMessage.value = null, 3000)
+}
+
+const completeFromTimeline = async (appointment) => {
+  if (!appointment.actual_start_at) {
+    error.value = 'Start the appointment before completing it.'
+    return
+  }
+
+  if (!isAppointmentRunning(appointment)) {
+    const updated = { ...appointment, status: 'in-progress' }
+    activeAppointment.value = updated
+    mergeIntoCollections(appointment.id, updated)
+
+    let totalSeconds = pausedAppointmentId.value === appointment.id && pausedElapsedSeconds.value > 0
+      ? pausedElapsedSeconds.value
+      : calculateElapsedSecondsSinceStart(updated)
+
+    timerMinutes.value = Math.floor(totalSeconds / 60)
+    timerSeconds.value = totalSeconds % 60
+  }
+
+  await completeAppointment()
 }
 
 const completeAppointment = async () => {
@@ -1587,28 +1710,18 @@ const completeAppointment = async () => {
     
     const duration = stopTimer()
     timing.value = false
+    pausedAppointmentId.value = null
+    pausedElapsedSeconds.value = 0
     
     successMessage.value = `Treatment completed for ${activeAppointment.value.patient.first_name} ${activeAppointment.value.patient.last_name} (${duration} minutes)`
     setTimeout(() => successMessage.value = null, 3000)
     
     // Merge completion into local lists to update position/height/duration immediately
     const id = activeAppointment.value.id
-    const tIdx = timelineAppointments.value.findIndex(a => a.id === id)
-    if (tIdx !== -1) {
-      timelineAppointments.value[tIdx] = {
-        ...timelineAppointments.value[tIdx],
-        actual_end_at: response?.actual_end_at || nowIso,
-        status: 'completed'
-      }
-    }
-    const qIdx = queueAppointments.value.findIndex(a => a.id === id)
-    if (qIdx !== -1) {
-      queueAppointments.value[qIdx] = {
-        ...queueAppointments.value[qIdx],
-        actual_end_at: response?.actual_end_at || nowIso,
-        status: 'completed'
-      }
-    }
+    mergeIntoCollections(id, {
+      actual_end_at: response?.actual_end_at || nowIso,
+      status: 'completed'
+    })
     activeAppointment.value = null
     // Optionally fetch for server truth after latency
     // await fetchDailySchedule()
@@ -2007,10 +2120,17 @@ const removeFromQueue = async (appointmentId) => {
 
 const removeFromTimeline = async (appointmentId) => {
   if (!confirm('Remove this appointment from timeline?')) return
-  
+
   try {
+    if (activeAppointment.value?.id === appointmentId) {
+      stopTimer()
+      timing.value = false
+      activeAppointment.value = null
+      pausedAppointmentId.value = null
+      pausedElapsedSeconds.value = 0
+    }
     await makeApiCall('DELETE', `/appointments/${appointmentId}/remove-from-timeline`)
-    
+
     successMessage.value = 'Appointment removed from timeline'
     setTimeout(() => successMessage.value = null, 3000)
     
@@ -2025,10 +2145,12 @@ const deleteAppointment = async (appointmentId) => {
   if (!confirm('Delete this appointment permanently?')) return
   try {
     // If currently timing this appointment, stop timer and reset state
-    if (activeAppointment.value?.id === appointmentId && timing.value) {
+    if (activeAppointment.value?.id === appointmentId) {
       stopTimer()
       timing.value = false
       activeAppointment.value = null
+      pausedAppointmentId.value = null
+      pausedElapsedSeconds.value = 0
     }
     await makeApiCall('DELETE', `/appointments/${appointmentId}`)
     successMessage.value = 'Appointment deleted'
@@ -2194,16 +2316,8 @@ const handleQueueItemClick = async (appointment) => {
   selectedAppointment.value = appointment
 }
 
-const handleTimelineCardClick = async (appointment) => {
-  // Do not allow restarting a completed appointment via card click
-  if (appointment.status === 'completed') {
-    return
-  }
-  if (timing.value && activeAppointment.value?.id === appointment.id) {
-    await completeAppointment()
-  } else {
-    await startAppointment(appointment)
-  }
+const handleTimelineCardClick = (appointment) => {
+  selectedAppointment.value = appointment
 }
 
 // Date navigation helpers
