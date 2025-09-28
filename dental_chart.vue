@@ -639,18 +639,33 @@
           <div v-if="isLoadingToothOrder" class="text-center py-8 text-blue-500">Loading...</div>
           <div v-else>
             <div v-if="toothOrderError" class="bg-red-100 text-red-700 rounded p-2 mb-2">{{ toothOrderError }}</div>
-            <div v-if="toothOrder.length === 0" class="text-gray-500 text-center py-8">No teeth in order. Add from pending treatments.</div>
-            <ul v-else class="space-y-3">
-              <li v-for="(tooth, idx) in toothOrder" :key="tooth" :class="['flex items-center bg-white rounded-lg shadow p-2 border border-blue-100', recentAddedToothKey === String(tooth) ? 'ring-2 ring-green-400 animate-pulse' : '']">
+            <div v-if="toothOrder.length === 0" class="text-gray-500 text-center py-8">No custom order yet. Pending treatments will appear here automatically.</div>
+            <ul v-else class="space-y-3" @dragover.prevent="handleListDragOver" @drop="handleListDrop">
+              <li
+                v-for="(tooth, idx) in toothOrder"
+                :key="tooth"
+                class="flex items-center bg-white rounded-lg shadow p-2 border border-blue-100 cursor-move select-none"
+                :class="[
+                  recentAddedTooth === String(tooth) ? 'ring-2 ring-green-400 animate-pulse' : '',
+                  dragOverIndex === idx ? 'ring-2 ring-indigo-300 shadow-lg' : ''
+                ]"
+                draggable="true"
+                @dragstart="handleDragStart($event, idx)"
+                @dragover="handleDragOver($event, idx)"
+                @dragleave="handleDragLeave($event)"
+                @drop="handleDrop($event, idx)"
+                @dragend="handleDragEnd"
+                @mouseenter="handleToothHover(tooth, $event, true)"
+                @mouseleave="handleToothLeave"
+              >
                 <img
                   :src="getToothImagePath(tooth)"
                   alt="tooth"
-                  class="w-8 h-8 mr-2 cursor-pointer"
+                  class="w-8 h-8 mr-2"
                   style="object-fit:contain;"
-                  @mouseenter="handleToothHover(tooth, $event, true)"
-                  @mouseleave="handleToothLeave"
                 />
-                <span class="font-semibold text-blue-700 mr-2">{{ tooth }}</span>
+                <span class="font-semibold text-blue-700 mr-2">#{{ idx + 1 }}</span>
+                <span class="font-semibold text-slate-700 mr-2">Tooth {{ tooth }}</span>
                 <button @click="moveToothUp(idx)" :disabled="idx === 0" class="ml-auto px-2 py-1 text-blue-500 hover:text-blue-700 disabled:opacity-30"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg></button>
                 <button @click="moveToothDown(idx)" :disabled="idx === toothOrder.length-1" class="px-2 py-1 text-blue-500 hover:text-blue-700 disabled:opacity-30"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></button>
                 <button @click="removeTooth(idx)" class="px-2 py-1 text-red-400 hover:text-red-600"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
@@ -1286,7 +1301,8 @@ const isLoadingToothOrder = ref(false);
 const isSavingToothOrder = ref(false);
 const toothOrderError = ref('');
 const newToothNumber = ref('');
-
+const draggedToothIndex = ref(null);
+const dragOverIndex = ref(null);
 
 const API_BASE_URL = useRuntimeConfig().public.API_BASE_URL;
 
@@ -1326,6 +1342,50 @@ const makeApiCall = async (method, endpoint, data = null) => {
   }
 };
 
+// --- Helpers to seed order from treatment summary ---
+const PENDING_TREATMENT_STATUSES = ['pending', 'initial', 'diagnosis_planned', 'intreatment', 'in_progress'];
+
+const getPendingTeethFromRecords = () => {
+  const pendingTeeth = [];
+  const seen = new Set();
+
+  props.records.forEach(record => {
+    if (!record || !record.tooth_number || !Array.isArray(record.treatments)) {
+      return;
+    }
+
+    const tooth = String(record.tooth_number);
+    if (seen.has(tooth)) {
+      return;
+    }
+
+    const hasPendingTreatment = record.treatments.some(treatment =>
+      PENDING_TREATMENT_STATUSES.includes((treatment?.status || '').toLowerCase())
+    );
+
+    if (hasPendingTreatment) {
+      seen.add(tooth);
+      pendingTeeth.push(tooth);
+    }
+  });
+
+  pendingTeeth.sort((a, b) => Number(a) - Number(b));
+  return pendingTeeth;
+};
+
+const initializeToothOrderFromPending = (shouldFlash = false) => {
+  if (toothOrder.value.length > 0) return;
+
+  const pendingTeeth = getPendingTeethFromRecords();
+  if (pendingTeeth.length === 0) return;
+
+  toothOrder.value = [...pendingTeeth];
+
+  if (shouldFlash && pendingTeeth.length > 0) {
+    flashRecentlyAdded(pendingTeeth[0]);
+  }
+};
+
 // --- API Methods ---
 
 const fetchToothOrder = async () => {
@@ -1336,15 +1396,17 @@ const fetchToothOrder = async () => {
     console.debug('[ToothOrder] Fetching for patient', props.patientId);
     const res = await makeApiCall('GET', `/patients/${props.patientId}/tooth-order`);
     console.debug('[ToothOrder] Fetch response:', res);
-    if (res && Array.isArray(res.tooth_order)) {
+    if (res && Array.isArray(res.tooth_order) && res.tooth_order.length > 0) {
       toothOrder.value = res.tooth_order.map(String);
     } else {
       toothOrder.value = [];
+      initializeToothOrderFromPending();
     }
   } catch (e) {
     toothOrderError.value = 'Failed to fetch tooth order.';
     toothOrder.value = [];
     console.error('[ToothOrder] Fetch error:', e);
+    initializeToothOrderFromPending();
   } finally {
     isLoadingToothOrder.value = false;
   }
@@ -1377,22 +1439,22 @@ const closeToothOrderPanel = () => {
 
 // --- Auto-populate from pending treatments if no order ---
 watch(showToothOrderPanel, (val) => {
-  if (val && toothOrder.value.length === 0) {
-    // Find teeth with pending treatments
-    const pendingTeeth = new Set();
-    props.records.forEach(record => {
-      if (record.tooth_number && record.treatments) {
-        record.treatments.forEach(treat => {
-          if (['pending', 'initial', 'diagnosis_planned', 'intreatment'].includes((treat.status||'').toLowerCase())) {
-            pendingTeeth.add(String(record.tooth_number));
-          }
-        });
-      }
-    });
-    if (pendingTeeth.size > 0) {
-      toothOrder.value = Array.from(pendingTeeth);
-    }
+  if (val) {
+    initializeToothOrderFromPending(true);
+  } else {
+    draggedToothIndex.value = null;
+    dragOverIndex.value = null;
   }
+});
+
+watch(() => props.records, () => {
+  if (toothOrder.value.length === 0) {
+    initializeToothOrderFromPending();
+  }
+}, { deep: true });
+
+onMounted(() => {
+  fetchToothOrder();
 });
 
 // --- Tooth Order List Actions ---
@@ -1412,7 +1474,7 @@ const moveToothDown = async (idx) => {
 };
 const removeTooth = async (idx) => {
   const arr = [...toothOrder.value];
-  const removed = arr.splice(idx, 1)[0];
+  arr.splice(idx, 1);
   toothOrder.value = arr;
   try { await saveToothOrder(); } catch(e) { console.error(e); }
   // flash feedback for removal? briefly show removal highlight on same id (not necessary)
@@ -1425,6 +1487,97 @@ const addTooth = async () => {
     flashRecentlyAdded(val);
     try { await saveToothOrder(); } catch(e) { console.error(e); }
   }
+};
+
+// --- Drag & Drop Ordering ---
+const handleDragStart = (event, idx) => {
+  draggedToothIndex.value = idx;
+  dragOverIndex.value = idx;
+  if (event?.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move';
+    try {
+      event.dataTransfer.setData('text/plain', toothOrder.value[idx]);
+    } catch (err) {
+      // Some browsers may throw if no dataTransfer; safe to ignore
+    }
+  }
+};
+
+const handleDragOver = (event, idx) => {
+  event.preventDefault();
+  dragOverIndex.value = idx;
+  if (event?.dataTransfer) {
+    event.dataTransfer.dropEffect = 'move';
+  }
+};
+
+const handleDrop = async (event, idx) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  if (draggedToothIndex.value === null || idx < 0) {
+    return;
+  }
+
+  const arr = [...toothOrder.value];
+  const [movedTooth] = arr.splice(draggedToothIndex.value, 1);
+
+  let insertIndex = idx;
+  const target = event.currentTarget;
+  if (target && typeof target.getBoundingClientRect === 'function') {
+    const rect = target.getBoundingClientRect();
+    const offsetY = event.clientY - rect.top;
+    if (offsetY > rect.height / 2) {
+      insertIndex = idx + 1;
+    }
+  } else if (draggedToothIndex.value < idx) {
+    insertIndex = idx + 1;
+  }
+
+  if (insertIndex < 0) insertIndex = 0;
+  if (insertIndex > arr.length) {
+    arr.push(movedTooth);
+  } else {
+    arr.splice(insertIndex, 0, movedTooth);
+  }
+
+  toothOrder.value = arr;
+  draggedToothIndex.value = null;
+  dragOverIndex.value = null;
+
+  try { await saveToothOrder(); } catch (e) { console.error(e); }
+};
+
+const handleDragLeave = (event) => {
+  if (!event?.currentTarget?.contains(event?.relatedTarget)) {
+    dragOverIndex.value = null;
+  }
+};
+
+const handleDragEnd = () => {
+  draggedToothIndex.value = null;
+  dragOverIndex.value = null;
+};
+
+const handleListDragOver = (event) => {
+  event.preventDefault();
+  if (event?.dataTransfer) {
+    event.dataTransfer.dropEffect = 'move';
+  }
+};
+
+const handleListDrop = async (event) => {
+  event.preventDefault();
+  if (draggedToothIndex.value === null) return;
+
+  const arr = [...toothOrder.value];
+  const [movedTooth] = arr.splice(draggedToothIndex.value, 1);
+  arr.push(movedTooth);
+  toothOrder.value = arr;
+  draggedToothIndex.value = null;
+  dragOverIndex.value = null;
+
+  try { await saveToothOrder(); } catch (e) { console.error(e); }
 };
 
 // Recent highlight state for UI feedback
