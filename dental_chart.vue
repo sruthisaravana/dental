@@ -113,11 +113,14 @@
         <div class="grid grid-cols-16 gap-0 mb-3 justify-items-center">
           <!-- Upper Right (Quadrant 1: 11-18) -->
           <div v-for="n in 8" :key="'upper-right-' + (19 - n)" class="relative text-center tooth-item">
-            <button 
-              @click="handleToothClick(19 - n)" 
-              @mouseenter="handleToothHover(19 - n, $event)"
-              @mouseleave="handleToothLeave"
-              class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
+              <button
+                @click="handleToothClick(19 - n)"
+                @mouseenter="handleToothHover(19 - n, $event)"
+                @mouseleave="handleToothLeave"
+                draggable="true"
+                @dragstart="handleChartToothDragStart($event, 19 - n)"
+                @dragend="handleDragEnd"
+                class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
               <div class="relative">
                 <!-- Critical indicator (red dot) -->
                 <span v-if="hasCriticalTreatment(19 - n)" class="absolute -top-1 -left-1 h-3 w-3 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-800 z-20 animate-pulse"></span>
@@ -147,11 +150,14 @@
           
           <!-- Upper Left (Quadrant 2: 21-28) -->
           <div v-for="n in 8" :key="'upper-left-' + (20 + n)" class="relative text-center tooth-item">
-            <button 
-              @click="handleToothClick(20 + n)" 
-              @mouseenter="handleToothHover(20 + n, $event)"
-              @mouseleave="handleToothLeave"
-              class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
+              <button
+                @click="handleToothClick(20 + n)"
+                @mouseenter="handleToothHover(20 + n, $event)"
+                @mouseleave="handleToothLeave"
+                draggable="true"
+                @dragstart="handleChartToothDragStart($event, 20 + n)"
+                @dragend="handleDragEnd"
+                class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
               <div class="relative">
                 <!-- Critical indicator (red dot) -->
                 <span v-if="hasCriticalTreatment(20 + n)" class="absolute -top-1 -left-1 h-3 w-3 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-800 z-20 animate-pulse"></span>
@@ -184,11 +190,14 @@
         <div class="grid grid-cols-16 gap-0 mt-6 pt-4 justify-items-center">
           <!-- Lower Right (Quadrant 4: 41-48) -->
           <div v-for="n in 8" :key="'lower-right-' + (49 - n)" class="relative text-center tooth-item">
-            <button 
-              @click="handleToothClick(49 - n)" 
-              @mouseenter="handleToothHover(49 - n, $event)"
-              @mouseleave="handleToothLeave"
-              class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
+              <button
+                @click="handleToothClick(49 - n)"
+                @mouseenter="handleToothHover(49 - n, $event)"
+                @mouseleave="handleToothLeave"
+                draggable="true"
+                @dragstart="handleChartToothDragStart($event, 49 - n)"
+                @dragend="handleDragEnd"
+                class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
               <div class="relative">
                 <!-- Critical indicator (red dot) -->
                 <span v-if="hasCriticalTreatment(49 - n)" class="absolute -top-1 -left-1 h-3 w-3 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-800 z-20 animate-pulse"></span>
@@ -218,11 +227,14 @@
           
           <!-- Lower Left (Quadrant 3: 31-38) -->
           <div v-for="n in 8" :key="'lower-left-' + (30 + n)" class="relative text-center tooth-item">
-            <button 
-              @click="handleToothClick(30 + n)" 
-              @mouseenter="handleToothHover(30 + n, $event)"
-              @mouseleave="handleToothLeave"
-              class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
+              <button
+                @click="handleToothClick(30 + n)"
+                @mouseenter="handleToothHover(30 + n, $event)"
+                @mouseleave="handleToothLeave"
+                draggable="true"
+                @dragstart="handleChartToothDragStart($event, 30 + n)"
+                @dragend="handleDragEnd"
+                class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
               <div class="relative">
                 <!-- Critical indicator (red dot) -->
                 <span v-if="hasCriticalTreatment(30 + n)" class="absolute -top-1 -left-1 h-3 w-3 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-800 z-20 animate-pulse"></span>
@@ -268,11 +280,14 @@
         <div class="grid grid-cols-10 gap-0 mb-3 justify-items-center">
           <!-- Upper Right (Quadrant 5: 51-55) -->
           <div v-for="n in 5" :key="'child-upper-right-' + (56 - n)" class="relative text-center tooth-item">
-            <button 
-              @click="handleToothClick(56 - n)" 
-              @mouseenter="handleToothHover(56 - n, $event)"
-              @mouseleave="handleToothLeave"
-              class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
+              <button
+                @click="handleToothClick(56 - n)"
+                @mouseenter="handleToothHover(56 - n, $event)"
+                @mouseleave="handleToothLeave"
+                draggable="true"
+                @dragstart="handleChartToothDragStart($event, 56 - n)"
+                @dragend="handleDragEnd"
+                class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
               <div class="relative">
                 <!-- Critical indicator (red dot) -->
                 <span v-if="hasCriticalTreatment(56 - n)" class="absolute -top-1 -left-1 h-3 w-3 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-800 z-20 animate-pulse"></span>
@@ -302,11 +317,14 @@
           
           <!-- Upper Left (Quadrant 6: 61-65) -->
           <div v-for="n in 5" :key="'child-upper-left-' + (60 + n)" class="relative text-center tooth-item">
-            <button 
-              @click="handleToothClick(60 + n)" 
-              @mouseenter="handleToothHover(60 + n, $event)"
-              @mouseleave="handleToothLeave"
-              class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
+              <button
+                @click="handleToothClick(60 + n)"
+                @mouseenter="handleToothHover(60 + n, $event)"
+                @mouseleave="handleToothLeave"
+                draggable="true"
+                @dragstart="handleChartToothDragStart($event, 60 + n)"
+                @dragend="handleDragEnd"
+                class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
               <div class="relative">
                 <!-- Critical indicator (red dot) -->
                 <span v-if="hasCriticalTreatment(60 + n)" class="absolute -top-1 -left-1 h-3 w-3 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-800 z-20 animate-pulse"></span>
@@ -339,11 +357,14 @@
         <div class="grid grid-cols-10 gap-0 mt-6 pt-4 justify-items-center">
           <!-- Lower Right (Quadrant 8: 81-85) -->
           <div v-for="n in 5" :key="'child-lower-right-' + (86 - n)" class="relative text-center tooth-item">
-            <button 
-              @click="handleToothClick(86 - n)" 
-              @mouseenter="handleToothHover(86 - n, $event)"
-              @mouseleave="handleToothLeave"
-              class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
+              <button
+                @click="handleToothClick(86 - n)"
+                @mouseenter="handleToothHover(86 - n, $event)"
+                @mouseleave="handleToothLeave"
+                draggable="true"
+                @dragstart="handleChartToothDragStart($event, 86 - n)"
+                @dragend="handleDragEnd"
+                class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
               <div class="relative">
                 <!-- Critical indicator (red dot) -->
                 <span v-if="hasCriticalTreatment(86 - n)" class="absolute -top-1 -left-1 h-3 w-3 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-800 z-20 animate-pulse"></span>
@@ -373,11 +394,14 @@
           
           <!-- Lower Left (Quadrant 7: 71-75) -->
           <div v-for="n in 5" :key="'child-lower-left-' + (70 + n)" class="relative text-center tooth-item">
-            <button 
-              @click="handleToothClick(70 + n)" 
-              @mouseenter="handleToothHover(70 + n, $event)"
-              @mouseleave="handleToothLeave"
-              class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
+              <button
+                @click="handleToothClick(70 + n)"
+                @mouseenter="handleToothHover(70 + n, $event)"
+                @mouseleave="handleToothLeave"
+                draggable="true"
+                @dragstart="handleChartToothDragStart($event, 70 + n)"
+                @dragend="handleDragEnd"
+                class="focus:outline-none flex flex-col items-center w-full relative group transition-all duration-200 hover:scale-110 hover:z-10">
               <div class="relative">
                 <!-- Critical indicator (red dot) -->
                 <span v-if="hasCriticalTreatment(70 + n)" class="absolute -top-1 -left-1 h-3 w-3 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-800 z-20 animate-pulse"></span>
@@ -609,7 +633,7 @@
 
       <!-- Floating Tooth Order Icon -->
       <div
-        class="fixed bottom-8 left-28 z-50 w-16 h-16 bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 rounded-2xl shadow-xl cursor-pointer hover:shadow-blue-400/30 transform hover:scale-105 transition-all duration-300 flex items-center justify-center group border border-white/20"
+        class="fixed bottom-8 right-8 z-40 w-16 h-16 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-2xl shadow-xl cursor-pointer hover:shadow-blue-400/40 transform hover:scale-105 transition-all duration-300 flex items-center justify-center group border border-white/20"
         @click="openToothOrderPanel"
         v-if="!showToothOrderPanel"
         style="user-select: none;"
@@ -623,67 +647,98 @@
       </div>
 
       <!-- Floating Tooth Order Panel -->
-  <div v-if="showToothOrderPanel" class="fixed top-0 left-0 h-full w-[320px] bg-gradient-to-b from-blue-50 via-white to-indigo-50 shadow-2xl z-50 border-r border-blue-200/50 transition-all duration-300">
-        <div class="bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 text-white p-6 relative">
-          <div class="flex items-center justify-between">
-            <div class="font-bold text-lg flex items-center">
-              <svg class="w-7 h-7 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 2c2.5 0 4.5 2 4.5 4.5S14.5 11 12 11 7.5 9 7.5 6.5 9.5 2 12 2zm0 0v20" />
-              </svg>
-              Tooth Treatment Order
+      <transition name="fade-slide">
+        <div
+          v-if="showToothOrderPanel"
+          class="fixed bottom-6 right-6 w-[380px] max-h-[80vh] bg-white dark:bg-gray-900 shadow-2xl rounded-3xl border border-blue-100 dark:border-gray-700 z-50 flex flex-col overflow-hidden"
+        >
+          <div class="bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 text-white p-5">
+            <div class="flex items-center justify-between">
+              <div class="font-bold text-lg flex items-center gap-2">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 2c2.5 0 4.5 2 4.5 4.5S14.5 11 12 11 7.5 9 7.5 6.5 9.5 2 12 2zm0 0v20" />
+                </svg>
+                <span>Tooth Treatment Order</span>
+              </div>
+              <button @click="closeToothOrderPanel" class="text-white hover:text-blue-100 text-2xl font-bold leading-none">&times;</button>
             </div>
-            <button @click="closeToothOrderPanel" class="text-white hover:text-blue-200 text-2xl font-bold">&times;</button>
+            <p class="mt-2 text-xs text-blue-100/90">Drag teeth from the chart or reorder items below to prioritize upcoming treatments.</p>
           </div>
-        </div>
-        <div class="p-4 flex-1 overflow-y-auto">
-          <div v-if="isLoadingToothOrder" class="text-center py-8 text-blue-500">Loading...</div>
-          <div v-else>
-            <div v-if="toothOrderError" class="bg-red-100 text-red-700 rounded p-2 mb-2">{{ toothOrderError }}</div>
-            <div v-if="toothOrder.length === 0" class="text-gray-500 text-center py-8">No custom order yet. Pending treatments will appear here automatically.</div>
-            <ul v-else class="space-y-3" @dragover.prevent="handleListDragOver" @drop="handleListDrop">
-              <li
-                v-for="(tooth, idx) in toothOrder"
-                :key="tooth"
-                class="flex items-center bg-white rounded-lg shadow p-2 border border-blue-100 cursor-move select-none"
-                :class="[
-                  recentAddedTooth === String(tooth) ? 'ring-2 ring-green-400 animate-pulse' : '',
-                  dragOverIndex === idx ? 'ring-2 ring-indigo-300 shadow-lg' : ''
-                ]"
-                draggable="true"
-                @dragstart="handleDragStart($event, idx)"
-                @dragover="handleDragOver($event, idx)"
-                @dragleave="handleDragLeave($event)"
-                @drop="handleDrop($event, idx)"
-                @dragend="handleDragEnd"
-                @mouseenter="handleToothHover(tooth, $event, true)"
-                @mouseleave="handleToothLeave"
+
+          <div class="p-4 flex-1 overflow-y-auto space-y-4">
+            <div v-if="isLoadingToothOrder" class="text-center py-12 text-blue-500">Loading...</div>
+
+            <template v-else>
+              <div v-if="toothOrderError" class="bg-red-100 text-red-700 rounded-lg p-3 text-sm">{{ toothOrderError }}</div>
+
+              <div
+                class="rounded-2xl border border-dashed border-blue-200 dark:border-blue-800 bg-blue-50/40 dark:bg-blue-900/20 p-3"
+                :class="{'ring-2 ring-indigo-300': dragOverIndex === 'list'}"
+                @dragover.prevent="handleListDragOver"
+                @dragleave="handleListDragLeave"
+                @drop="handleListDrop"
               >
-                <img
-                  :src="getToothImagePath(tooth)"
-                  alt="tooth"
-                  class="w-8 h-8 mr-2"
-                  style="object-fit:contain;"
-                />
-                <span class="font-semibold text-blue-700 mr-2">#{{ idx + 1 }}</span>
-                <span class="font-semibold text-slate-700 mr-2">Tooth {{ tooth }}</span>
-                <button @click="moveToothUp(idx)" :disabled="idx === 0" class="ml-auto px-2 py-1 text-blue-500 hover:text-blue-700 disabled:opacity-30"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg></button>
-                <button @click="moveToothDown(idx)" :disabled="idx === toothOrder.length-1" class="px-2 py-1 text-blue-500 hover:text-blue-700 disabled:opacity-30"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></button>
-                <button @click="removeTooth(idx)" class="px-2 py-1 text-red-400 hover:text-red-600"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
-              </li>
-            </ul>
-            <div class="mt-4 flex gap-2">
-              <input v-model="newToothNumber" placeholder="Add tooth #" class="border rounded px-2 py-1 w-24" />
-              <button @click="addTooth" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">Add</button>
-              <button @click="saveToothOrder" :disabled="isSavingToothOrder" class="ml-auto bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded flex items-center gap-1">
-                <svg v-if="isSavingToothOrder" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-opacity=".3"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
-                <span>Save Order</span>
-              </button>
-            </div>
+                <template v-if="toothOrder.length === 0">
+                  <div class="text-center text-gray-500 dark:text-gray-400 py-10 px-2 text-sm">
+                    Drop teeth here or use the chart to seed the order from pending treatments automatically.
+                  </div>
+                </template>
+                <template v-else>
+                  <ul class="space-y-3">
+                    <li
+                      v-for="(tooth, idx) in toothOrder"
+                      :key="tooth"
+                      class="flex items-center bg-white dark:bg-gray-800 rounded-xl shadow-sm p-3 border border-blue-100 dark:border-gray-700 cursor-grab select-none transition-all duration-150"
+                      :class="[
+                        recentAddedTooth === String(tooth) ? 'ring-2 ring-green-400 animate-pulse' : '',
+                        dragOverIndex === idx ? 'ring-2 ring-indigo-300 shadow-lg' : ''
+                      ]"
+                      draggable="true"
+                      @dragstart="handleDragStart($event, idx)"
+                      @dragover="handleDragOver($event, idx)"
+                      @dragleave="handleDragLeave($event, idx)"
+                      @drop="handleDrop($event, idx)"
+                      @dragend="handleDragEnd"
+                      @mouseover="handleToothHover(tooth, $event, true)"
+                      @mouseout="handleToothLeave"
+                    >
+                      <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100/70 dark:bg-blue-900/40">
+                          <img
+                            :src="getToothImagePath(tooth)"
+                            alt="tooth"
+                            class="w-8 h-8"
+                            style="object-fit:contain;"
+                            draggable="false"
+                          />
+                        </div>
+                        <div class="flex flex-col min-w-0">
+                          <span class="text-xs font-semibold text-slate-500">Position {{ idx + 1 }}</span>
+                          <span class="font-semibold text-slate-800 dark:text-slate-100 truncate">Tooth {{ tooth }}</span>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-1 ml-3">
+                        <button @click="moveToothUp(idx)" :disabled="idx === 0" class="p-2 text-blue-500 hover:text-blue-700 disabled:opacity-30" title="Move up"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg></button>
+                        <button @click="moveToothDown(idx)" :disabled="idx === toothOrder.length-1" class="p-2 text-blue-500 hover:text-blue-700 disabled:opacity-30" title="Move down"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></button>
+                        <button @click="removeTooth(idx)" class="p-2 text-red-400 hover:text-red-600" title="Remove"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                      </div>
+                    </li>
+                  </ul>
+                </template>
+              </div>
+
+              <div class="flex flex-wrap gap-2 items-center">
+                <input v-model="newToothNumber" placeholder="Add tooth #" class="border border-blue-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg px-3 py-2 w-28 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                <button @click="addTooth" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm">Add</button>
+                <button @click="saveToothOrder" :disabled="isSavingToothOrder" class="ml-auto bg-green-500 hover:bg-green-600 disabled:opacity-60 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm">
+                  <svg v-if="isSavingToothOrder" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-opacity=".3"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+                  <span>Save Order</span>
+                </button>
+              </div>
+            </template>
           </div>
         </div>
-      </div>
-      <!-- Overlay -->
-      <div v-if="showToothOrderPanel" @click="closeToothOrderPanel" class="fixed inset-0 bg-black/40 z-40"></div>
+      </transition>
 
 </template>
 
@@ -1302,7 +1357,9 @@ const isSavingToothOrder = ref(false);
 const toothOrderError = ref('');
 const newToothNumber = ref('');
 const draggedToothIndex = ref(null);
+const draggedToothNumber = ref(null);
 const dragOverIndex = ref(null);
+const isDraggingFromChart = ref(false);
 
 const API_BASE_URL = useRuntimeConfig().public.API_BASE_URL;
 
@@ -1435,6 +1492,7 @@ const openToothOrderPanel = () => {
 };
 const closeToothOrderPanel = () => {
   showToothOrderPanel.value = false;
+  resetDragState();
 };
 
 // --- Auto-populate from pending treatments if no order ---
@@ -1442,8 +1500,7 @@ watch(showToothOrderPanel, (val) => {
   if (val) {
     initializeToothOrderFromPending(true);
   } else {
-    draggedToothIndex.value = null;
-    dragOverIndex.value = null;
+    resetDragState();
   }
 });
 
@@ -1490,9 +1547,26 @@ const addTooth = async () => {
 };
 
 // --- Drag & Drop Ordering ---
+const getDraggedToothFromEvent = (event) => {
+  if (draggedToothNumber.value) {
+    return draggedToothNumber.value;
+  }
+  const data = event?.dataTransfer?.getData('text/plain');
+  return data ? data.trim() : null;
+};
+
+const resetDragState = () => {
+  draggedToothIndex.value = null;
+  draggedToothNumber.value = null;
+  dragOverIndex.value = null;
+  isDraggingFromChart.value = false;
+};
+
 const handleDragStart = (event, idx) => {
   draggedToothIndex.value = idx;
   dragOverIndex.value = idx;
+  draggedToothNumber.value = toothOrder.value[idx];
+  isDraggingFromChart.value = false;
   if (event?.dataTransfer) {
     event.dataTransfer.effectAllowed = 'move';
     try {
@@ -1503,24 +1577,35 @@ const handleDragStart = (event, idx) => {
   }
 };
 
+const handleChartToothDragStart = (event, toothNumber) => {
+  draggedToothIndex.value = null;
+  draggedToothNumber.value = String(toothNumber);
+  isDraggingFromChart.value = true;
+  dragOverIndex.value = 'list';
+  if (!showToothOrderPanel.value) {
+    openToothOrderPanel();
+  }
+  if (event?.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'copyMove';
+    try {
+      event.dataTransfer.setData('text/plain', String(toothNumber));
+    } catch (err) {
+      // Ignore transfer errors
+    }
+  }
+};
+
 const handleDragOver = (event, idx) => {
   event.preventDefault();
   dragOverIndex.value = idx;
   if (event?.dataTransfer) {
-    event.dataTransfer.dropEffect = 'move';
+    event.dataTransfer.dropEffect = draggedToothIndex.value !== null ? 'move' : 'copy';
   }
 };
 
 const handleDrop = async (event, idx) => {
   event.preventDefault();
   event.stopPropagation();
-
-  if (draggedToothIndex.value === null || idx < 0) {
-    return;
-  }
-
-  const arr = [...toothOrder.value];
-  const [movedTooth] = arr.splice(draggedToothIndex.value, 1);
 
   let insertIndex = idx;
   const target = event.currentTarget;
@@ -1530,54 +1615,107 @@ const handleDrop = async (event, idx) => {
     if (offsetY > rect.height / 2) {
       insertIndex = idx + 1;
     }
-  } else if (draggedToothIndex.value < idx) {
+  } else if (draggedToothIndex.value !== null && draggedToothIndex.value < idx) {
     insertIndex = idx + 1;
+  }
+
+  const tooth = getDraggedToothFromEvent(event);
+  if (!tooth) {
+    resetDragState();
+    return;
+  }
+
+  const arr = [...toothOrder.value];
+  const existingIdx = arr.indexOf(tooth);
+
+  if (existingIdx !== -1) {
+    arr.splice(existingIdx, 1);
+    if (existingIdx < insertIndex) {
+      insertIndex -= 1;
+    }
+  }
+
+  if (existingIdx === insertIndex) {
+    resetDragState();
+    return;
   }
 
   if (insertIndex < 0) insertIndex = 0;
   if (insertIndex > arr.length) {
-    arr.push(movedTooth);
+    arr.push(tooth);
   } else {
-    arr.splice(insertIndex, 0, movedTooth);
+    arr.splice(insertIndex, 0, tooth);
   }
 
   toothOrder.value = arr;
-  draggedToothIndex.value = null;
-  dragOverIndex.value = null;
 
-  try { await saveToothOrder(); } catch (e) { console.error(e); }
+  try {
+    await saveToothOrder();
+  } catch (e) {
+    console.error(e);
+  }
+
+  if (existingIdx === -1) {
+    flashRecentlyAdded(tooth);
+  }
+
+  resetDragState();
 };
 
-const handleDragLeave = (event) => {
+const handleDragLeave = (event, idx = null) => {
   if (!event?.currentTarget?.contains(event?.relatedTarget)) {
-    dragOverIndex.value = null;
+    if (idx !== null && dragOverIndex.value === idx) {
+      dragOverIndex.value = null;
+    } else if (idx === null && dragOverIndex.value === 'list') {
+      dragOverIndex.value = null;
+    }
   }
 };
 
 const handleDragEnd = () => {
-  draggedToothIndex.value = null;
-  dragOverIndex.value = null;
+  resetDragState();
 };
 
 const handleListDragOver = (event) => {
   event.preventDefault();
+  dragOverIndex.value = 'list';
   if (event?.dataTransfer) {
-    event.dataTransfer.dropEffect = 'move';
+    event.dataTransfer.dropEffect = draggedToothIndex.value !== null ? 'move' : 'copy';
   }
+};
+
+const handleListDragLeave = (event) => {
+  handleDragLeave(event);
 };
 
 const handleListDrop = async (event) => {
   event.preventDefault();
-  if (draggedToothIndex.value === null) return;
+
+  const tooth = getDraggedToothFromEvent(event);
+  if (!tooth) {
+    resetDragState();
+    return;
+  }
 
   const arr = [...toothOrder.value];
-  const [movedTooth] = arr.splice(draggedToothIndex.value, 1);
-  arr.push(movedTooth);
+  const existingIdx = arr.indexOf(tooth);
+  if (existingIdx !== -1) {
+    arr.splice(existingIdx, 1);
+  }
+  arr.push(tooth);
   toothOrder.value = arr;
-  draggedToothIndex.value = null;
-  dragOverIndex.value = null;
 
-  try { await saveToothOrder(); } catch (e) { console.error(e); }
+  try {
+    await saveToothOrder();
+  } catch (e) {
+    console.error(e);
+  }
+
+  if (existingIdx === -1) {
+    flashRecentlyAdded(tooth);
+  }
+
+  resetDragState();
 };
 
 // Recent highlight state for UI feedback
@@ -1619,6 +1757,17 @@ const flashRecentlyAdded = (tooth) => {
 /* Smooth animations for hover effects */
 .group:hover .opacity-60 {
   opacity: 1;
+}
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.25s ease;
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(12px) scale(0.97);
 }
 
 /* Enhanced scrollbar for hover summary */
