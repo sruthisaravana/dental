@@ -434,11 +434,12 @@
 
     <!-- Compact Floating Tooth Treatment Summary - Bottom Right Corner -->
     <Teleport to="body">
-        <div v-if="hoveredTooth && showHoverSummary" 
-             class="fixed bottom-4 right-4 z-60 pointer-events-auto">
-        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl w-[350px] transition-opacity duration-200">
+        <div v-if="hoveredTooth && showHoverSummary"
+             class="fixed bottom-6 right-6 pointer-events-auto"
+             style="z-index: 9999;">
+        <div class="bg-white/95 dark:bg-gray-900/95 backdrop-blur border border-gray-200/80 dark:border-gray-700/80 rounded-2xl shadow-2xl w-[360px] transition-all duration-200">
           <!-- Compact Header -->
-          <div class="p-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 rounded-t-xl relative">
+          <div class="p-4 border-b border-gray-200/70 dark:border-gray-700/70 bg-white/60 dark:bg-gray-800/70 rounded-t-2xl relative backdrop-blur-sm">
             <!-- Status badge positioned at top-right -->
             <span v-if="getToothStatus(hoveredTooth)" 
                   :class="getHoverStatusClass(getToothStatus(hoveredTooth))" 
@@ -447,8 +448,8 @@
             </span>
             
             <div class="flex items-center space-x-2 pr-16">
-              <div class="bg-gray-100 dark:bg-gray-600 p-2 rounded-lg">
-                <svg class="w-4 h-4 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="bg-blue-100/60 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 p-2 rounded-xl">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.5a1.5 1.5 0 011.5 1.5v1a1.5 1.5 0 01-1.5 1.5H9"/>
                 </svg>
               </div>
@@ -471,7 +472,7 @@
           
           <!-- Compact content area -->
           <div class="max-h-80 overflow-y-auto custom-scrollbar">
-            <div class="p-3 space-y-2">
+            <div class="p-4 space-y-3">
             
             <!-- No treatments state -->
             <div v-if="getToothTreatments(hoveredTooth).length === 0" 
@@ -620,7 +621,7 @@
                 </div>
               </div>
             </div>
-            </div>
+          </div>
           </div>
         </div>
       </div>
@@ -633,16 +634,18 @@
 
       <!-- Floating Tooth Order Icon -->
       <div
-        class="fixed bottom-8 right-8 z-40 w-16 h-16 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-2xl shadow-xl cursor-pointer hover:shadow-blue-400/40 transform hover:scale-105 transition-all duration-300 flex items-center justify-center group border border-white/20"
+        class="fixed bottom-8 left-8 z-40 w-16 h-16 bg-white/90 dark:bg-gray-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-gray-700/70 shadow-2xl cursor-pointer hover:shadow-blue-400/30 transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center group rounded-2xl"
         @click="openToothOrderPanel"
         v-if="!showToothOrderPanel"
         style="user-select: none;"
       >
-        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 2c2.5 0 4.5 2 4.5 4.5S14.5 11 12 11 7.5 9 7.5 6.5 9.5 2 12 2zm0 0v20" />
-        </svg>
-        <div class="absolute bottom-full mb-3 px-3 py-2 bg-slate-800/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap shadow-lg border border-white/10">
-          Tooth Order
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 via-indigo-500 to-purple-500 flex items-center justify-center shadow-inner">
+          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 2c2.5 0 4.5 2 4.5 4.5S14.5 11 12 11 7.5 9 7.5 6.5 9.5 2 12 2zm0 0v20" />
+          </svg>
+        </div>
+        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-2 bg-slate-900/95 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap shadow-lg border border-white/10">
+          Manage Tooth Order
         </div>
       </div>
 
@@ -650,29 +653,39 @@
       <transition name="fade-slide">
         <div
           v-if="showToothOrderPanel"
-          class="fixed bottom-6 right-6 w-[380px] max-h-[80vh] bg-white dark:bg-gray-900 shadow-2xl rounded-3xl border border-blue-100 dark:border-gray-700 z-50 flex flex-col overflow-hidden"
+          class="fixed bottom-6 right-6 w-[380px] max-h-[80vh] bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-[0_20px_60px_rgba(15,23,42,0.35)] rounded-[28px] border border-slate-200/80 dark:border-gray-700/70 z-50 flex flex-col overflow-hidden"
         >
-          <div class="bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 text-white p-5">
-            <div class="flex items-center justify-between">
-              <div class="font-bold text-lg flex items-center gap-2">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 2c2.5 0 4.5 2 4.5 4.5S14.5 11 12 11 7.5 9 7.5 6.5 9.5 2 12 2zm0 0v20" />
-                </svg>
-                <span>Tooth Treatment Order</span>
+          <div class="px-6 py-5 border-b border-slate-200/80 dark:border-gray-700/70 bg-white/70 dark:bg-gray-900/60 backdrop-blur">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-400 via-indigo-500 to-purple-500 flex items-center justify-center shadow-inner">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 2c2.5 0 4.5 2 4.5 4.5S14.5 11 12 11 7.5 9 7.5 6.5 9.5 2 12 2zm0 0v20" />
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 font-semibold">Planner</p>
+                  <h2 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">Tooth Treatment Order</h2>
+                  <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Arrange procedures by priority to guide your workflow.</p>
+                </div>
               </div>
-              <button @click="closeToothOrderPanel" class="text-white hover:text-blue-100 text-2xl font-bold leading-none">&times;</button>
+              <button @click="closeToothOrderPanel" class="shrink-0 text-slate-500 hover:text-slate-800 dark:text-slate-300 dark:hover:text-white transition-colors">
+                <span class="sr-only">Close</span>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-            <p class="mt-2 text-xs text-blue-100/90">Drag teeth from the chart or reorder items below to prioritize upcoming treatments.</p>
           </div>
 
-          <div class="p-4 flex-1 overflow-y-auto space-y-4">
-            <div v-if="isLoadingToothOrder" class="text-center py-12 text-blue-500">Loading...</div>
+          <div class="px-5 py-4 flex-1 overflow-y-auto space-y-4">
+            <div v-if="isLoadingToothOrder" class="text-center py-12 text-slate-500 dark:text-slate-400">Loading...</div>
 
             <template v-else>
               <div v-if="toothOrderError" class="bg-red-100 text-red-700 rounded-lg p-3 text-sm">{{ toothOrderError }}</div>
 
               <div
-                class="rounded-2xl border border-dashed border-blue-200 dark:border-blue-800 bg-blue-50/40 dark:bg-blue-900/20 p-3"
+                class="rounded-2xl border border-dashed border-slate-300/70 dark:border-slate-600/70 bg-slate-50/70 dark:bg-slate-800/40 p-3"
                 :class="{'ring-2 ring-indigo-300': dragOverIndex === 'list'}"
                 @dragover.prevent="handleListDragOver"
                 @dragleave="handleListDragLeave"
@@ -688,7 +701,7 @@
                     <li
                       v-for="(tooth, idx) in toothOrder"
                       :key="tooth"
-                      class="flex items-center bg-white dark:bg-gray-800 rounded-xl shadow-sm p-3 border border-blue-100 dark:border-gray-700 cursor-grab select-none transition-all duration-150"
+                      class="flex items-center bg-white/90 dark:bg-gray-900/70 rounded-2xl shadow-sm p-3 border border-slate-200/80 dark:border-gray-700/70 cursor-grab select-none transition-all duration-150"
                       :class="[
                         recentAddedTooth === String(tooth) ? 'ring-2 ring-green-400 animate-pulse' : '',
                         dragOverIndex === idx ? 'ring-2 ring-indigo-300 shadow-lg' : ''
@@ -703,24 +716,24 @@
                       @mouseout="handleToothLeave"
                     >
                       <div class="flex items-center gap-3 flex-1 min-w-0">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100/70 dark:bg-blue-900/40">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-slate-100 dark:bg-gray-800/80 border border-slate-200/80 dark:border-gray-700/70">
                           <img
                             :src="getToothImagePath(tooth)"
                             alt="tooth"
-                            class="w-8 h-8"
+                            class="w-9 h-9"
                             style="object-fit:contain;"
                             draggable="false"
                           />
                         </div>
                         <div class="flex flex-col min-w-0">
-                          <span class="text-xs font-semibold text-slate-500">Position {{ idx + 1 }}</span>
-                          <span class="font-semibold text-slate-800 dark:text-slate-100 truncate">Tooth {{ tooth }}</span>
+                          <span class="text-[11px] uppercase tracking-wide font-semibold text-slate-400">Position {{ idx + 1 }}</span>
+                          <span class="font-semibold text-slate-800 dark:text-slate-100 truncate text-base">Tooth {{ tooth }}</span>
                         </div>
                       </div>
-                      <div class="flex items-center gap-1 ml-3">
-                        <button @click="moveToothUp(idx)" :disabled="idx === 0" class="p-2 text-blue-500 hover:text-blue-700 disabled:opacity-30" title="Move up"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg></button>
-                        <button @click="moveToothDown(idx)" :disabled="idx === toothOrder.length-1" class="p-2 text-blue-500 hover:text-blue-700 disabled:opacity-30" title="Move down"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></button>
-                        <button @click="removeTooth(idx)" class="p-2 text-red-400 hover:text-red-600" title="Remove"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                      <div class="flex items-center gap-1.5 ml-3">
+                        <button @click="moveToothUp(idx)" :disabled="idx === 0" class="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 disabled:opacity-30" title="Move up"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg></button>
+                        <button @click="moveToothDown(idx)" :disabled="idx === toothOrder.length-1" class="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 disabled:opacity-30" title="Move down"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></button>
+                        <button @click="removeTooth(idx)" class="p-2 rounded-xl text-red-400 hover:text-red-600 hover:bg-red-50/80 dark:hover:bg-red-500/10" title="Remove"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
                       </div>
                     </li>
                   </ul>
@@ -728,9 +741,9 @@
               </div>
 
               <div class="flex flex-wrap gap-2 items-center">
-                <input v-model="newToothNumber" placeholder="Add tooth #" class="border border-blue-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg px-3 py-2 w-28 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                <button @click="addTooth" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm">Add</button>
-                <button @click="saveToothOrder" :disabled="isSavingToothOrder" class="ml-auto bg-green-500 hover:bg-green-600 disabled:opacity-60 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm">
+                <input v-model="newToothNumber" placeholder="Add tooth #" class="border border-slate-300/80 dark:border-gray-700 bg-white/90 dark:bg-gray-900/70 rounded-lg px-3 py-2 w-28 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                <button @click="addTooth" class="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white px-3 py-2 rounded-lg text-sm shadow-sm">Add</button>
+                <button @click="saveToothOrder" :disabled="isSavingToothOrder" class="ml-auto bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm shadow-sm">
                   <svg v-if="isSavingToothOrder" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-opacity=".3"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
                   <span>Save Order</span>
                 </button>
