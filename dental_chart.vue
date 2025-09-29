@@ -653,7 +653,7 @@
       <transition name="fade-slide">
         <div
           v-if="showToothOrderPanel"
-          class="fixed bottom-6 right-6 w-[380px] max-h-[80vh] bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-[0_20px_60px_rgba(15,23,42,0.35)] rounded-[28px] border border-slate-200/80 dark:border-gray-700/70 z-50 flex flex-col overflow-hidden"
+          class="fixed bottom-6 left-6 w-[380px] max-h-[80vh] bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-[0_20px_60px_rgba(15,23,42,0.35)] rounded-[28px] border border-slate-200/80 dark:border-gray-700/70 z-50 flex flex-col overflow-hidden"
         >
           <div class="px-6 py-5 border-b border-slate-200/80 dark:border-gray-700/70 bg-white/70 dark:bg-gray-900/60 backdrop-blur">
             <div class="flex items-start justify-between gap-4">
@@ -1528,34 +1528,66 @@ onMounted(() => {
 });
 
 // --- Tooth Order List Actions ---
+const areOrdersEqual = (a, b) => {
+  if (a.length !== b.length) return false;
+  return a.every((val, idx) => val === b[idx]);
+};
+
+const commitOrderChange = async (nextOrder, flashTarget = null) => {
+  const sanitizedNext = nextOrder.map(tooth => String(tooth));
+  const previous = [...toothOrder.value];
+  if (areOrdersEqual(previous, sanitizedNext)) {
+    toothOrder.value = previous;
+    return false;
+  }
+
+  toothOrder.value = sanitizedNext;
+  try {
+    await saveToothOrder();
+    if (flashTarget) {
+      flashRecentlyAdded(flashTarget);
+    }
+    return true;
+  } catch (e) {
+    toothOrder.value = previous;
+    throw e;
+  }
+};
+
 const moveToothUp = async (idx) => {
   if (idx <= 0) return;
   const arr = [...toothOrder.value];
-  [arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]];
-  toothOrder.value = arr;
-  try { await saveToothOrder(); } catch(e) { console.error(e); }
+  const [item] = arr.splice(idx, 1);
+  arr.splice(idx - 1, 0, item);
+  try { await commitOrderChange(arr); } catch (e) { console.error(e); }
 };
+
 const moveToothDown = async (idx) => {
   if (idx >= toothOrder.value.length - 1) return;
   const arr = [...toothOrder.value];
-  [arr[idx], arr[idx + 1]] = [arr[idx + 1], arr[idx]];
-  toothOrder.value = arr;
-  try { await saveToothOrder(); } catch(e) { console.error(e); }
+  const [item] = arr.splice(idx, 1);
+  arr.splice(idx + 1, 0, item);
+  try { await commitOrderChange(arr); } catch (e) { console.error(e); }
 };
+
 const removeTooth = async (idx) => {
   const arr = [...toothOrder.value];
   arr.splice(idx, 1);
-  toothOrder.value = arr;
-  try { await saveToothOrder(); } catch(e) { console.error(e); }
-  // flash feedback for removal? briefly show removal highlight on same id (not necessary)
+  try { await commitOrderChange(arr); } catch (e) { console.error(e); }
 };
+
 const addTooth = async () => {
   const val = newToothNumber.value.trim();
-  if (val && !toothOrder.value.includes(val)) {
-    toothOrder.value.push(val);
-    newToothNumber.value = '';
-    flashRecentlyAdded(val);
-    try { await saveToothOrder(); } catch(e) { console.error(e); }
+  if (!val || toothOrder.value.includes(val)) return;
+
+  const arr = [...toothOrder.value, val];
+  try {
+    const didChange = await commitOrderChange(arr, val);
+    if (didChange) {
+      newToothNumber.value = '';
+    }
+  } catch (e) {
+    console.error(e);
   }
 };
 
@@ -1640,36 +1672,25 @@ const handleDrop = async (event, idx) => {
 
   const arr = [...toothOrder.value];
   const existingIdx = arr.indexOf(tooth);
+  let flashTarget = null;
 
   if (existingIdx !== -1) {
-    arr.splice(existingIdx, 1);
+    const [item] = arr.splice(existingIdx, 1);
     if (existingIdx < insertIndex) {
       insertIndex -= 1;
     }
-  }
-
-  if (existingIdx === insertIndex) {
-    resetDragState();
-    return;
-  }
-
-  if (insertIndex < 0) insertIndex = 0;
-  if (insertIndex > arr.length) {
-    arr.push(tooth);
+    insertIndex = Math.max(0, Math.min(insertIndex, arr.length));
+    arr.splice(insertIndex, 0, item);
   } else {
+    insertIndex = Math.max(0, Math.min(insertIndex, arr.length));
     arr.splice(insertIndex, 0, tooth);
+    flashTarget = tooth;
   }
-
-  toothOrder.value = arr;
 
   try {
-    await saveToothOrder();
+    await commitOrderChange(arr, flashTarget);
   } catch (e) {
     console.error(e);
-  }
-
-  if (existingIdx === -1) {
-    flashRecentlyAdded(tooth);
   }
 
   resetDragState();
@@ -1713,19 +1734,16 @@ const handleListDrop = async (event) => {
   const arr = [...toothOrder.value];
   const existingIdx = arr.indexOf(tooth);
   if (existingIdx !== -1) {
-    arr.splice(existingIdx, 1);
+    const [item] = arr.splice(existingIdx, 1);
+    arr.push(item);
+  } else {
+    arr.push(tooth);
   }
-  arr.push(tooth);
-  toothOrder.value = arr;
 
   try {
-    await saveToothOrder();
+    await commitOrderChange(arr, existingIdx === -1 ? tooth : null);
   } catch (e) {
     console.error(e);
-  }
-
-  if (existingIdx === -1) {
-    flashRecentlyAdded(tooth);
   }
 
   resetDragState();
