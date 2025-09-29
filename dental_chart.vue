@@ -435,7 +435,7 @@
     <!-- Compact Floating Tooth Treatment Summary - Bottom Right Corner -->
     <Teleport to="body">
         <div v-if="hoveredTooth && showHoverSummary"
-             class="fixed bottom-6 right-6 pointer-events-auto"
+             class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 pointer-events-auto"
              style="z-index: 9999;">
         <div class="bg-white/95 dark:bg-gray-900/95 backdrop-blur border border-gray-200/80 dark:border-gray-700/80 rounded-2xl shadow-2xl w-[360px] transition-all duration-200">
           <!-- Compact Header -->
@@ -726,8 +726,15 @@
                           />
                         </div>
                         <div class="flex flex-col min-w-0">
-                          <span class="text-[11px] uppercase tracking-wide font-semibold text-slate-400">Position {{ idx + 1 }}</span>
-                          <span class="font-semibold text-slate-800 dark:text-slate-100 truncate text-base">Tooth {{ tooth }}</span>
+                          <span class="text-lg font-semibold text-slate-800 dark:text-slate-100 leading-tight">{{ tooth }}</span>
+                          <span
+                            v-if="getToothCondition(tooth)"
+                            class="mt-1 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                            :class="getConditionDisplayClass(getToothCondition(tooth))"
+                          >
+                            {{ getFormattedCondition(getToothCondition(tooth)) }}
+                          </span>
+                          <span v-else class="mt-1 text-xs text-slate-400 dark:text-slate-500">No condition recorded</span>
                         </div>
                       </div>
                       <div class="flex items-center gap-1.5 ml-3">
