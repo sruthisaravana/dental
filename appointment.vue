@@ -293,10 +293,11 @@
             pixelsPerHour > 48 ? 'timeline-scrollable' : 'timeline-autoheight'
           ]"
           :style="pixelsPerHour > 48 ? 'max-height: 700px; min-height: 80vh; overflow-y: auto;' : 'min-height: 80vh; max-height: none; overflow-y: visible;'"
+          @dragenter.prevent="handleDragEnter"
           @dragover.prevent="handleDragOver"
-          @dragleave="handleDragLeave" 
+          @dragleave="handleDragLeave"
           @drop="handleDrop"
-          @wheel="handleTimelineWheel">
+          @wheel.prevent="handleTimelineWheel">
                 
                 <!-- Time Grid - FIXED with proper spacing -->
                 <div class="absolute left-0 top-0 w-20 h-full">
@@ -336,85 +337,116 @@
                          @mouseenter="onTimelineCardEnter($event, appointment)"
                          @mouseleave="hideOverlapPopover">
                       
-                      <!-- COMPACT Timeline Card Content -->
-                      <div class="flex flex-col h-full justify-between">
-                        <!-- Header: Name + Status in one line -->
-                        <div class="flex justify-between items-start mb-2">
-                          <div class="flex-1">
-                            <div class="flex items-center space-x-2">
-                              <h3 class="font-bold text-slate-900 text-sm truncate">
-                                {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
-                              </h3>
-                              <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
-                                {{ appointment.patient.phone || 'No phone' }}
-                              </span>
-
-
-                                                     <div class="flex justify-center items-center mt-2 space-x-2">
-                          <button v-if="appointment.status !== 'completed'"
-                                  @click.stop="startAppointment(appointment)"
-                                  class="px-4 py-2 text-sm rounded-full font-semibold transition-all shadow-sm"
-                                  :class="timing && activeAppointment?.id === appointment.id 
-                                    ? 'bg-red-500 text-white hover:bg-red-600' 
-                                    : 'bg-green-600 text-white hover:bg-green-700'">
-                            {{ timing && activeAppointment?.id === appointment.id ? 'Stop' : 'Start' }}
-                          </button>
-                          <button v-if="appointment.status === 'completed'" 
-                                  @click.stop="showTimeEditModal(appointment)"
-                                  class="px-3 py-1.5 text-xs bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 font-semibold transition-all">
-                            Edit
-                          </button>
-                          <button @click.stop="removeFromTimeline(appointment.id)"
-                                  class="px-2 py-1 text-xs bg-slate-100 text-slate-600 rounded-md hover:bg-slate-200 transition-all"
-                                  title="Remove from timeline">
-                            <X class="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                            </div>
-                            <p v-if="!isTightCard(appointment)" class="text-xs text-slate-600 mt-1 truncate">{{ appointment.reason || appointment.treatment || 'Checkup' }}</p>
-                            <!-- <div v-if="isTightCard(appointment)" class="mt-1">
-                              <span class="inline-block text-[11px] font-semibold text-blue-700 bg-blue-50 rounded px-1.5 py-0.5">{{ getDisplayTimeRange(appointment) }}</span>
-                            </div> -->
+                      <!-- Refined Timeline Card Content -->
+                      <div class="flex h-full flex-col justify-between gap-3">
+                        <div class="space-y-2">
+                          <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:text-sm">
+                            <h3 class="font-semibold text-slate-900 text-sm sm:text-base truncate max-w-[12rem]">
+                              {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
+                            </h3>
+                            <span v-if="appointment.patient.phone" class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-medium text-slate-600">
+                              {{ appointment.patient.phone }}
+                            </span>
+                            <span v-else class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-medium text-slate-500">
+                              No phone
+                            </span>
+                            <span class="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700">
+                              {{ getDisplayTimeRange(appointment) }}
+                            </span>
+                            <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
+                              {{ appointment.duration || 30 }}m
+                            </span>
                           </div>
-                          
-                          <!-- Status Badge -->
-                          <span class="text-xs px-2 py-1 rounded-full font-bold uppercase tracking-wide ml-2"
-                                :class="getStatusBadgeClass(appointment.status)">
-                            {{ appointment.status }}
+                          <p v-if="appointment.reason || appointment.treatment"
+                             :class="isTightCard(appointment)
+                               ? 'text-[11px] font-medium text-slate-500 truncate'
+                               : 'text-xs leading-relaxed text-slate-600 line-clamp-2'">
+                            {{ appointment.reason || appointment.treatment }}
+                          </p>
+                          <p v-else :class="isTightCard(appointment)
+                              ? 'text-[11px] font-medium text-slate-400 truncate'
+                              : 'text-xs leading-relaxed text-slate-500'">
+                            General checkup
+                          </p>
+                        </div>
+
+                        <div v-if="appointment.status === 'completed' && appointment.actual_end_at" class="text-[11px] font-semibold text-purple-600">
+                          Duration: {{ getActualDuration(appointment) }} min
+                        </div>
+
+                        <div class="mt-auto flex items-center justify-between gap-2 border-t border-slate-200/80 pt-2">
+                          <span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide"
+                                :class="getStatusBadgeClass(getTimelineStatusLabel(appointment))">
+                            {{ getTimelineStatusLabel(appointment) }}
                           </span>
-                        </div>
-                        
-                        <!-- Time Range (prefers actual when started/completed) -->
-                        <div class="space-y-1">
-                          <div class="text-sm font-semibold text-blue-600">
-                            {{ getDisplayTimeRange(appointment) }}
+                          <div class="flex items-center gap-2">
+                            <button v-if="shouldShowStartButton(appointment)"
+                                    @click.stop="startAppointment(appointment)"
+                                    class="inline-flex items-center rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-emerald-600 sm:text-sm">
+                              Start
+                            </button>
+                            <button v-if="shouldShowResumeButton(appointment)"
+                                    @click.stop="resumeAppointment(appointment)"
+                                    class="inline-flex items-center rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-emerald-600 sm:text-sm">
+                              Resume
+                            </button>
+                            <button v-if="shouldShowPauseButton(appointment)"
+                                    @click.stop="pauseAppointment(appointment)"
+                                    class="inline-flex items-center rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-amber-600 sm:text-sm">
+                              Pause
+                            </button>
+                            <button v-if="appointment.actual_start_at && appointment.status !== 'completed'"
+                                    @click.stop="completeFromTimeline(appointment)"
+                                    class="inline-flex items-center rounded-lg bg-rose-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-rose-600 sm:text-sm">
+                              Complete
+                            </button>
+                            <button v-if="appointment.status === 'completed'"
+                                    @click.stop="showTimeEditModal(appointment)"
+                                    class="inline-flex items-center rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-semibold text-blue-700 transition-all hover:bg-blue-200">
+                              Edit
+                            </button>
+                            <button @click.stop="removeFromTimeline(appointment.id)"
+                                    class="inline-flex items-center justify-center rounded-lg bg-slate-100 p-1.5 text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700"
+                                    title="Remove from timeline">
+                              <X class="h-3.5 w-3.5" />
+                            </button>
                           </div>
-                          <div v-if="appointment.status === 'completed' && appointment.actual_end_at" class="text-xs text-purple-700 font-medium">
-                            Duration: {{ getActualDuration(appointment) }}min
-                          </div>
                         </div>
-                        
-                        <!-- Action Buttons - Centered primary action -->
- 
                       </div>
                     </div>
                   </TransitionGroup>
                   <!-- Overlap Popover -->
-                  <div v-if="overlapPopover.visible" class="absolute z-40 bg-white border border-slate-200 rounded-xl shadow-xl p-3 text-xs w-[280px]" :style="{ top: overlapPopover.y + 'px', left: overlapPopover.x + 'px' }" @mouseenter="keepOverlapPopover" @mouseleave="hideOverlapPopover">
-                    <div class="font-semibold text-slate-700 mb-2">Overlapping appointments</div>
-                    <div class="space-y-2">
-                      <div v-for="apt in overlapPopover.items" :key="apt.id" class="p-2 rounded-lg bg-slate-50 border border-slate-200">
-                        <div class="font-bold text-slate-900 truncate">{{ apt.patient.first_name }} {{ apt.patient.last_name }}</div>
-                        <div class="text-blue-700 font-medium">{{ getDisplayTimeRange(apt) }}</div>
-                        <div class="text-slate-600 truncate">{{ apt.reason || apt.treatment || 'Checkup' }}</div>
-                        <div class="text-[10px] uppercase tracking-wide mt-1 inline-block px-2 py-0.5 rounded-full" :class="getStatusBadgeClass(apt.status)">{{ apt.status }}</div>
-                      </div>
+                <div v-if="overlapPopover.visible" class="absolute z-40 bg-white border border-slate-200 rounded-xl shadow-xl p-3 text-xs w-[280px]" :style="{ top: overlapPopover.y + 'px', left: overlapPopover.x + 'px' }" @mouseenter="keepOverlapPopover" @mouseleave="hideOverlapPopover">
+                  <div class="font-semibold text-slate-700 mb-2">Overlapping appointments</div>
+                  <div class="space-y-2">
+                    <div v-for="apt in overlapPopover.items" :key="apt.id" class="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                      <div class="font-bold text-slate-900 truncate">{{ apt.patient.first_name }} {{ apt.patient.last_name }}</div>
+                      <div class="text-blue-700 font-medium">{{ getDisplayTimeRange(apt) }}</div>
+                      <div class="text-slate-600 truncate">{{ apt.reason || apt.treatment || 'Checkup' }}</div>
+                      <div class="text-[10px] uppercase tracking-wide mt-1 inline-block px-2 py-0.5 rounded-full" :class="getStatusBadgeClass(apt.status)">{{ apt.status }}</div>
                     </div>
                   </div>
                 </div>
 
-                <!-- Empty State -->
-                <div v-if="timelineAppointments.length === 0" 
+                <!-- Zoom Controls -->
+                  <div class="pointer-events-auto fixed bottom-6 right-6 z-40 flex flex-col gap-2">
+                  <button type="button"
+                          class="rounded-full border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-600 shadow-sm transition-all hover:border-blue-400 hover:text-blue-600"
+                          @click.stop="zoomIn"
+                          title="Zoom in">
+                    ＋
+                  </button>
+                  <button type="button"
+                          class="rounded-full border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-600 shadow-sm transition-all hover:border-blue-400 hover:text-blue-600"
+                          @click.stop="zoomOut"
+                          title="Zoom out">
+                    －
+                  </button>
+                </div>
+              </div>
+
+              <!-- Empty State -->
+              <div v-if="timelineAppointments.length === 0"
                      class="flex flex-col items-center justify-center h-64 text-slate-400 ml-20">
                   <CalendarClock class="w-16 h-16 mb-4 text-slate-300" />
                   <p class="text-xl font-bold text-slate-500">No appointments scheduled</p>
@@ -454,9 +486,9 @@
                        draggable="true"
                        @dragstart="startQueueDrag($event, appointment, index)"
                        @dragend="endQueueDrag"
-                       class="queue-item group border rounded-lg p-2 cursor-move hover:shadow transition-all bg-white hover:bg-slate-25 relative flex items-center"
+                       class="queue-item group border rounded-lg p-2 cursor-move hover:shadow transition-all relative flex items-center"
                        :class="[getQueueItemClass(appointment), queueDragState.draggedIndex === index ? 'opacity-50' : '']"
-                       @click="selectAppointment(appointment)">
+                       @click="handleQueueItemClick(appointment)">
                     <!-- Position & Status -->
                     <div class="flex flex-col items-center mr-2">
                       <div class="w-5 h-5 rounded flex items-center justify-center text-xs font-bold"
@@ -478,13 +510,12 @@
                       </div>
                     </div>
                     <!-- Actions -->
-                    <div class="flex flex-col items-end ml-2 space-y-1">
-                      <button @click.stop="deleteAppointment(appointment.id)"
-                              class="p-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full"
-                              title="Delete appointment from queue (removes everywhere)">
-                        <Trash2 class="w-4 h-4" />
-                      </button>
-                      <div class="flex space-x-1">
+                    <div class="flex items-center ml-2 space-x-2">
+                      <span class="inline-flex items-center rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                            :class="getStatusBadgeClass(isAppointmentPaused(appointment) ? 'paused' : (appointment.status || 'pending'))">
+                        {{ isAppointmentPaused(appointment) ? 'paused' : (appointment.status || 'pending') }}
+                      </span>
+                      <div class="flex items-center space-x-1">
                         <button @click.stop="reorderInQueue(appointment.id, 'up')"
                                 :disabled="index === 0"
                                 class="p-1 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded disabled:opacity-30"
@@ -498,9 +529,11 @@
                           <ChevronDown class="w-3 h-3" />
                         </button>
                       </div>
-                      <div class="text-[11px] leading-tight text-slate-500 text-right min-w-[60px]">
-                        <div class="font-medium capitalize">{{ appointment.status || 'pending' }}</div>
-                      </div>
+                      <button @click.stop="deleteAppointment(appointment.id)"
+                              class="p-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full"
+                              title="Delete appointment from queue (removes everywhere)">
+                        <Trash2 class="w-4 h-4" />
+                      </button>
                     </div>
                     <!-- Active Treatment Indicator -->
                     <div v-if="activeAppointment?.id === appointment.id && timing"
@@ -603,7 +636,6 @@ import {
   ChevronRight,
   Trash2,
   Users,
-  GripVertical,
   ChevronUp,
   ChevronDown
 } from 'lucide-vue-next'
@@ -631,6 +663,8 @@ const timing = ref(false)
 const timerMinutes = ref(0)
 const timerSeconds = ref(0)
 const timerInterval = ref(null)
+const pausedAppointmentId = ref(null)
+const pausedElapsedSeconds = ref(0)
 
 // UI State
 const isDragOver = ref(false)
@@ -644,6 +678,7 @@ const dropIndicator = ref({ visible: false, top: 0, label: '' })
 const pixelsPerHour = ref(48)
 const minPixelsPerHour = 32
 const maxPixelsPerHour = 300 // Increased for better zoom capability
+let zoomAnimationFrame = null
 
 // Overlap popover
 const overlapPopover = ref({ visible: false, x: 0, y: 0, items: [] })
@@ -682,6 +717,7 @@ const dragPreview = ref({
   patientName: '',
   duration: 0
 })
+let previewAnimationFrame = null
 
 // Duration options
 const selectedDuration = ref({ label: '30min', value: 30 })
@@ -821,6 +857,8 @@ const clearMessages = () => {
   successMessage.value = null
 }
 
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
+
 const updateTime = () => {
   currentTime.value = new Date().toLocaleTimeString('en-US', {
     hour: '2-digit',
@@ -925,17 +963,49 @@ const getAppointmentPosition = (appointment) => {
 // FIXED: Drop position calculation
 const calculateDropPosition = (event) => {
   if (!timelineContainer.value) return 9 * 60
-  
+
   const rect = timelineContainer.value.getBoundingClientRect()
   const y = event.clientY - rect.top - 8 // Account for padding
   const hourPosition = Math.max(0, y / pixelsPerHour.value)
   const timeMinutes = (9 * 60) + (hourPosition * 60)
-  
+
   // Snap to 15-minute intervals
   const snapInterval = 15
   const snappedMinutes = Math.round(timeMinutes / snapInterval) * snapInterval
-  
+
   return Math.max(snappedMinutes, 9 * 60)
+}
+
+const updateDragPreviewForMinutes = (dropMinutes, event = null) => {
+  if (!draggedItem.value) return
+
+  const startHour = Math.floor(dropMinutes / 60)
+  const startMin = dropMinutes % 60
+  const endMinutes = dropMinutes + (draggedItem.value.duration || 30)
+  const endHour = Math.floor(endMinutes / 60)
+  const endMin = endMinutes % 60
+
+  const startPeriod = startHour >= 12 ? 'PM' : 'AM'
+  const endPeriod = endHour >= 12 ? 'PM' : 'AM'
+  const displayStartHour = startHour > 12 ? startHour - 12 : startHour === 0 ? 12 : startHour
+  const displayEndHour = endHour > 12 ? endHour - 12 : endHour === 0 ? 12 : endHour
+
+  const startTime = `${displayStartHour}:${startMin.toString().padStart(2, '0')} ${startPeriod}`
+  const endTime = `${displayEndHour}:${endMin.toString().padStart(2, '0')} ${endPeriod}`
+
+  dragPreview.value.timeRange = `${startTime} - ${endTime}`
+
+  if (timelineContainer.value && event) {
+    const rect = timelineContainer.value.getBoundingClientRect()
+    const y = event.clientY - (rect?.top || 0) - 8
+    dropIndicator.value.top = Math.max(0, y)
+  } else if (timelineContainer.value) {
+    const rect = timelineContainer.value.getBoundingClientRect()
+    dropIndicator.value.top = Math.max(0, ((dropMinutes - 9 * 60) / 60) * pixelsPerHour.value)
+  }
+
+  dropIndicator.value.label = `${startTime}`
+  dropIndicator.value.visible = true
 }
 
 // Determine if a timeline card is very tight with neighbors: collapse details
@@ -983,33 +1053,44 @@ const hideOverlapPopover = () => {
   overlapPopover.value.visible = false
 }
 
+const applyZoomStep = (direction, anchorRatio = 0.5, intensity = 1) => {
+  if (!direction) return
+
+  const normalizedIntensity = clamp(intensity || 1, 0.5, 3)
+  const step = 6 * normalizedIntensity
+  const previous = pixelsPerHour.value
+  const next = clamp(previous - direction * step, minPixelsPerHour, maxPixelsPerHour)
+  if (next === previous) return
+
+  const ratio = clamp(anchorRatio, 0, 1)
+  const container = timelineContainer.value
+  const previousScroll = container?.scrollTop ?? 0
+
+  pixelsPerHour.value = next
+
+  if (!container) return
+
+  if (zoomAnimationFrame) cancelAnimationFrame(zoomAnimationFrame)
+  zoomAnimationFrame = requestAnimationFrame(() => {
+    const delta = (next - previous) * 6
+    container.scrollTop = Math.max(0, previousScroll + delta * ratio)
+  })
+}
+
 // Scroll to zoom handler
 const handleTimelineWheel = (e) => {
-  if (!e.ctrlKey && !e.metaKey) return // require Ctrl/Cmd to zoom; normal scroll remains page scroll
   e.preventDefault()
-  const delta = e.deltaY
-  const step = 8
-  const next = Math.min(maxPixelsPerHour, Math.max(minPixelsPerHour, pixelsPerHour.value - Math.sign(delta) * step))
-  if (next === pixelsPerHour.value) return
-  // Optional: anchor zoom around cursor Y so content appears to zoom centered
   const container = timelineContainer.value
-  if (container) {
-    const rect = container.getBoundingClientRect()
-    const cursorOffset = e.clientY - rect.top
-    const ratio = cursorOffset / (rect.height || 1)
-    // Adjust scroll by ratio of change to keep cursor-aligned content in place
-    const prevPx = pixelsPerHour.value
-    pixelsPerHour.value = next
-    // Force reflow after value change, then scroll
-    requestAnimationFrame(() => {
-      const newRect = container.getBoundingClientRect()
-      const deltaPx = (next - prevPx) * 8 // approximate per 8 hours visible baseline
-      container.scrollTop = Math.max(0, container.scrollTop + deltaPx * ratio)
-    })
-  } else {
-    pixelsPerHour.value = next
-  }
+  const rect = container?.getBoundingClientRect()
+  const anchorRatio = rect ? (e.clientY - rect.top) / (rect.height || 1) : 0.5
+  const direction = Math.sign(e.deltaY)
+  const normalization = e.deltaMode === 1 ? 6 : 120
+  const intensity = normalization ? Math.abs(e.deltaY) / normalization : Math.abs(e.deltaY) / 120
+  applyZoomStep(direction, anchorRatio, intensity)
 }
+
+const zoomIn = () => applyZoomStep(-1)
+const zoomOut = () => applyZoomStep(1)
 
 // Display helper: Prefer actual time range
 const getDisplayTimeRange = (appointment) => {
@@ -1078,18 +1159,30 @@ const getScheduledTimeForAppointment = (appointmentId) => {
 
 const getQueueItemClass = (appointment) => {
   const isOnTimeline = isAppointmentOnTimeline(appointment.id)
-  
+
   if (selectedAppointment.value?.id === appointment.id) {
-    return isOnTimeline 
-      ? 'border-green-400 bg-green-50 shadow-green-200 ring-2 ring-green-200' 
+    return isOnTimeline
+      ? 'border-green-400 bg-green-50 shadow-green-200 ring-2 ring-green-200'
       : 'border-blue-400 bg-blue-50 shadow-blue-200 ring-2 ring-blue-200'
   }
-  
+
   if (isOnTimeline) {
     return 'border-green-300 bg-gradient-to-r from-green-25 to-green-50 hover:border-green-400 shadow-green-100 ring-1 ring-green-200'
   }
-  
-  return 'border-slate-200 bg-white hover:border-slate-300 shadow-slate-100 hover:bg-slate-25'
+
+  return 'border-slate-200 bg-slate-100 text-slate-700 hover:border-slate-300 hover:bg-slate-200 shadow-none'
+}
+
+const mergeIntoCollections = (appointmentId, updates) => {
+  const tIdx = timelineAppointments.value.findIndex(a => a.id === appointmentId)
+  if (tIdx !== -1) {
+    timelineAppointments.value[tIdx] = { ...timelineAppointments.value[tIdx], ...updates }
+  }
+
+  const qIdx = queueAppointments.value.findIndex(a => a.id === appointmentId)
+  if (qIdx !== -1) {
+    queueAppointments.value[qIdx] = { ...queueAppointments.value[qIdx], ...updates }
+  }
 }
 
 const getStatusBadgeClass = (status) => {
@@ -1097,6 +1190,8 @@ const getStatusBadgeClass = (status) => {
     case 'completed':
       return 'bg-purple-100 text-purple-800'
     case 'in-progress':
+      return 'bg-amber-100 text-amber-800'
+    case 'paused':
       return 'bg-amber-100 text-amber-800'
     case 'scheduled':
       return 'bg-green-100 text-green-800'
@@ -1204,11 +1299,14 @@ const fetchDailySchedule = async (date = null) => {
     // FIXED: Queue should show ALL appointments with proper indicators
     // Combine all appointments for the queue display
     const allAppointments = [...unscheduledAppointments, ...appointments]
-    queueAppointments.value = allAppointments
-    
-  // Timeline shows only scheduled appointments
+  queueAppointments.value = allAppointments
+
+// Timeline shows only scheduled appointments
   timelineAppointments.value = appointments.filter(apt => apt.timeline_added && (apt.scheduled_at || apt.actual_start_at))
-  
+
+    pausedAppointmentId.value = null
+    pausedElapsedSeconds.value = 0
+
     // Enhanced auto-resume timer for in-progress appointments
     // Check both regular appointments and unscheduled ones for in-progress status
     const allAptsToCheck = [...appointments, ...unscheduledAppointments]
@@ -1230,20 +1328,29 @@ const fetchDailySchedule = async (date = null) => {
       } : null
     })
     
-    if (inProgressAppointment) {
-      // Check if we need to resume or continue timing
-      const shouldResume = !activeAppointment.value || 
-                          activeAppointment.value.id !== inProgressAppointment.id ||
-                          !timing.value
-      
-      if (shouldResume) {
-        // Found an in-progress appointment - resume timing
-        activeAppointment.value = inProgressAppointment
-        
-        // Calculate elapsed time since start
-        const startTime = new Date(inProgressAppointment.actual_start_at)
-        const currentTime = new Date()
-        const elapsedMs = Math.max(0, currentTime.getTime() - startTime.getTime())
+  if (inProgressAppointment) {
+    // Check if we need to resume or continue timing
+    const shouldResume = !activeAppointment.value ||
+                        activeAppointment.value.id !== inProgressAppointment.id ||
+                        !timing.value
+
+    if (shouldResume) {
+      // Found an in-progress appointment - resume timing
+      const timelineMatch = timelineAppointments.value.find(apt => apt.id === inProgressAppointment.id)
+      if (timelineMatch) {
+        Object.assign(timelineMatch, inProgressAppointment)
+      }
+      const queueMatch = queueAppointments.value.find(apt => apt.id === inProgressAppointment.id)
+      if (queueMatch) {
+        Object.assign(queueMatch, inProgressAppointment)
+      }
+
+      activeAppointment.value = timelineMatch || queueMatch || inProgressAppointment
+
+      // Calculate elapsed time since start
+      const startTime = new Date(inProgressAppointment.actual_start_at)
+      const currentTime = new Date()
+      const elapsedMs = Math.max(0, currentTime.getTime() - startTime.getTime())
         const elapsedSeconds = Math.floor(elapsedMs / 1000)
         
         // Set timer display to current elapsed time
@@ -1353,8 +1460,33 @@ const addPatientToQueue = async () => {
   }
 }
 
-const selectAppointment = (appointment) => {
-  selectedAppointment.value = appointment
+const isAppointmentRunning = (appointment) => timing.value && activeAppointment.value?.id === appointment.id
+
+const isAppointmentPaused = (appointment) => pausedAppointmentId.value === appointment.id && !timing.value
+
+const hasAppointmentStarted = (appointment) => Boolean(appointment.actual_start_at)
+
+const shouldShowStartButton = (appointment) => !hasAppointmentStarted(appointment) && appointment.status !== 'completed'
+
+const shouldShowResumeButton = (appointment) => {
+  if (appointment.status === 'completed') return false
+  if (!hasAppointmentStarted(appointment)) return false
+
+  if (isAppointmentPaused(appointment)) return true
+
+  return !isAppointmentRunning(appointment) && (!timing.value || activeAppointment.value?.id === appointment.id)
+}
+
+const shouldShowPauseButton = (appointment) => isAppointmentRunning(appointment)
+
+const getTimelineStatusLabel = (appointment) => {
+  if (isAppointmentRunning(appointment)) return 'in-progress'
+  if (isAppointmentPaused(appointment)) return 'paused'
+  if (appointment.status === 'in-progress' && activeAppointment.value?.id === appointment.id && !timing.value) {
+    return 'paused'
+  }
+  if (appointment.status) return appointment.status
+  return hasAppointmentStarted(appointment) ? 'scheduled' : 'pending'
 }
 
 // Enhanced Timer Functions with auto-sync capability
@@ -1421,60 +1553,148 @@ const stopTimer = () => {
 const startAppointment = async (appointment) => {
   try {
     clearMessages()
-    // Prevent starting a completed appointment
+
     if (appointment.status === 'completed' || appointment.actual_end_at) {
       return
     }
-    
-    // If already timing, stop current
-    if (timing.value && activeAppointment.value) {
-      await completeAppointment()
+
+    if (timing.value) {
+      if (activeAppointment.value?.id === appointment.id) {
+        return
+      }
+      error.value = 'Please pause or complete the active appointment before starting another.'
+      return
     }
-    
-    // Determine current time as actual start immediately for responsive UI
+
+    if (pausedAppointmentId.value && pausedAppointmentId.value !== appointment.id) {
+      error.value = 'Resume or complete the paused appointment before starting another.'
+      return
+    }
+
+    if (appointment.actual_start_at) {
+      resumeAppointment(appointment)
+      return
+    }
+
     const nowIso = new Date().toISOString()
     const timezone_offset = new Date().getTimezoneOffset() * -1
-    // Optimistically set locally so the card moves right away
-    const updated = { ...appointment, actual_start_at: nowIso, status: 'in-progress' }
-    // Reflect in both active state and the timeline list
+    const updated = { ...appointment, actual_start_at: nowIso, status: 'in-progress', timeline_added: true }
+
     activeAppointment.value = updated
-    // Ensure the appointment exists on the timeline; if not, add it
-    const idx = timelineAppointments.value.findIndex(a => a.id === appointment.id)
-    if (idx === -1) {
+    pausedAppointmentId.value = null
+    pausedElapsedSeconds.value = 0
+
+    const existingTimelineIndex = timelineAppointments.value.findIndex(a => a.id === appointment.id)
+    if (existingTimelineIndex === -1) {
       timelineAppointments.value.push(updated)
-    } else {
-      timelineAppointments.value[idx] = { ...timelineAppointments.value[idx], ...updated }
     }
-    // Also update the queue reference
-    const qIdx = queueAppointments.value.findIndex(a => a.id === appointment.id)
-    if (qIdx !== -1) {
-      queueAppointments.value[qIdx] = { ...queueAppointments.value[qIdx], ...updated }
-    }
-    // Notify backend (non-blocking) but await to keep state consistent
+
+    mergeIntoCollections(appointment.id, updated)
+
+    timing.value = true
+    startTimer()
+
     const response = await makeApiCall('POST', `/appointments/${appointment.id}/start`, {
       timezone_offset,
       actual_start_at: nowIso
     })
-    // If backend returns canonical values, merge them back
+
     if (response) {
       const merged = { ...updated, ...response }
       activeAppointment.value = merged
-      const t2 = timelineAppointments.value.findIndex(a => a.id === appointment.id)
-      if (t2 !== -1) timelineAppointments.value[t2] = { ...timelineAppointments.value[t2], ...merged }
-      const q2 = queueAppointments.value.findIndex(a => a.id === appointment.id)
-      if (q2 !== -1) queueAppointments.value[q2] = { ...queueAppointments.value[q2], ...merged }
+      mergeIntoCollections(appointment.id, merged)
     }
-    timing.value = true
-    startTimer() // Start from 0 for new appointments
-    
+
     successMessage.value = `Treatment started for ${appointment.patient.first_name} ${appointment.patient.last_name}`
     setTimeout(() => successMessage.value = null, 3000)
-    // Re-sort/layout happens via computed props; optionally refresh later
-    // await fetchDailySchedule()
-    
   } catch (err) {
-    error.value = 'Failed to start appointment'
+    timing.value = false
+    if (timerInterval.value) {
+      clearInterval(timerInterval.value)
+      timerInterval.value = null
+    }
+    activeAppointment.value = null
+    pausedAppointmentId.value = null
+    pausedElapsedSeconds.value = 0
+    await fetchDailySchedule().catch(() => {})
+    error.value = err?.data?.error || 'Failed to start appointment'
   }
+}
+
+const calculateElapsedSecondsSinceStart = (appointment) => {
+  if (!appointment.actual_start_at) return 0
+  const startTime = new Date(appointment.actual_start_at)
+  const now = new Date()
+  return Math.max(0, Math.floor((now.getTime() - startTime.getTime()) / 1000))
+}
+
+const resumeAppointment = (appointment) => {
+  if (appointment.status === 'completed') return
+
+  clearMessages()
+
+  const updated = { ...appointment, status: 'in-progress' }
+  activeAppointment.value = updated
+  mergeIntoCollections(appointment.id, updated)
+
+  let totalSeconds = 0
+  if (pausedAppointmentId.value === appointment.id && pausedElapsedSeconds.value > 0) {
+    totalSeconds = pausedElapsedSeconds.value
+  } else {
+    totalSeconds = calculateElapsedSecondsSinceStart(updated)
+  }
+
+  const resumeMinutes = Math.floor(totalSeconds / 60)
+  const resumeSeconds = totalSeconds % 60
+
+  pausedAppointmentId.value = null
+  pausedElapsedSeconds.value = 0
+
+  timing.value = true
+  startTimer(resumeMinutes, resumeSeconds)
+
+  successMessage.value = `Resumed treatment for ${appointment.patient.first_name} ${appointment.patient.last_name}`
+  setTimeout(() => successMessage.value = null, 3000)
+}
+
+const pauseAppointment = (appointment) => {
+  if (!isAppointmentRunning(appointment)) return
+
+  const elapsedSeconds = timerMinutes.value * 60 + timerSeconds.value
+  pausedAppointmentId.value = appointment.id
+  pausedElapsedSeconds.value = elapsedSeconds
+
+  stopTimer()
+  timing.value = false
+
+  const updated = { ...appointment, status: 'paused' }
+  activeAppointment.value = updated
+  mergeIntoCollections(appointment.id, updated)
+
+  successMessage.value = `${appointment.patient.first_name} ${appointment.patient.last_name}'s treatment paused`
+  setTimeout(() => successMessage.value = null, 3000)
+}
+
+const completeFromTimeline = async (appointment) => {
+  if (!appointment.actual_start_at) {
+    error.value = 'Start the appointment before completing it.'
+    return
+  }
+
+  if (!isAppointmentRunning(appointment)) {
+    const updated = { ...appointment, status: 'in-progress' }
+    activeAppointment.value = updated
+    mergeIntoCollections(appointment.id, updated)
+
+    let totalSeconds = pausedAppointmentId.value === appointment.id && pausedElapsedSeconds.value > 0
+      ? pausedElapsedSeconds.value
+      : calculateElapsedSecondsSinceStart(updated)
+
+    timerMinutes.value = Math.floor(totalSeconds / 60)
+    timerSeconds.value = totalSeconds % 60
+  }
+
+  await completeAppointment()
 }
 
 const completeAppointment = async () => {
@@ -1490,28 +1710,18 @@ const completeAppointment = async () => {
     
     const duration = stopTimer()
     timing.value = false
+    pausedAppointmentId.value = null
+    pausedElapsedSeconds.value = 0
     
     successMessage.value = `Treatment completed for ${activeAppointment.value.patient.first_name} ${activeAppointment.value.patient.last_name} (${duration} minutes)`
     setTimeout(() => successMessage.value = null, 3000)
     
     // Merge completion into local lists to update position/height/duration immediately
     const id = activeAppointment.value.id
-    const tIdx = timelineAppointments.value.findIndex(a => a.id === id)
-    if (tIdx !== -1) {
-      timelineAppointments.value[tIdx] = {
-        ...timelineAppointments.value[tIdx],
-        actual_end_at: response?.actual_end_at || nowIso,
-        status: 'completed'
-      }
-    }
-    const qIdx = queueAppointments.value.findIndex(a => a.id === id)
-    if (qIdx !== -1) {
-      queueAppointments.value[qIdx] = {
-        ...queueAppointments.value[qIdx],
-        actual_end_at: response?.actual_end_at || nowIso,
-        status: 'completed'
-      }
-    }
+    mergeIntoCollections(id, {
+      actual_end_at: response?.actual_end_at || nowIso,
+      status: 'completed'
+    })
     activeAppointment.value = null
     // Optionally fetch for server truth after latency
     // await fetchDailySchedule()
@@ -1550,35 +1760,30 @@ const startDrag = (event, appointment) => {
   event.dataTransfer.setData('text/plain', appointment.id.toString())
 }
 
+const handleDragEnter = (event) => {
+  event.preventDefault()
+  isDragOver.value = true
+
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'move'
+  }
+
+  if (!draggedItem.value || !timelineContainer.value) return
+
+  const dropMinutes = calculateDropPosition(event)
+  updateDragPreviewForMinutes(dropMinutes, event)
+}
+
 const handleDragOver = (event) => {
   event.preventDefault()
-  event.dataTransfer.dropEffect = 'move'
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'move'
+  }
   isDragOver.value = true
-  
+
   if (draggedItem.value) {
     const dropMinutes = calculateDropPosition(event)
-    const startHour = Math.floor(dropMinutes / 60)
-    const startMin = dropMinutes % 60
-    const endMinutes = dropMinutes + (draggedItem.value.duration || 30)
-    const endHour = Math.floor(endMinutes / 60)
-    const endMin = endMinutes % 60
-    
-    const startPeriod = startHour >= 12 ? 'PM' : 'AM'
-    const endPeriod = endHour >= 12 ? 'PM' : 'AM'
-    const displayStartHour = startHour > 12 ? startHour - 12 : startHour === 0 ? 12 : startHour
-    const displayEndHour = endHour > 12 ? endHour - 12 : endHour === 0 ? 12 : endHour
-    
-    const startTime = `${displayStartHour}:${startMin.toString().padStart(2, '0')} ${startPeriod}`
-    const endTime = `${displayEndHour}:${endMin.toString().padStart(2, '0')} ${endPeriod}`
-    
-    dragPreview.value.timeRange = `${startTime} - ${endTime}`
-
-    // Update drop indicator position and label
-    const rect = timelineContainer.value?.getBoundingClientRect()
-    const y = event.clientY - (rect?.top || 0) - 8
-    dropIndicator.value.top = Math.max(0, y)
-    dropIndicator.value.label = `${startTime}`
-    dropIndicator.value.visible = true
+    updateDragPreviewForMinutes(dropMinutes, event)
   }
 }
 
@@ -1590,64 +1795,101 @@ const handleDragLeave = (event) => {
   }
 }
 
-const handleDrop = async (event) => {
+const handleDrop = (event) => {
   event.preventDefault()
   isDragOver.value = false
   isDragging.value = false
-  
-  // Capture the dragged item locally to avoid race with dragend clearing global state
-  const item = draggedItem.value
-  if (!item) return
-  
-  try {
-    clearMessages()
-    
-    const dropMinutes = calculateDropPosition(event)
-    const dropTime = new Date(selectedDate.value)
-    dropTime.setHours(Math.floor(dropMinutes / 60))
-    dropTime.setMinutes(dropMinutes % 60)
-    dropTime.setSeconds(0)
-    dropTime.setMilliseconds(0)
 
-    // Build a local datetime string without timezone to avoid server shifting time
-    const toLocalSql = (d) => {
-      const y = d.getFullYear()
-      const m = String(d.getMonth() + 1).padStart(2, '0')
-      const day = String(d.getDate()).padStart(2, '0')
-      const hh = String(d.getHours()).padStart(2, '0')
-      const mm = String(d.getMinutes()).padStart(2, '0')
-      const ss = '00'
-      return `${y}-${m}-${day} ${hh}:${mm}:${ss}`
-    }
-    const approximate_time = toLocalSql(dropTime)
-    
-    console.log('Dropping appointment at:', dropTime.toISOString())
-    
-    const response = await makeApiCall('PUT', `/appointments/${item.id}/set-timeline-time`, {
-      approximate_time
-    })
-    
-    const startHour = Math.floor(dropMinutes / 60)
-    const startMin = dropMinutes % 60
-    const period = startHour >= 12 ? 'PM' : 'AM'
-    const displayHour = startHour > 12 ? startHour - 12 : startHour === 0 ? 12 : startHour
-    const timeString = `${displayHour}:${startMin.toString().padStart(2, '0')} ${period}`
-    
-    const first = item.patient?.first_name || 'Patient'
-    const last = item.patient?.last_name || ''
-    successMessage.value = `${first} ${last}`.trim() + ` scheduled for ${timeString}`
-    setTimeout(() => successMessage.value = null, 3000)
-    
-    await fetchDailySchedule()
-    
-  } catch (err) {
-    console.error('Drop error:', err)
-    error.value = err.data?.error || 'Failed to schedule appointment'
-  } finally {
-    draggedItem.value = null
+  const item = draggedItem.value
+  if (!item) {
     dragPreview.value.visible = false
     dropIndicator.value.visible = false
+    return
   }
+
+  clearMessages()
+
+  const dropMinutes = calculateDropPosition(event)
+  const dropTime = new Date(selectedDate.value)
+  dropTime.setHours(Math.floor(dropMinutes / 60))
+  dropTime.setMinutes(dropMinutes % 60)
+  dropTime.setSeconds(0)
+  dropTime.setMilliseconds(0)
+
+  const toLocalSql = (d) => {
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    const hh = String(d.getHours()).padStart(2, '0')
+    const mm = String(d.getMinutes()).padStart(2, '0')
+    const ss = '00'
+    return `${y}-${m}-${day} ${hh}:${mm}:${ss}`
+  }
+
+  const approximate_time = toLocalSql(dropTime)
+  const scheduledIso = dropTime.toISOString()
+
+  const previousTimeline = [...timelineAppointments.value]
+  const previousQueue = [...queueAppointments.value]
+
+  const updatedFields = {
+    scheduled_at: scheduledIso,
+    approximate_time,
+    timeline_added: true
+  }
+
+  const existingTimelineIndex = timelineAppointments.value.findIndex(a => a.id === item.id)
+  if (existingTimelineIndex !== -1) {
+    timelineAppointments.value = timelineAppointments.value.map(apt =>
+      apt.id === item.id ? { ...apt, ...updatedFields } : apt
+    )
+  } else {
+    timelineAppointments.value = [...timelineAppointments.value, { ...item, ...updatedFields }]
+  }
+
+  queueAppointments.value = queueAppointments.value.map(apt =>
+    apt.id === item.id ? { ...apt, ...updatedFields } : apt
+  )
+
+  dropIndicator.value.visible = false
+
+  const startHour = Math.floor(dropMinutes / 60)
+  const startMin = dropMinutes % 60
+  const period = startHour >= 12 ? 'PM' : 'AM'
+  const displayHour = startHour > 12 ? startHour - 12 : startHour === 0 ? 12 : startHour
+  const timeString = `${displayHour}:${startMin.toString().padStart(2, '0')} ${period}`
+  const displayName = `${item.patient?.first_name || 'Patient'} ${item.patient?.last_name || ''}`.trim()
+
+  makeApiCall('PUT', `/appointments/${item.id}/set-timeline-time`, { approximate_time })
+    .then((response) => {
+      const scheduledFromServer = response?.scheduled_at || response?.actual_start_at
+      if (scheduledFromServer) {
+        timelineAppointments.value = timelineAppointments.value.map(apt =>
+          apt.id === item.id ? { ...apt, scheduled_at: scheduledFromServer } : apt
+        )
+        queueAppointments.value = queueAppointments.value.map(apt =>
+          apt.id === item.id ? { ...apt, scheduled_at: scheduledFromServer } : apt
+        )
+      }
+      successMessage.value = `${displayName} scheduled for ${timeString}`
+      setTimeout(() => successMessage.value = null, 3000)
+      fetchDailySchedule().catch(err => console.error('Refresh error after drop:', err))
+    })
+    .catch((err) => {
+      console.error('Drop error:', err)
+      error.value = err?.data?.error || 'Failed to schedule appointment'
+      timelineAppointments.value = previousTimeline
+      queueAppointments.value = previousQueue
+    })
+
+  queueDragState.value = {
+    draggedIndex: -1,
+    draggedItem: null,
+    isDragging: false
+  }
+  dragDropIndicator.value.visible = false
+  draggedItem.value = null
+  dragPreview.value.visible = false
 }
 
 // Queue reordering functions
@@ -1681,7 +1923,23 @@ const startQueueDrag = (event, appointment, index) => {
     duration: appointment.duration || 30
   }
 
-  event.dataTransfer.effectAllowed = 'move'
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/plain', String(appointment.id))
+
+    // Use a transparent drag image so the custom preview is all that shows
+    const dragImage = document.createElement('div')
+    dragImage.style.width = '1px'
+    dragImage.style.height = '1px'
+    dragImage.style.opacity = '0'
+    document.body.appendChild(dragImage)
+    event.dataTransfer.setDragImage(dragImage, 0, 0)
+    requestAnimationFrame(() => {
+      if (dragImage.parentNode) {
+        dragImage.parentNode.removeChild(dragImage)
+      }
+    })
+  }
 }
 
 const endQueueDrag = () => {
@@ -1737,128 +1995,111 @@ const handleQueueDragOver = (event) => {
  
  
  
-const handleQueueDrop = async (event) => {
+const handleQueueDrop = (event) => {
   event.preventDefault()
-  
+
   if (!queueDragState.value.isDragging) return
-  
-  try {
-    const container = event.currentTarget
-    const rect = container.getBoundingClientRect()
-    const y = event.clientY - rect.top
-    
-    // Find the position to insert
-    const items = container.querySelectorAll('.queue-item')
-    let newPosition = 0
-    
-    for (let i = 0; i < items.length; i++) {
-      const itemRect = items[i].getBoundingClientRect()
-      const itemY = itemRect.top - rect.top + itemRect.height / 2
-      
-      if (y < itemY) {
-        newPosition = i
-        break
-      }
-      newPosition = i + 1
+
+  clearMessages()
+
+  const container = event.currentTarget
+  const rect = container.getBoundingClientRect()
+  const y = event.clientY - rect.top
+
+  const items = container.querySelectorAll('.queue-item')
+  let newPosition = 0
+
+  for (let i = 0; i < items.length; i++) {
+    const itemRect = items[i].getBoundingClientRect()
+    const itemY = itemRect.top - rect.top + itemRect.height / 2
+
+    if (y < itemY) {
+      newPosition = i
+      break
     }
-    
-    const oldIndex = queueDragState.value.draggedIndex
-    
-    // Don't do anything if dropping in same position
-    if (newPosition === oldIndex || newPosition === oldIndex + 1) {
-      endQueueDrag()
-      return
-    }
-    
-    // Calculate the actual array position (account for removed item)
-    const targetIndex = newPosition > oldIndex ? newPosition - 1 : newPosition
-    
-    // Create new order array
-    const newOrder = [...queueAppointments.value]
-    const [movedItem] = newOrder.splice(oldIndex, 1)
-    newOrder.splice(targetIndex, 0, movedItem)
-    
-    // Update UI immediately (optimistic)
-    queueAppointments.value = newOrder
-    
-    // Save to server using the reorder API
-    const appointmentOrder = newOrder.map(apt => apt.id)
-    await makeApiCall('POST', `/daily-schedule`, {
-      schedule_date: selectedDate.value,
-      appointment_order: appointmentOrder
-    })
-    
-    successMessage.value = `Moved ${movedItem.patient.first_name} ${movedItem.patient.last_name} to position ${targetIndex + 1}`
-    setTimeout(() => successMessage.value = null, 2000)
-    
-    // Refresh to ensure consistency
-    await fetchDailySchedule()
-    
-  } catch (err) {
-    console.error('Error reordering queue:', err)
-    error.value = err.data?.error || err.message || 'Failed to reorder appointment'
-    // Revert optimistic UI on failure
-    await fetchDailySchedule()
-  } finally {
-    endQueueDrag()
+    newPosition = i + 1
   }
+
+  const oldIndex = queueDragState.value.draggedIndex
+
+  if (newPosition === oldIndex || newPosition === oldIndex + 1) {
+    endQueueDrag()
+    return
+  }
+
+  const targetIndex = newPosition > oldIndex ? newPosition - 1 : newPosition
+
+  const previousOrder = [...queueAppointments.value]
+  const newOrder = [...queueAppointments.value]
+  const [movedItem] = newOrder.splice(oldIndex, 1)
+  newOrder.splice(targetIndex, 0, movedItem)
+
+  queueAppointments.value = newOrder
+  endQueueDrag()
+
+  const appointmentOrder = newOrder.map(apt => apt.id)
+
+  makeApiCall('POST', `/daily-schedule`, {
+    schedule_date: selectedDate.value,
+    appointment_order: appointmentOrder
+  })
+    .then(() => {
+      successMessage.value = `Moved ${movedItem.patient.first_name} ${movedItem.patient.last_name} to position ${targetIndex + 1}`
+      setTimeout(() => successMessage.value = null, 2000)
+      fetchDailySchedule().catch(err => console.error('Refresh error after queue drop:', err))
+    })
+    .catch((err) => {
+      console.error('Error reordering queue:', err)
+      error.value = err?.data?.error || err?.message || 'Failed to reorder appointment'
+      queueAppointments.value = previousOrder
+    })
 }
 
 // Queue Management - FIXED WITH DEBUG AND IMPROVED REORDER
-const reorderInQueue = async (appointmentId, direction) => {
-  try {
-    clearMessages()
-    console.log('Reordering appointment:', appointmentId, 'direction:', direction)
-    
-    const currentIndex = queueAppointments.value.findIndex(apt => apt.id === appointmentId)
-    if (currentIndex === -1) {
-      console.error('Appointment not found in queue')
-      return
-    }
-    
-    let newIndex
-    if (direction === 'up' && currentIndex > 0) {
-      newIndex = currentIndex - 1
-    } else if (direction === 'down' && currentIndex < queueAppointments.value.length - 1) {
-      newIndex = currentIndex + 1
-    } else {
-      console.log('No reordering needed')
-      return // No change needed
-    }
-    
-    console.log('Moving from index', currentIndex, 'to index', newIndex)
-    
-    // Create new order array (optimistic UI)
-    const prevOrder = [...queueAppointments.value]
-    const newOrder = [...queueAppointments.value]
-    const [movedItem] = newOrder.splice(currentIndex, 1)
-    newOrder.splice(newIndex, 0, movedItem)
-    
-    // Update UI immediately (optimistic)
-    queueAppointments.value = newOrder
-    
-    // Extract appointment IDs in new order for API
-    const appointmentOrder = newOrder.map(apt => apt.id)
-    console.log('New appointment order:', appointmentOrder)
-    
-    // Save to server
-    await makeApiCall('POST', `/daily-schedule`, {
-      schedule_date: selectedDate.value,
-      appointment_order: appointmentOrder
-    })
-    
-    successMessage.value = `Moved ${movedItem.patient.first_name} ${movedItem.patient.last_name} ${direction}`
-    setTimeout(() => successMessage.value = null, 2000)
-    
-    // Refresh to ensure consistency
-    await fetchDailySchedule()
-    
-  } catch (err) {
-    console.error('Error reordering queue:', err)
-    error.value = err.data?.error || err.message || 'Failed to reorder appointment'
-    // revert optimistic UI on failure
-    await fetchDailySchedule()
+const reorderInQueue = (appointmentId, direction) => {
+  clearMessages()
+  console.log('Reordering appointment:', appointmentId, 'direction:', direction)
+
+  const currentIndex = queueAppointments.value.findIndex(apt => apt.id === appointmentId)
+  if (currentIndex === -1) {
+    console.error('Appointment not found in queue')
+    return
   }
+
+  let newIndex
+  if (direction === 'up' && currentIndex > 0) {
+    newIndex = currentIndex - 1
+  } else if (direction === 'down' && currentIndex < queueAppointments.value.length - 1) {
+    newIndex = currentIndex + 1
+  } else {
+    console.log('No reordering needed')
+    return
+  }
+
+  const previousOrder = [...queueAppointments.value]
+  const newOrder = [...queueAppointments.value]
+  const [movedItem] = newOrder.splice(currentIndex, 1)
+  newOrder.splice(newIndex, 0, movedItem)
+
+  queueAppointments.value = newOrder
+
+  const appointmentOrder = newOrder.map(apt => apt.id)
+  console.log('New appointment order:', appointmentOrder)
+
+  makeApiCall('POST', `/daily-schedule`, {
+    schedule_date: selectedDate.value,
+    appointment_order: appointmentOrder
+  })
+    .then(() => {
+      successMessage.value = `Moved ${movedItem.patient.first_name} ${movedItem.patient.last_name} ${direction}`
+      setTimeout(() => successMessage.value = null, 2000)
+      fetchDailySchedule().catch(err => console.error('Refresh error after reorder:', err))
+    })
+    .catch((err) => {
+      console.error('Error reordering queue:', err)
+      error.value = err?.data?.error || err?.message || 'Failed to reorder appointment'
+      queueAppointments.value = previousOrder
+    })
 }
 
 const removeFromQueue = async (appointmentId) => {
@@ -1879,10 +2120,17 @@ const removeFromQueue = async (appointmentId) => {
 
 const removeFromTimeline = async (appointmentId) => {
   if (!confirm('Remove this appointment from timeline?')) return
-  
+
   try {
+    if (activeAppointment.value?.id === appointmentId) {
+      stopTimer()
+      timing.value = false
+      activeAppointment.value = null
+      pausedAppointmentId.value = null
+      pausedElapsedSeconds.value = 0
+    }
     await makeApiCall('DELETE', `/appointments/${appointmentId}/remove-from-timeline`)
-    
+
     successMessage.value = 'Appointment removed from timeline'
     setTimeout(() => successMessage.value = null, 3000)
     
@@ -1897,10 +2145,12 @@ const deleteAppointment = async (appointmentId) => {
   if (!confirm('Delete this appointment permanently?')) return
   try {
     // If currently timing this appointment, stop timer and reset state
-    if (activeAppointment.value?.id === appointmentId && timing.value) {
+    if (activeAppointment.value?.id === appointmentId) {
       stopTimer()
       timing.value = false
       activeAppointment.value = null
+      pausedAppointmentId.value = null
+      pausedElapsedSeconds.value = 0
     }
     await makeApiCall('DELETE', `/appointments/${appointmentId}`)
     successMessage.value = 'Appointment deleted'
@@ -1912,58 +2162,58 @@ const deleteAppointment = async (appointmentId) => {
 }
 
 // Move item to top/bottom in queue and persist - IMPROVED
-const moveToTop = async (appointmentId) => {
-  try {
-    const idx = queueAppointments.value.findIndex(a => a.id === appointmentId)
-    if (idx <= 0) return
-    
-    const newOrder = [...queueAppointments.value]
-    const [item] = newOrder.splice(idx, 1)
-    newOrder.unshift(item)
-    
-    // Update UI immediately (optimistic)
-    queueAppointments.value = newOrder
-    
-    await makeApiCall('POST', `/daily-schedule`, {
-      schedule_date: selectedDate.value,
-      appointment_order: newOrder.map(a => a.id)
+const moveToTop = (appointmentId) => {
+  const idx = queueAppointments.value.findIndex(a => a.id === appointmentId)
+  if (idx <= 0) return
+
+  const previousOrder = [...queueAppointments.value]
+  const newOrder = [...queueAppointments.value]
+  const [item] = newOrder.splice(idx, 1)
+  newOrder.unshift(item)
+
+  queueAppointments.value = newOrder
+
+  makeApiCall('POST', `/daily-schedule`, {
+    schedule_date: selectedDate.value,
+    appointment_order: newOrder.map(a => a.id)
+  })
+    .then(() => {
+      successMessage.value = `Moved ${item.patient.first_name} to top`
+      setTimeout(() => successMessage.value = null, 2000)
+      fetchDailySchedule().catch(err => console.error('Refresh error after moveToTop:', err))
     })
-    
-    successMessage.value = `Moved ${item.patient.first_name} to top`
-    setTimeout(() => successMessage.value = null, 2000)
-    
-    await fetchDailySchedule()
-  } catch (err) {
-    error.value = 'Failed to move to top'
-    await fetchDailySchedule() // revert on error
-  }
+    .catch((err) => {
+      console.error('Failed to move to top', err)
+      error.value = err?.data?.error || err?.message || 'Failed to move to top'
+      queueAppointments.value = previousOrder
+    })
 }
 
-const moveToBottom = async (appointmentId) => {
-  try {
-    const idx = queueAppointments.value.findIndex(a => a.id === appointmentId)
-    if (idx === -1 || idx === queueAppointments.value.length - 1) return
-    
-    const newOrder = [...queueAppointments.value]
-    const [item] = newOrder.splice(idx, 1)
-    newOrder.push(item)
-    
-    // Update UI immediately (optimistic)
-    queueAppointments.value = newOrder
-    
-    await makeApiCall('POST', `/daily-schedule`, {
-      schedule_date: selectedDate.value,
-      appointment_order: newOrder.map(a => a.id)
+const moveToBottom = (appointmentId) => {
+  const idx = queueAppointments.value.findIndex(a => a.id === appointmentId)
+  if (idx === -1 || idx === queueAppointments.value.length - 1) return
+
+  const previousOrder = [...queueAppointments.value]
+  const newOrder = [...queueAppointments.value]
+  const [item] = newOrder.splice(idx, 1)
+  newOrder.push(item)
+
+  queueAppointments.value = newOrder
+
+  makeApiCall('POST', `/daily-schedule`, {
+    schedule_date: selectedDate.value,
+    appointment_order: newOrder.map(a => a.id)
+  })
+    .then(() => {
+      successMessage.value = `Moved ${item.patient.first_name} to bottom`
+      setTimeout(() => successMessage.value = null, 2000)
+      fetchDailySchedule().catch(err => console.error('Refresh error after moveToBottom:', err))
     })
-    
-    successMessage.value = `Moved ${item.patient.first_name} to bottom`
-    setTimeout(() => successMessage.value = null, 2000)
-    
-    await fetchDailySchedule()
-  } catch (err) {
-    error.value = 'Failed to move to bottom'
-    await fetchDailySchedule() // revert on error
-  }
+    .catch((err) => {
+      console.error('Failed to move to bottom', err)
+      error.value = err?.data?.error || err?.message || 'Failed to move to bottom'
+      queueAppointments.value = previousOrder
+    })
 }
 
 // Time Edit Functions
@@ -2045,10 +2295,14 @@ const saveManualTimes = async () => {
 
 // Mouse event handlers for drag preview
 const handleMouseMove = (event) => {
-  if (isDragging.value && draggedItem.value) {
-    dragPreview.value.x = event.clientX + 15
-    dragPreview.value.y = event.clientY - 15
-  }
+  if (!isDragging.value || !draggedItem.value) return
+
+  if (previewAnimationFrame) cancelAnimationFrame(previewAnimationFrame)
+  const { clientX, clientY } = event
+  previewAnimationFrame = requestAnimationFrame(() => {
+    dragPreview.value.x = clientX + 15
+    dragPreview.value.y = clientY - 15
+  })
 }
 
 const navigateToCreatePatient = () => {
@@ -2062,16 +2316,8 @@ const handleQueueItemClick = async (appointment) => {
   selectedAppointment.value = appointment
 }
 
-const handleTimelineCardClick = async (appointment) => {
-  // Do not allow restarting a completed appointment via card click
-  if (appointment.status === 'completed') {
-    return
-  }
-  if (timing.value && activeAppointment.value?.id === appointment.id) {
-    await completeAppointment()
-  } else {
-    await startAppointment(appointment)
-  }
+const handleTimelineCardClick = (appointment) => {
+  selectedAppointment.value = appointment
 }
 
 // Date navigation helpers
@@ -2125,6 +2371,14 @@ onMounted(async () => {
     clearInterval(interval)
     document.removeEventListener('mousemove', handleMouseMove)
     document.removeEventListener('click', handleClickOutside)
+    if (previewAnimationFrame) {
+      cancelAnimationFrame(previewAnimationFrame)
+      previewAnimationFrame = null
+    }
+    if (zoomAnimationFrame) {
+      cancelAnimationFrame(zoomAnimationFrame)
+      zoomAnimationFrame = null
+    }
     if (timerInterval.value) {
       clearInterval(timerInterval.value)
     }
