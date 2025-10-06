@@ -1,0 +1,484 @@
+{
+  "items": [
+    {
+      "name": "Ibuprofen",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Nonsteroidal Anti-Inflammatory Drug (NSAID) for pain relief and inflammation.",
+      "is_public": true,
+      "tags": ["painkiller", "nsaid", "anti-inflammatory"]
+    },
+    {
+      "name": "Naproxen",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Nonsteroidal Anti-Inflammatory Drug (NSAID) for pain relief.",
+      "is_public": true,
+      "tags": ["painkiller", "nsaid", "anti-inflammatory"]
+    },
+    {
+      "name": "Diclofenac",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Nonsteroidal Anti-Inflammatory Drug (NSAID) for pain and inflammation.",
+      "is_public": true,
+      "tags": ["painkiller", "nsaid", "anti-inflammatory"]
+    },
+    {
+      "name": "Ketorolac",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Potent Nonsteroidal Anti-Inflammatory Drug (NSAID) for short-term pain management.",
+      "is_public": true,
+      "tags": ["painkiller", "nsaid", "anti-inflammatory"]
+    },
+    {
+      "name": "Aceclofenac",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Nonsteroidal Anti-Inflammatory Drug (NSAID) for pain relief.",
+      "is_public": true,
+      "tags": ["painkiller", "nsaid", "anti-inflammatory"]
+    },
+    {
+      "name": "Aspirin",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Nonsteroidal Anti-Inflammatory Drug (NSAID), also used for antiplatelet effects.",
+      "is_public": true,
+      "tags": ["painkiller", "nsaid", "anti-inflammatory", "emergency"]
+    },
+    {
+      "name": "Celecoxib",
+      "type": "tablet",
+      "strength": null,
+      "notes": "COX-2 selective Nonsteroidal Anti-Inflammatory Drug (NSAID).",
+      "is_public": true,
+      "tags": ["painkiller", "nsaid", "anti-inflammatory"]
+    },
+    {
+      "name": "Etoricoxib",
+      "type": "tablet",
+      "strength": null,
+      "notes": "COX-2 selective Nonsteroidal Anti-Inflammatory Drug (NSAID).",
+      "is_public": true,
+      "tags": ["painkiller", "nsaid", "anti-inflammatory"]
+    },
+    {
+      "name": "Mefenamic Acid",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Nonsteroidal Anti-Inflammatory Drug (NSAID) for mild to moderate pain.",
+      "is_public": true,
+      "tags": ["painkiller", "nsaid", "anti-inflammatory"]
+    },
+    {
+      "name": "Piroxicam",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Nonsteroidal Anti-Inflammatory Drug (NSAID) for pain relief.",
+      "is_public": true,
+      "tags": ["painkiller", "nsaid", "anti-inflammatory"]
+    },
+    {
+      "name": "Nimesulide",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Nonsteroidal Anti-Inflammatory Drug (NSAID) for acute pain.",
+      "is_public": true,
+      "tags": ["painkiller", "nsaid", "anti-inflammatory"]
+    },
+    {
+      "name": "Lornoxicam",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Nonsteroidal Anti-Inflammatory Drug (NSAID) for pain management.",
+      "is_public": true,
+      "tags": ["painkiller", "nsaid", "anti-inflammatory"]
+    },
+    {
+      "name": "Acetaminophen / Paracetamol",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Analgesic and antipyretic for pain and fever relief.",
+      "is_public": true,
+      "tags": ["painkiller", "fever", "analgesic"]
+    },
+    {
+      "name": "Codeine",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Opioid analgesic for moderate pain.",
+      "is_public": true,
+      "tags": ["painkiller", "opioid", "narcotic"]
+    },
+    {
+      "name": "Tramadol",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Opioid analgesic for moderate to severe pain.",
+      "is_public": true,
+      "tags": ["painkiller", "opioid"]
+    },
+    {
+      "name": "Hydrocodone",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Opioid analgesic for severe pain.",
+      "is_public": true,
+      "tags": ["painkiller", "opioid", "narcotic"]
+    },
+    {
+      "name": "Oxycodone",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Potent opioid analgesic for severe pain.",
+      "is_public": true,
+      "tags": ["painkiller", "opioid", "narcotic"]
+    },
+    {
+      "name": "Morphine",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Strong opioid analgesic for severe pain.",
+      "is_public": true,
+      "tags": ["painkiller", "opioid", "narcotic"]
+    },
+    {
+      "name": "Zerodol-SP",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Combination of Aceclofenac, Paracetamol, and Serratiopeptidase for pain and inflammation.",
+      "is_public": true,
+      "tags": ["painkiller", "combination", "anti-inflammatory"]
+    },
+    {
+      "name": "Tolpa D",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Combination of Paracetamol and Diclofenac.",
+      "is_public": true,
+      "tags": ["painkiller", "combination", "nsaid"]
+    },
+    {
+      "name": "Powergesic MR",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Combination of Diclofenac, Paracetamol, and Chlorzoxazone for pain and muscle spasms.",
+      "is_public": true,
+      "tags": ["painkiller", "combination", "muscle relaxant"]
+    },
+    {
+      "name": "Vicoprofen (Hydrocodone + Ibuprofen)",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Combination opioid and NSAID for pain relief.",
+      "is_public": true,
+      "tags": ["painkiller", "combination", "opioid", "nsaid"]
+    },
+    {
+      "name": "Tylenol #3 (Codeine + Acetaminophen)",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Combination opioid and analgesic for pain relief.",
+      "is_public": true,
+      "tags": ["painkiller", "combination", "opioid"]
+    },
+    {
+      "name": "Amoxicillin",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Broad-spectrum penicillin-class antibiotic for bacterial infections.",
+      "is_public": true,
+      "tags": ["antibiotic", "infection", "penicillin"]
+    },
+    {
+      "name": "Amoxicillin with Clavulanic Acid",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Penicillin-class antibiotic with beta-lactamase inhibitor (e.g., Augmentin).",
+      "is_public": true,
+      "tags": ["antibiotic", "infection", "penicillin"]
+    },
+    {
+      "name": "Clindamycin",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Antibiotic often used for patients with penicillin allergies.",
+      "is_public": true,
+      "tags": ["antibiotic", "infection"]
+    },
+    {
+      "name": "Azithromycin",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Macrolide antibiotic, often used for penicillin allergies.",
+      "is_public": true,
+      "tags": ["antibiotic", "infection"]
+    },
+    {
+      "name": "Metronidazole",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Antibiotic effective against anaerobic bacteria, often used for dental abscesses.",
+      "is_public": true,
+      "tags": ["antibiotic", "infection", "anaerobic"]
+    },
+    {
+      "name": "Doxycycline",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Tetracycline-class antibiotic used for infections and periodontal disease.",
+      "is_public": true,
+      "tags": ["antibiotic", "infection", "tetracycline", "periodontal"]
+    },
+    {
+      "name": "Ferric Sulfate",
+      "type": "solution",
+      "strength": "15.5-20%",
+      "notes": "Chemical hemostatic agent to control bleeding.",
+      "is_public": true,
+      "tags": ["hemostatic", "bleeding control", "chemical"]
+    },
+    {
+      "name": "Aluminum Chloride",
+      "type": "solution",
+      "strength": "5-25%",
+      "notes": "Chemical hemostatic agent and gingival retraction agent.",
+      "is_public": true,
+      "tags": ["hemostatic", "bleeding control", "retraction"]
+    },
+    {
+      "name": "Gel Foam Dental Sponge",
+      "type": "sponge",
+      "strength": null,
+      "notes": "Mechanical hemostatic agent to promote clotting.",
+      "is_public": true,
+      "tags": ["hemostatic", "bleeding control", "mechanical"]
+    },
+    {
+      "name": "Benzocaine",
+      "type": "gel",
+      "strength": "10-20%",
+      "notes": "Ester-based topical anesthetic for numbing mucosal surfaces.",
+      "is_public": true,
+      "tags": ["anesthetic", "topical", "numbing"]
+    },
+    {
+      "name": "Lidocaine",
+      "type": "gel",
+      "strength": "2-8%",
+      "notes": "Amide-based topical anesthetic.",
+      "is_public": true,
+      "tags": ["anesthetic", "topical", "numbing"]
+    },
+    {
+      "name": "EMLA Cream (Lidocaine + Prilocaine)",
+      "type": "cream",
+      "strength": "5%",
+      "notes": "Combination amide-based topical anesthetic cream.",
+      "is_public": true,
+      "tags": ["anesthetic", "topical", "numbing", "combination"]
+    },
+    {
+      "name": "Lidocaine with Epinephrine",
+      "type": "injection",
+      "strength": null,
+      "notes": "Local injectable anesthetic with vasoconstrictor.",
+      "is_public": true,
+      "tags": ["anesthetic", "injectable", "local"]
+    },
+    {
+      "name": "Articaine with Epinephrine",
+      "type": "injection",
+      "strength": null,
+      "notes": "Local injectable anesthetic with vasoconstrictor, known for good bone penetration.",
+      "is_public": true,
+      "tags": ["anesthetic", "injectable", "local"]
+    },
+    {
+      "name": "Chlorhexidine Gluconate Mouthwash",
+      "type": "solution",
+      "strength": "0.12%",
+      "notes": "Antiseptic and disinfectant oral rinse (e.g., Peridex, PerioGard).",
+      "is_public": true,
+      "tags": ["antiseptic", "disinfectant", "mouthwash", "gingivitis"]
+    },
+    {
+      "name": "PerioChip",
+      "type": "chip",
+      "strength": null,
+      "notes": "A small chip containing chlorhexidine gluconate placed in periodontal pockets.",
+      "is_public": true,
+      "tags": ["antiseptic", "periodontal", "chlorhexidine"]
+    },
+    {
+      "name": "Povidone Iodine",
+      "type": "solution",
+      "strength": "1-10%",
+      "notes": "Iodine-based antiseptic for disinfection.",
+      "is_public": true,
+      "tags": ["antiseptic", "disinfectant", "iodine"]
+    },
+    {
+      "name": "Hydrogen Peroxide",
+      "type": "solution",
+      "strength": "3%",
+      "notes": "Oxidizing agent used for rinsing and debridement.",
+      "is_public": true,
+      "tags": ["antiseptic", "oxidizing agent"]
+    },
+    {
+      "name": "Prednisone / Prednisolone",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Systemic corticosteroid for severe inflammation.",
+      "is_public": true,
+      "tags": ["corticosteroid", "anti-inflammatory", "steroid"]
+    },
+    {
+      "name": "Dexamethasone",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Potent systemic corticosteroid.",
+      "is_public": true,
+      "tags": ["corticosteroid", "anti-inflammatory", "steroid"]
+    },
+    {
+      "name": "Triamcinolone Acetonide Paste",
+      "type": "paste",
+      "strength": "0.1%",
+      "notes": "Topical corticosteroid paste for oral lesions (e.g., Kenalog in Orabase).",
+      "is_public": true,
+      "tags": ["corticosteroid", "anti-inflammatory", "topical", "ulcers"]
+    },
+    {
+      "name": "Fluconazole",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Systemic antifungal medication for treating oral thrush (candidiasis).",
+      "is_public": true,
+      "tags": ["antifungal", "thrush", "candidiasis"]
+    },
+    {
+      "name": "Nystatin",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Antifungal medication, also available as a liquid rinse.",
+      "is_public": true,
+      "tags": ["antifungal", "thrush", "candidiasis"]
+    },
+    {
+      "name": "Acyclovir",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Antiviral medication for herpes virus infections (e.g., cold sores).",
+      "is_public": true,
+      "tags": ["antiviral", "herpes", "cold sores"]
+    },
+    {
+      "name": "Penciclovir",
+      "type": "cream",
+      "strength": null,
+      "notes": "Topical antiviral cream for cold sores.",
+      "is_public": true,
+      "tags": ["antiviral", "herpes", "cold sores", "topical"]
+    },
+    {
+      "name": "Nitroglycerin",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Emergency drug for angina (chest pain).",
+      "is_public": true,
+      "tags": ["emergency", "cardiovascular", "angina"]
+    },
+    {
+      "name": "Salbutamol Inhaler",
+      "type": "inhaler",
+      "strength": null,
+      "notes": "Emergency drug for bronchospasm or asthma attack.",
+      "is_public": true,
+      "tags": ["emergency", "respiratory", "asthma"]
+    },
+    {
+      "name": "Epinephrine",
+      "type": "injection",
+      "strength": null,
+      "notes": "Emergency drug for anaphylaxis (severe allergic reaction).",
+      "is_public": true,
+      "tags": ["emergency", "anaphylaxis", "allergy"]
+    },
+    {
+      "name": "Pheniramine Maleate (Avil)",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Antihistamine for allergic reactions.",
+      "is_public": true,
+      "tags": ["emergency", "allergy", "antihistamine"]
+    },
+    {
+      "name": "Glucose Powder",
+      "type": "powder",
+      "strength": null,
+      "notes": "Emergency treatment for hypoglycemia (low blood sugar).",
+      "is_public": true,
+      "tags": ["emergency", "hypoglycemia", "diabetes"]
+    },
+    {
+      "name": "Diazepam (Valium)",
+      "type": "tablet",
+      "strength": "2mg/5mg",
+      "notes": "Benzodiazepine for anxiety, sedation, or seizure management.",
+      "is_public": true,
+      "tags": ["anxiolytic", "sedative", "benzodiazepine", "emergency"]
+    },
+    {
+      "name": "Triazolam (Halcion)",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Benzodiazepine for sedation before dental procedures.",
+      "is_public": true,
+      "tags": ["anxiolytic", "sedative", "benzodiazepine"]
+    },
+    {
+      "name": "Pilocarpine",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Medication to increase saliva production for dry mouth (xerostomia).",
+      "is_public": true,
+      "tags": ["saliva", "dry mouth", "xerostomia"]
+    },
+    {
+      "name": "Artificial Saliva Products",
+      "type": "solution",
+      "strength": null,
+      "notes": "Over-the-counter or prescription products to relieve dry mouth.",
+      "is_public": true,
+      "tags": ["saliva", "dry mouth", "xerostomia"]
+    },
+    {
+      "name": "Fluoride Varnish",
+      "type": "varnish",
+      "strength": null,
+      "notes": "Professionally applied topical fluoride for caries prevention.",
+      "is_public": true,
+      "tags": ["fluoride", "preventive", "caries"]
+    },
+    {
+      "name": "Omeprazole",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Proton Pump Inhibitor (PPI) to reduce stomach acid, can be relevant for dental erosion from GERD.",
+      "is_public": true,
+      "tags": ["ppi", "gerd", "erosion"]
+    },
+    {
+      "name": "Serratiopeptidase",
+      "type": "tablet",
+      "strength": null,
+      "notes": "Anti-inflammatory enzyme often combined with NSAIDs to reduce swelling.",
+      "is_public": true,
+      "tags": ["anti-inflammatory", "enzyme", "swelling"]
+    }
+  ]
+}
