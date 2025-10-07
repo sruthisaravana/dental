@@ -241,6 +241,14 @@
       "tags": ["hemostatic", "bleeding control", "chemical"]
     },
     {
+      "name": "Ferric Sulfate Hemostatic Gel",
+      "type": "gel",
+      "strength": "15.5%",
+      "notes": "Viscous ferric sulfate formulation applied with syringes for rapid control of gingival crevicular bleeding.",
+      "is_public": true,
+      "tags": ["hemostatic", "gel", "gingival", "bleeding control"]
+    },
+    {
       "name": "Aluminum Chloride",
       "type": "solution",
       "strength": "5-25%",
@@ -249,12 +257,60 @@
       "tags": ["hemostatic", "bleeding control", "retraction"]
     },
     {
+      "name": "Aluminum Chloride Hemostatic Gel",
+      "type": "gel",
+      "strength": "20%",
+      "notes": "Thickened aluminum chloride gel ideal for tissue management during crown and bridge impressions.",
+      "is_public": true,
+      "tags": ["hemostatic", "gel", "retraction", "crown"]
+    },
+    {
       "name": "Gel Foam Dental Sponge",
       "type": "sponge",
       "strength": null,
       "notes": "Mechanical hemostatic agent to promote clotting.",
       "is_public": true,
       "tags": ["hemostatic", "bleeding control", "mechanical"]
+    },
+    {
+      "name": "Tannic Acid Hemostatic Paste",
+      "type": "paste",
+      "strength": "20-100%",
+      "notes": "Astringent tannic acid paste used to coagulate superficial bleeding during restorative procedures.",
+      "is_public": true,
+      "tags": ["hemostatic", "astringent", "paste", "gingival"]
+    },
+    {
+      "name": "Zinc Chloride Hemostatic Paste",
+      "type": "paste",
+      "strength": "8-20%",
+      "notes": "Strong astringent paste for challenging sulcular bleeding, used with caution to avoid tissue necrosis.",
+      "is_public": true,
+      "tags": ["hemostatic", "astringent", "paste", "tissue management"]
+    },
+    {
+      "name": "Epinephrine Retraction Paste",
+      "type": "paste",
+      "strength": "0.1-0.2%",
+      "notes": "Hemostatic retraction paste containing epinephrine for rapid sulcular control prior to impressions.",
+      "is_public": true,
+      "tags": ["gingival retraction", "hemostatic", "paste", "epinephrine"]
+    },
+    {
+      "name": "Aluminum Chloride Retraction Paste",
+      "type": "paste",
+      "strength": "15%",
+      "notes": "Cartridge-delivered paste that gently retracts tissue while controlling crevicular fluid.",
+      "is_public": true,
+      "tags": ["gingival retraction", "paste", "hemostatic", "tissue management"]
+    },
+    {
+      "name": "Ferric Sulfate Retraction Paste",
+      "type": "paste",
+      "strength": "15.5%",
+      "notes": "Viscous ferric sulfate paste offering displacement and bleeding control for crown and bridge preparations.",
+      "is_public": true,
+      "tags": ["gingival retraction", "paste", "hemostatic", "crown"]
     },
     {
       "name": "Benzocaine",
@@ -279,6 +335,94 @@
       "notes": "Combination amide-based topical anesthetic cream.",
       "is_public": true,
       "tags": ["anesthetic", "topical", "numbing", "combination"]
+    },
+    {
+      "name": "Mucopain Gel",
+      "type": "gel",
+      "strength": "20% Benzocaine",
+      "notes": "High-strength benzocaine gel for rapid topical anesthesia before minor oral procedures.",
+      "is_public": true,
+      "tags": ["anesthetic", "benzocaine", "topical", "numbing"]
+    },
+    {
+      "name": "Orajel Benzocaine Gel",
+      "type": "gel",
+      "strength": "20%",
+      "notes": "Over-the-counter benzocaine gel used for temporary relief of oral pain and teething discomfort.",
+      "is_public": true,
+      "tags": ["anesthetic", "benzocaine", "otc", "oral pain"]
+    },
+    {
+      "name": "Anbesol Maximum Strength Gel",
+      "type": "gel",
+      "strength": "20% Benzocaine",
+      "notes": "Topical benzocaine gel providing temporary relief from toothache, sore gums, and denture irritation.",
+      "is_public": true,
+      "tags": ["anesthetic", "benzocaine", "topical", "oral pain"]
+    },
+    {
+      "name": "Hurricane Topical Anesthetic Gel",
+      "type": "gel",
+      "strength": "20% Benzocaine",
+      "notes": "Chairside benzocaine gel for numbing mucosa prior to injections, scaling, or minor procedures.",
+      "is_public": true,
+      "tags": ["anesthetic", "benzocaine", "chairside", "numbing"]
+    },
+    {
+      "name": "Topex Topical Anesthetic Gel",
+      "type": "gel",
+      "strength": "20% Benzocaine",
+      "notes": "Flavored benzocaine gel applied before injections or prophylaxis for enhanced patient comfort.",
+      "is_public": true,
+      "tags": ["anesthetic", "benzocaine", "topical", "prophylaxis"]
+    },
+    {
+      "name": "Viscous Lidocaine 2%",
+      "type": "solution",
+      "strength": "2%",
+      "notes": "Thickened lidocaine solution swished or dabbed for mucosal anesthesia in ulcers and procedural sites.",
+      "is_public": true,
+      "tags": ["anesthetic", "lidocaine", "topical", "mucositis"]
+    },
+    {
+      "name": "Xylocaine Topical Gel",
+      "type": "gel",
+      "strength": "2% Lidocaine",
+      "notes": "Lidocaine gel applied to oral mucosa for localized anesthesia and relief from irritations.",
+      "is_public": true,
+      "tags": ["anesthetic", "lidocaine", "topical", "numbing"]
+    },
+    {
+      "name": "Lidocaine Gel 8%",
+      "type": "gel",
+      "strength": "8%",
+      "notes": "Concentrated lidocaine gel compounded for patients requiring enhanced topical anesthesia prior to instrumentation.",
+      "is_public": true,
+      "tags": ["anesthetic", "lidocaine", "compounded", "numbing"]
+    },
+    {
+      "name": "Lidocaine Gel 60%",
+      "type": "gel",
+      "strength": "60%",
+      "notes": "Ultra-high potency lidocaine gel reserved for severe neuropathic oral pain under specialist supervision.",
+      "is_public": true,
+      "tags": ["anesthetic", "lidocaine", "compounded", "high potency"]
+    },
+    {
+      "name": "Cetacaine Gel",
+      "type": "gel",
+      "strength": "Benzocaine 14% + Butamben 2% + Tetracaine 2%",
+      "notes": "Combination topical anesthetic gel offering rapid-onset mucosal anesthesia for periodontal and surgical care.",
+      "is_public": true,
+      "tags": ["anesthetic", "combination", "topical", "periodontal"]
+    },
+    {
+      "name": "Dyclonine Hydrochloride Gel",
+      "type": "gel",
+      "strength": "0.5-1%",
+      "notes": "Ketone-based topical anesthetic alternative for patients sensitive to ester or amide agents.",
+      "is_public": true,
+      "tags": ["anesthetic", "topical", "alternative", "numbing"]
     },
     {
       "name": "Lidocaine with Epinephrine",
@@ -353,6 +497,78 @@
       "tags": ["corticosteroid", "anti-inflammatory", "topical", "ulcers"]
     },
     {
+      "name": "Kenalog in Orabase",
+      "type": "paste",
+      "strength": "0.1% Triamcinolone Acetonide",
+      "notes": "Adhesive corticosteroid paste in an orabase vehicle for recurrent aphthous ulcers and inflammatory lesions.",
+      "is_public": true,
+      "tags": ["corticosteroid", "ulcers", "adhesive", "topical"]
+    },
+    {
+      "name": "Oralone Dental Paste",
+      "type": "paste",
+      "strength": "0.1% Triamcinolone Acetonide",
+      "notes": "Triamcinolone dental paste that adheres to oral mucosa to reduce inflammation and discomfort.",
+      "is_public": true,
+      "tags": ["corticosteroid", "anti-inflammatory", "topical", "adhesive"]
+    },
+    {
+      "name": "Fluocinonide Oral Gel",
+      "type": "gel",
+      "strength": "0.05%",
+      "notes": "High-potency corticosteroid gel prescribed for erosive lichen planus and recalcitrant aphthous ulcers.",
+      "is_public": true,
+      "tags": ["corticosteroid", "anti-inflammatory", "gel", "oral lesions"]
+    },
+    {
+      "name": "Clobetasol Propionate Oral Gel",
+      "type": "gel",
+      "strength": "0.05%",
+      "notes": "Ultra-potent steroid gel used short-term for severe immune-mediated oral mucosal diseases.",
+      "is_public": true,
+      "tags": ["corticosteroid", "anti-inflammatory", "gel", "lichen planus"]
+    },
+    {
+      "name": "Clobetasol in Orabase",
+      "type": "paste",
+      "strength": "0.05%",
+      "notes": "Compounded clobetasol paste in an orabase adhesive for localized treatment of erosive lesions.",
+      "is_public": true,
+      "tags": ["corticosteroid", "adhesive", "ulcers", "compounded"]
+    },
+    {
+      "name": "Dexamethasone Elixir",
+      "type": "solution",
+      "strength": "0.5 mg/5 mL",
+      "notes": "Swish-and-spit corticosteroid rinse used for diffuse inflammatory oral conditions and mucositis.",
+      "is_public": true,
+      "tags": ["corticosteroid", "anti-inflammatory", "rinse", "mucositis"]
+    },
+    {
+      "name": "Fluocinolone Acetonide Gel",
+      "type": "gel",
+      "strength": "0.025%",
+      "notes": "Medium-potency steroid gel applied to oral mucosa for symptomatic relief of autoimmune lesions.",
+      "is_public": true,
+      "tags": ["corticosteroid", "anti-inflammatory", "gel", "oral lesions"]
+    },
+    {
+      "name": "Betamethasone Valerate Gel",
+      "type": "gel",
+      "strength": "0.05%",
+      "notes": "Topical steroid gel providing anti-inflammatory action for aphthous ulcers and desquamative gingivitis.",
+      "is_public": true,
+      "tags": ["corticosteroid", "anti-inflammatory", "gel", "gingivitis"]
+    },
+    {
+      "name": "Hydrocortisone Dental Ointment",
+      "type": "ointment",
+      "strength": "1%",
+      "notes": "Mild topical corticosteroid ointment for minor oral irritations and angular cheilitis flare-ups.",
+      "is_public": true,
+      "tags": ["corticosteroid", "anti-inflammatory", "ointment", "cheilitis"]
+    },
+    {
       "name": "Fluconazole",
       "type": "tablet",
       "strength": null,
@@ -377,12 +593,36 @@
       "tags": ["antiviral", "herpes", "cold sores"]
     },
     {
-      "name": "Penciclovir",
+      "name": "Penciclovir Cream 1%",
       "type": "cream",
-      "strength": null,
-      "notes": "Topical antiviral cream for cold sores.",
+      "strength": "1%",
+      "notes": "Topical antiviral cream indicated for recurrent herpes labialis lesions.",
       "is_public": true,
       "tags": ["antiviral", "herpes", "cold sores", "topical"]
+    },
+    {
+      "name": "Acyclovir Cream 5%",
+      "type": "cream",
+      "strength": "5%",
+      "notes": "Topical acyclovir formulation for episodic management of herpes labialis outbreaks.",
+      "is_public": true,
+      "tags": ["antiviral", "herpes", "cold sores", "topical"]
+    },
+    {
+      "name": "Docosanol Cream 10%",
+      "type": "cream",
+      "strength": "10%",
+      "notes": "Over-the-counter fusion inhibitor cream (Abreva) that shortens duration of cold sores.",
+      "is_public": true,
+      "tags": ["antiviral", "otc", "cold sores", "topical"]
+    },
+    {
+      "name": "Hydrocortisone Lip Balm",
+      "type": "ointment",
+      "strength": "1%",
+      "notes": "Mild steroid lip preparation to reduce inflammation from cheilitis and post-herpetic irritation.",
+      "is_public": true,
+      "tags": ["corticosteroid", "lip care", "ointment", "anti-inflammatory"]
     },
     {
       "name": "Nitroglycerin",
@@ -457,6 +697,54 @@
       "tags": ["saliva", "dry mouth", "xerostomia"]
     },
     {
+      "name": "Artificial Saliva Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Viscous saliva substitute formulated with carboxymethylcellulose or hydroxyethylcellulose for lasting moisture.",
+      "is_public": true,
+      "tags": ["dry mouth", "xerostomia", "gel", "lubricant"]
+    },
+    {
+      "name": "Moi-Stir Oral Moisturizing Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Saliva substitute gel that coats oral tissues and provides sustained relief from xerostomia.",
+      "is_public": true,
+      "tags": ["dry mouth", "gel", "xerostomia", "moisturizing"]
+    },
+    {
+      "name": "Mouth Kote Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Xylitol-containing saliva substitute gel that stimulates residual salivary function while lubricating tissues.",
+      "is_public": true,
+      "tags": ["dry mouth", "xylitol", "gel", "moisturizing"]
+    },
+    {
+      "name": "Optimoist Oral Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Moisturizing gel formulated with cellulose derivatives to reduce discomfort from persistent xerostomia.",
+      "is_public": true,
+      "tags": ["dry mouth", "gel", "xerostomia", "comfort"]
+    },
+    {
+      "name": "Xero-Lube Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Neutral pH saliva substitute gel used by denture wearers and radiotherapy patients to lubricate oral tissues.",
+      "is_public": true,
+      "tags": ["dry mouth", "gel", "xerostomia", "denture"]
+    },
+    {
+      "name": "Salix Oral Hydrating Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Hydroxyethylcellulose-based gel that offers lasting moisture and relief from dry mouth discomfort.",
+      "is_public": true,
+      "tags": ["dry mouth", "gel", "xerostomia", "hydration"]
+    },
+    {
       "name": "Fluoride Varnish",
       "type": "varnish",
       "strength": null,
@@ -479,6 +767,814 @@
       "notes": "Anti-inflammatory enzyme often combined with NSAIDs to reduce swelling.",
       "is_public": true,
       "tags": ["anti-inflammatory", "enzyme", "swelling"]
+    },
+    {
+      "name": "Rexidin-M Forte Mouthwash",
+      "type": "solution",
+      "strength": null,
+      "notes": "Combination chlorhexidine gluconate and metronidazole mouth rinse for periodontal infections.",
+      "is_public": true,
+      "tags": ["antiseptic", "antibacterial", "mouthwash", "periodontal"]
+    },
+    {
+      "name": "Benzydamine Hydrochloride Mouthwash",
+      "type": "solution",
+      "strength": "0.15%",
+      "notes": "Anti-inflammatory and analgesic oral rinse for mucositis and sore throat relief (e.g., Tantum).",
+      "is_public": true,
+      "tags": ["anti-inflammatory", "analgesic", "mouthwash", "mucositis"]
+    },
+    {
+      "name": "Sodium Fluoride Mouthrinse",
+      "type": "solution",
+      "strength": "0.05-0.2%",
+      "notes": "Topical fluoride mouthwash for enamel remineralization and caries prevention.",
+      "is_public": true,
+      "tags": ["fluoride", "preventive", "mouthwash", "remineralization"]
+    },
+    {
+      "name": "Hexigel (Chlorhexidine Dental Gel)",
+      "type": "gel",
+      "strength": "1%",
+      "notes": "Chlorhexidine gluconate gel used as a topical antiseptic for gingivitis and periodontal pockets.",
+      "is_public": true,
+      "tags": ["antiseptic", "chlorhexidine", "gel", "gingivitis"]
+    },
+    {
+      "name": "Metrogyl DG Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Metronidazole and chlorhexidine combination dental gel for anaerobic infections in periodontal pockets.",
+      "is_public": true,
+      "tags": ["antibacterial", "antiseptic", "gel", "periodontal"]
+    },
+    {
+      "name": "Dologel-CT Oral Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Choline salicylate and lignocaine hydrochloride gel for teething discomfort and aphthous ulcers.",
+      "is_public": true,
+      "tags": ["analgesic", "anti-inflammatory", "gel", "ulcers"]
+    },
+    {
+      "name": "Orasore Mouth Ulcer Gel",
+      "type": "gel",
+      "strength": "Choline Salicylate 8.7% + Cetalkonium Chloride",
+      "notes": "Combination gel that soothes aphthous ulcers, teething pain, and minor oral irritations.",
+      "is_public": true,
+      "tags": ["ulcers", "anti-inflammatory", "gel", "analgesic"]
+    },
+    {
+      "name": "Bonjela Oral Gel",
+      "type": "gel",
+      "strength": "Choline Salicylate",
+      "notes": "Over-the-counter mouth ulcer gel that relieves pain and reduces inflammation in oral mucosa.",
+      "is_public": true,
+      "tags": ["ulcers", "otc", "gel", "analgesic"]
+    },
+    {
+      "name": "Dentogel Mouth Ulcer Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Multi-ingredient oral gel formulated to ease pain and accelerate healing of mouth ulcers.",
+      "is_public": true,
+      "tags": ["ulcers", "gel", "analgesic", "healing"]
+    },
+    {
+      "name": "Olergel Mouth Ulcer Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Prescription ulcer gel combining anti-inflammatory and antiseptic agents for recurrent aphthous ulcers.",
+      "is_public": true,
+      "tags": ["ulcers", "gel", "anti-inflammatory", "antiseptic"]
+    },
+    {
+      "name": "Coolrap Mouth Ulcer Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Cooling oral gel with analgesic and protective ingredients for canker sores and denture sore spots.",
+      "is_public": true,
+      "tags": ["ulcers", "gel", "soothing", "protective"]
+    },
+    {
+      "name": "Miconazole Oral Gel",
+      "type": "gel",
+      "strength": "2%",
+      "notes": "Topical antifungal gel for oral candidiasis and angular cheilitis.",
+      "is_public": true,
+      "tags": ["antifungal", "gel", "thrush", "cheilitis"]
+    },
+    {
+      "name": "Miconazole with Chlorhexidine Gel",
+      "type": "gel",
+      "strength": "2% + 0.25%",
+      "notes": "Dual-action gel that combines antifungal and antiseptic activity for denture stomatitis and periodontal pockets.",
+      "is_public": true,
+      "tags": ["antifungal", "antiseptic", "gel", "combination"]
+    },
+    {
+      "name": "Chlorhexidine Gluconate Gel 0.2%",
+      "type": "gel",
+      "strength": "0.2%",
+      "notes": "Low-strength chlorhexidine gel applied to gingiva for plaque control and gingivitis management.",
+      "is_public": true,
+      "tags": ["antiseptic", "chlorhexidine", "gel", "gingivitis"]
+    },
+    {
+      "name": "Chlorhexidine Periodontal Gel 2%",
+      "type": "gel",
+      "strength": "2%",
+      "notes": "High-concentration chlorhexidine gel placed in periodontal pockets for sustained antimicrobial effect.",
+      "is_public": true,
+      "tags": ["antiseptic", "chlorhexidine", "periodontal", "gel"]
+    },
+    {
+      "name": "Peridex Periodontal Gel",
+      "type": "gel",
+      "strength": "0.12% Chlorhexidine",
+      "notes": "Prescription chlorhexidine gel formulated for localized delivery to periodontal sites after scaling and root planing.",
+      "is_public": true,
+      "tags": ["antiseptic", "chlorhexidine", "periodontal", "maintenance"]
+    },
+    {
+      "name": "Hexidine Dental Gel",
+      "type": "gel",
+      "strength": "1% Chlorhexidine",
+      "notes": "Chlorhexidine-based dental gel indicated for adjunctive treatment of gingivitis and periodontal infections.",
+      "is_public": true,
+      "tags": ["antiseptic", "chlorhexidine", "gel", "periodontal"]
+    },
+    {
+      "name": "Clorni Dental Gel",
+      "type": "gel",
+      "strength": "Chlorhexidine 1% + Metronidazole 1%",
+      "notes": "Combination antimicrobial gel for management of chronic periodontitis and gingival inflammation.",
+      "is_public": true,
+      "tags": ["antimicrobial", "chlorhexidine", "metronidazole", "gel"]
+    },
+    {
+      "name": "Povidone-Iodine Oral Gel",
+      "type": "gel",
+      "strength": "5-10%",
+      "notes": "Broad-spectrum antiseptic gel for pre-procedural disinfection and management of infected oral lesions.",
+      "is_public": true,
+      "tags": ["antiseptic", "iodine", "gel", "broad-spectrum"]
+    },
+    {
+      "name": "Metronidazole Dental Gel",
+      "type": "gel",
+      "strength": "25%",
+      "notes": "Topical nitroimidazole gel applied in periodontal pockets to target anaerobic bacteria.",
+      "is_public": true,
+      "tags": ["antibacterial", "periodontal", "gel", "anaerobic"]
+    },
+    {
+      "name": "Clindamycin Dental Gel",
+      "type": "gel",
+      "strength": "1%",
+      "notes": "Lincosamide antibiotic gel compounded for refractory periodontal infections and localized osteitis.",
+      "is_public": true,
+      "tags": ["antibiotic", "gel", "periodontal", "compounded"]
+    },
+    {
+      "name": "Clotrimazole Lozenges",
+      "type": "lozenge",
+      "strength": "10mg",
+      "notes": "Antifungal lozenges for treating oral candidiasis.",
+      "is_public": true,
+      "tags": ["antifungal", "lozenge", "thrush"]
+    },
+    {
+      "name": "Nystatin Topical Cream",
+      "type": "cream",
+      "strength": "100,000 units/g",
+      "notes": "Polyene antifungal cream for angular cheilitis and perioral candidiasis associated with dentures.",
+      "is_public": true,
+      "tags": ["antifungal", "cream", "cheilitis", "denture"]
+    },
+    {
+      "name": "Nystatin Topical Ointment",
+      "type": "ointment",
+      "strength": "100,000 units/g",
+      "notes": "Adherent antifungal ointment for lip commissures, denture sore areas, and neonatal thrush lesions.",
+      "is_public": true,
+      "tags": ["antifungal", "ointment", "cheilitis", "topical"]
+    },
+    {
+      "name": "Nystatin with Triamcinolone Ointment",
+      "type": "ointment",
+      "strength": "100,000 units/g + 0.1%",
+      "notes": "Combination antifungal and corticosteroid ointment to manage inflammatory fungal infections around the mouth.",
+      "is_public": true,
+      "tags": ["antifungal", "corticosteroid", "ointment", "combination"]
+    },
+    {
+      "name": "Miconazole Dental Gel",
+      "type": "gel",
+      "strength": "2%",
+      "notes": "Oral mucosal gel for candidiasis that may be preferred when nystatin resistance or intolerance occurs.",
+      "is_public": true,
+      "tags": ["antifungal", "gel", "candidiasis", "topical"]
+    },
+    {
+      "name": "Clotrimazole Topical Cream",
+      "type": "cream",
+      "strength": "1%",
+      "notes": "Imidazole antifungal cream used on labial commissures and perioral tissues affected by candidal infections.",
+      "is_public": true,
+      "tags": ["antifungal", "cream", "cheilitis", "topical"]
+    },
+    {
+      "name": "Ketoconazole Topical Cream",
+      "type": "cream",
+      "strength": "2%",
+      "notes": "Broad-spectrum azole cream for chronic oral candidiasis affecting mucosal and perioral tissues.",
+      "is_public": true,
+      "tags": ["antifungal", "cream", "azole", "topical"]
+    },
+    {
+      "name": "Fluconazole Oral Gel",
+      "type": "gel",
+      "strength": "0.5%",
+      "notes": "Compounded fluconazole gel for resistant oral thrush or when systemic therapy is contraindicated.",
+      "is_public": true,
+      "tags": ["antifungal", "gel", "compounded", "thrush"]
+    },
+    {
+      "name": "Iodoquinol with Hydrocortisone Cream",
+      "type": "cream",
+      "strength": "1% + 1%",
+      "notes": "Antifungal and corticosteroid combination cream for angular cheilitis and inflammatory perioral infections.",
+      "is_public": true,
+      "tags": ["antifungal", "corticosteroid", "cream", "combination"]
+    },
+    {
+      "name": "Soft-Bristle Toothbrush",
+      "type": "oral care accessory",
+      "strength": null,
+      "notes": "Patient home-care toothbrush with soft bristles to reduce abrasion of enamel and gingiva.",
+      "is_public": true,
+      "tags": ["oral hygiene", "home care", "preventive"]
+    },
+    {
+      "name": "Interdental Brush",
+      "type": "oral care accessory",
+      "strength": null,
+      "notes": "Small brush designed to clean interdental spaces and orthodontic appliances.",
+      "is_public": true,
+      "tags": ["oral hygiene", "home care", "interdental"]
+    },
+    {
+      "name": "Waxed Dental Floss",
+      "type": "oral care accessory",
+      "strength": null,
+      "notes": "Wax-coated dental floss for plaque removal between teeth.",
+      "is_public": true,
+      "tags": ["oral hygiene", "home care", "plaque control"]
+    },
+    {
+      "name": "Tongue Cleaner",
+      "type": "oral care accessory",
+      "strength": null,
+      "notes": "Tool used to mechanically remove debris and bacteria from the dorsal surface of the tongue.",
+      "is_public": true,
+      "tags": ["oral hygiene", "home care", "halitosis"]
+    },
+    {
+      "name": "Chlorhexidine Gluconate Mouthwash 0.2%",
+      "type": "solution",
+      "strength": "0.2%",
+      "notes": "Higher strength chlorhexidine mouthrinse used for short-term intensive plaque control and post-surgical care.",
+      "is_public": true,
+      "tags": ["antiseptic", "mouthwash", "chlorhexidine", "plaque control"]
+    },
+    {
+      "name": "Essential Oil Mouthrinse (Listerine)",
+      "type": "solution",
+      "strength": null,
+      "notes": "Combination of thymol, eucalyptol, methyl salicylate, and menthol for broad-spectrum plaque and gingivitis reduction.",
+      "is_public": true,
+      "tags": ["antiseptic", "mouthwash", "essential oils", "gingivitis"]
+    },
+    {
+      "name": "Cetylpyridinium Chloride Mouthwash",
+      "type": "solution",
+      "strength": "0.05-0.07%",
+      "notes": "Quaternary ammonium compound rinse for halitosis management and plaque control (e.g., Colgate Plax).",
+      "is_public": true,
+      "tags": ["antiseptic", "mouthwash", "halitosis", "plaque control"]
+    },
+    {
+      "name": "Tranexamic Acid Mouthrinse",
+      "type": "solution",
+      "strength": "4.8-5%",
+      "notes": "Antifibrinolytic mouthwash prescribed to minimize post-operative bleeding, especially in anticoagulated patients.",
+      "is_public": true,
+      "tags": ["hemostatic", "mouthwash", "post-operative", "antifibrinolytic"]
+    },
+    {
+      "name": "Sodium Bicarbonate Mouth Rinse",
+      "type": "solution",
+      "strength": null,
+      "notes": "Mild alkaline rinse prepared chairside for mucositis comfort and neutralization of oral acids.",
+      "is_public": true,
+      "tags": ["soothing", "mouthwash", "mucositis", "alkaline"]
+    },
+    {
+      "name": "Benzydamine Hydrochloride Oral Spray",
+      "type": "spray",
+      "strength": "0.15%",
+      "notes": "Topical nonsteroidal anti-inflammatory spray that relieves oral mucosal pain and inflammation.",
+      "is_public": true,
+      "tags": ["anti-inflammatory", "analgesic", "spray", "mucositis"]
+    },
+    {
+      "name": "Amlexanox Oral Paste",
+      "type": "paste",
+      "strength": "5%",
+      "notes": "Prescription topical anti-inflammatory paste for recurrent aphthous ulcers and Behçet lesions.",
+      "is_public": true,
+      "tags": ["anti-inflammatory", "ulcers", "topical", "aphthous"]
+    },
+    {
+      "name": "Orabase Protective Paste",
+      "type": "paste",
+      "strength": null,
+      "notes": "Carboxymethylcellulose-based paste that forms a protective barrier over oral ulcers and sore spots.",
+      "is_public": true,
+      "tags": ["protective", "ulcers", "topical", "barrier"]
+    },
+    {
+      "name": "Zilactin Protective Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Film-forming gel that seals canker sores to reduce irritation from eating, drinking, and speaking.",
+      "is_public": true,
+      "tags": ["protective", "ulcers", "film-forming", "pain relief"]
+    },
+    {
+      "name": "Sucralfate Oral Suspension",
+      "type": "suspension",
+      "strength": "1g/5mL",
+      "notes": "Mucosal coating agent used off-label for oral mucositis and ulcer discomfort.",
+      "is_public": true,
+      "tags": ["protective", "mucositis", "ulcers", "coating"]
+    },
+    {
+      "name": "Sucralfate Oral Paste",
+      "type": "paste",
+      "strength": null,
+      "notes": "Adherent paste compounded from sucralfate tablets to form a protective barrier over painful mucosal ulcers.",
+      "is_public": true,
+      "tags": ["protective", "mucositis", "ulcers", "compounded"]
+    },
+    {
+      "name": "Aluminum-Magnesium Antacid Paste",
+      "type": "paste",
+      "strength": null,
+      "notes": "Soothing antacid paste mixed with local anesthetic for symptomatic relief of aphthous ulcers and mucositis.",
+      "is_public": true,
+      "tags": ["protective", "buffering", "ulcers", "soothing"]
+    },
+    {
+      "name": "Becaplermin Gel",
+      "type": "gel",
+      "strength": "0.01%",
+      "notes": "Recombinant platelet-derived growth factor gel sometimes used off-label to promote healing of refractory oral wounds.",
+      "is_public": true,
+      "tags": ["healing", "growth factor", "gel", "wound care"]
+    },
+    {
+      "name": "Silver Sulfadiazine Cream",
+      "type": "cream",
+      "strength": "1%",
+      "notes": "Topical antimicrobial cream used post-operatively to prevent infection and aid healing in oral burns and graft sites.",
+      "is_public": true,
+      "tags": ["antimicrobial", "healing", "cream", "post-surgical"]
+    },
+    {
+      "name": "Calendula Ointment",
+      "type": "ointment",
+      "strength": null,
+      "notes": "Herbal ointment providing soothing anti-inflammatory effects for minor oral mucosal injuries.",
+      "is_public": true,
+      "tags": ["herbal", "anti-inflammatory", "ointment", "soothing"]
+    },
+    {
+      "name": "Aloe Vera Oral Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Bioactive aloe gel applied to oral tissues to reduce inflammation, promote healing, and provide moisture.",
+      "is_public": true,
+      "tags": ["herbal", "soothing", "gel", "healing"]
+    },
+    {
+      "name": "Serratiopeptidase Topical Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Proteolytic enzyme gel used to reduce localized swelling and inflammation following oral surgery.",
+      "is_public": true,
+      "tags": ["enzyme", "anti-inflammatory", "gel", "post-surgical"]
+    },
+    {
+      "name": "Trypsin-Chymotrypsin Enzyme Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Combined proteolytic enzymes formulated to debride necrotic tissue and accelerate mucosal healing.",
+      "is_public": true,
+      "tags": ["enzyme", "wound care", "gel", "healing"]
+    },
+    {
+      "name": "Bromelain Oral Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Pineapple-derived enzyme gel employed for its anti-inflammatory and edema-reducing properties.",
+      "is_public": true,
+      "tags": ["enzyme", "anti-inflammatory", "gel", "natural"]
+    },
+    {
+      "name": "Papain Oral Debridement Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Papaya enzyme gel that gently debrides fibrinous slough on oral ulcers to facilitate healing.",
+      "is_public": true,
+      "tags": ["enzyme", "debridement", "gel", "healing"]
+    },
+    {
+      "name": "Hyaluronic Acid Oral Gel",
+      "type": "gel",
+      "strength": "0.2%",
+      "notes": "Moisturizing gel that accelerates soft tissue repair and reduces inflammation in periodontal lesions.",
+      "is_public": true,
+      "tags": ["healing", "hyaluronic acid", "gel", "periodontal"]
+    },
+    {
+      "name": "Collagen Wound Dressing Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Topical collagen matrix gel supporting granulation and epithelialization in oral surgical sites.",
+      "is_public": true,
+      "tags": ["healing", "collagen", "gel", "wound care"]
+    },
+    {
+      "name": "Platelet-Rich Plasma Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Autologous plasma gel rich in growth factors applied post-surgically to enhance soft-tissue regeneration.",
+      "is_public": true,
+      "tags": ["healing", "regeneration", "gel", "autologous"]
+    },
+    {
+      "name": "Topical Growth Factor Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Biologically active gel containing recombinant growth factors to stimulate angiogenesis and epithelial repair.",
+      "is_public": true,
+      "tags": ["healing", "growth factor", "gel", "advanced"]
+    },
+    {
+      "name": "Neomycin-Bacitracin Antibiotic Ointment",
+      "type": "ointment",
+      "strength": null,
+      "notes": "Topical antibiotic ointment applied post-surgically to reduce risk of secondary infection at extraoral sites.",
+      "is_public": true,
+      "tags": ["antibiotic", "ointment", "post-surgical", "infection control"]
+    },
+    {
+      "name": "Chlorhexidine Post-Surgical Gel",
+      "type": "gel",
+      "strength": "0.2%",
+      "notes": "Bioadhesive chlorhexidine gel dispensed after periodontal surgery to maintain antimicrobial protection.",
+      "is_public": true,
+      "tags": ["antiseptic", "post-surgical", "gel", "chlorhexidine"]
+    },
+    {
+      "name": "Vitamin E Healing Ointment",
+      "type": "ointment",
+      "strength": null,
+      "notes": "Topical tocopherol ointment used to nourish epithelium and minimize scarring after oral procedures.",
+      "is_public": true,
+      "tags": ["healing", "vitamin", "ointment", "post-surgical"]
+    },
+    {
+      "name": "Centella Asiatica Oral Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Botanical gel rich in asiaticoside to promote angiogenesis and collagen synthesis during mucosal repair.",
+      "is_public": true,
+      "tags": ["herbal", "healing", "gel", "post-surgical"]
+    },
+    {
+      "name": "Plastibase Compounding Base",
+      "type": "ointment base",
+      "strength": null,
+      "notes": "Thermoplastic polyethylene and mineral oil base used to prepare stable custom dental ointments.",
+      "is_public": true,
+      "tags": ["compounding", "base", "ointment", "custom"]
+    },
+    {
+      "name": "Orabase Mucoadhesive Base",
+      "type": "paste",
+      "strength": null,
+      "notes": "Gelatin-pectin-carboxymethylcellulose base that adheres to mucosa and serves as a vehicle for medicated pastes.",
+      "is_public": true,
+      "tags": ["compounding", "base", "adhesive", "mucosa"]
+    },
+    {
+      "name": "Carbomer Gel Base",
+      "type": "gel",
+      "strength": null,
+      "notes": "Neutralized carbomer polymer base utilized for compounding viscous oral gels with uniform drug dispersion.",
+      "is_public": true,
+      "tags": ["compounding", "base", "gel", "stable"]
+    },
+    {
+      "name": "Hydroxypropyl Cellulose Gel Base",
+      "type": "gel",
+      "strength": null,
+      "notes": "Bioadhesive cellulose derivative base that provides sustained release of active agents on mucosal surfaces.",
+      "is_public": true,
+      "tags": ["compounding", "base", "gel", "bioadhesive"]
+    },
+    {
+      "name": "Petrolatum Ointment Base",
+      "type": "ointment",
+      "strength": null,
+      "notes": "Occlusive hydrocarbon base commonly used to compound custom lip and mucosal ointments.",
+      "is_public": true,
+      "tags": ["compounding", "base", "ointment", "occlusive"]
+    },
+    {
+      "name": "Choline Salicylate Oral Gel",
+      "type": "gel",
+      "strength": "8.7%",
+      "notes": "Anti-inflammatory oral gel for teething discomfort, aphthous ulcers, and sore gums.",
+      "is_public": true,
+      "tags": ["anti-inflammatory", "gel", "ulcers", "teething"]
+    },
+    {
+      "name": "Lignocaine Oral Spray 10%",
+      "type": "spray",
+      "strength": "10%",
+      "notes": "Topical anesthetic spray for gag reflex suppression and minor oral procedures.",
+      "is_public": true,
+      "tags": ["anesthetic", "topical", "spray", "procedural"]
+    },
+    {
+      "name": "Orthodontic Relief Wax",
+      "type": "oral care accessory",
+      "strength": null,
+      "notes": "Soft wax provided to orthodontic patients to cushion brackets and wires from oral mucosa.",
+      "is_public": true,
+      "tags": ["orthodontic", "home care", "comfort", "oral hygiene"]
+    },
+    {
+      "name": "Denture Adhesive Cream",
+      "type": "oral care accessory",
+      "strength": null,
+      "notes": "Polymer cream that improves denture retention and comfort for removable prosthesis wearers.",
+      "is_public": true,
+      "tags": ["denture", "home care", "retention", "prosthodontic"]
+    },
+    {
+      "name": "Denture Cleansing Tablets",
+      "type": "oral care accessory",
+      "strength": null,
+      "notes": "Effervescent alkaline peroxide tablets for daily soaking and decontamination of dentures.",
+      "is_public": true,
+      "tags": ["denture", "cleansing", "oral hygiene", "home care"]
+    },
+    {
+      "name": "Desensitizing Toothpaste (Potassium Nitrate 5%)",
+      "type": "oral care accessory",
+      "strength": "5%",
+      "notes": "Potassium nitrate toothpaste recommended for dentin hypersensitivity relief.",
+      "is_public": true,
+      "tags": ["sensitivity", "toothpaste", "home care", "potassium nitrate"]
+    },
+    {
+      "name": "Potassium Nitrate Desensitizing Paste",
+      "type": "paste",
+      "strength": "5%",
+      "notes": "Chairside potassium nitrate paste applied to exposed dentin prior to bonding or whitening procedures.",
+      "is_public": true,
+      "tags": ["sensitivity", "paste", "in-office", "dentin"]
+    },
+    {
+      "name": "Arginine Calcium Carbonate Paste",
+      "type": "paste",
+      "strength": "8% Arginine",
+      "notes": "Professional desensitizing paste that occludes dentinal tubules using arginine and calcium carbonate technology.",
+      "is_public": true,
+      "tags": ["sensitivity", "paste", "arginine", "tubule occlusion"]
+    },
+    {
+      "name": "Calcium Phosphate Remineralizing Paste",
+      "type": "paste",
+      "strength": null,
+      "notes": "Bioavailable calcium and phosphate paste (e.g., NovaMin) for hypersensitivity relief and enamel repair.",
+      "is_public": true,
+      "tags": ["remineralization", "paste", "sensitivity", "calcium"]
+    },
+    {
+      "name": "Calcium Hydroxide Paste",
+      "type": "paste",
+      "strength": null,
+      "notes": "Intracanal medicament providing high pH antibacterial action during endodontic therapy.",
+      "is_public": true,
+      "tags": ["endodontic", "medicament", "paste", "antibacterial"]
+    },
+    {
+      "name": "Iodoform Root Canal Paste",
+      "type": "paste",
+      "strength": null,
+      "notes": "Radiopaque iodine-based paste used for primary tooth pulpectomies and persistent periapical infections.",
+      "is_public": true,
+      "tags": ["endodontic", "paste", "iodine", "pulpectomy"]
+    },
+    {
+      "name": "Zinc Oxide Eugenol Paste",
+      "type": "paste",
+      "strength": null,
+      "notes": "Sedative dressing and temporary cement providing obtundant effect on inflamed pulpal tissues.",
+      "is_public": true,
+      "tags": ["endodontic", "sedative", "paste", "temporary"]
+    },
+    {
+      "name": "Formocresol Pulp Dressing",
+      "type": "paste",
+      "strength": null,
+      "notes": "Fixative dressing historically used in pulpotomy procedures; now limited to specific pediatric indications.",
+      "is_public": true,
+      "tags": ["endodontic", "pulp therapy", "paste", "legacy"]
+    },
+    {
+      "name": "Stannous Fluoride Toothpaste",
+      "type": "oral care accessory",
+      "strength": "0.454%",
+      "notes": "Stannous fluoride dentifrice that offers anti-caries, anti-gingivitis, and sensitivity benefits.",
+      "is_public": true,
+      "tags": ["fluoride", "toothpaste", "sensitivity", "gingivitis"]
+    },
+    {
+      "name": "Carbamide Peroxide Whitening Gel",
+      "type": "gel",
+      "strength": "10-35%",
+      "notes": "Take-home bleaching gel dispensed in custom trays for gradual whitening of vital teeth.",
+      "is_public": true,
+      "tags": ["whitening", "cosmetic", "gel", "peroxide"]
+    },
+    {
+      "name": "Hydrogen Peroxide In-Office Gel",
+      "type": "gel",
+      "strength": "3-10%",
+      "notes": "Professionally applied whitening gel activated chairside for rapid shade improvement.",
+      "is_public": true,
+      "tags": ["whitening", "cosmetic", "gel", "in-office"]
+    },
+    {
+      "name": "Potassium Nitrate Desensitizing Gel",
+      "type": "gel",
+      "strength": "3-5%",
+      "notes": "Adjunct gel used alongside bleaching to reduce post-whitening sensitivity and calm exposed dentin.",
+      "is_public": true,
+      "tags": ["sensitivity", "gel", "whitening", "potassium nitrate"]
+    },
+    {
+      "name": "CPP-ACP Remineralizing Cream",
+      "type": "cream",
+      "strength": null,
+      "notes": "Casein phosphopeptide-amorphous calcium phosphate cream (e.g., GC Tooth Mousse) for enamel remineralization.",
+      "is_public": true,
+      "tags": ["remineralization", "cream", "calcium", "preventive"]
+    },
+    {
+      "name": "Silver Diamine Fluoride",
+      "type": "solution",
+      "strength": "38%",
+      "notes": "Topical agent used to arrest active dental caries and reduce dentin hypersensitivity.",
+      "is_public": true,
+      "tags": ["fluoride", "caries control", "nonrestorative", "sensitivity"]
+    },
+    {
+      "name": "Acidulated Phosphate Fluoride Gel",
+      "type": "gel",
+      "strength": "1.23%",
+      "notes": "In-office professional fluoride gel applied in trays for caries prevention.",
+      "is_public": true,
+      "tags": ["fluoride", "preventive", "in-office", "gel"]
+    },
+    {
+      "name": "Neutral Sodium Fluoride Gel",
+      "type": "gel",
+      "strength": "2%",
+      "notes": "Professional fluoride gel recommended for patients with porcelain restorations or xerostomia.",
+      "is_public": true,
+      "tags": ["fluoride", "preventive", "gel", "xerostomia"]
+    },
+    {
+      "name": "Xylitol Chewing Gum",
+      "type": "oral care accessory",
+      "strength": null,
+      "notes": "Sugar-free gum sweetened with xylitol to stimulate salivary flow and reduce mutans streptococci.",
+      "is_public": true,
+      "tags": ["saliva", "caries prevention", "home care", "xylitol"]
+    },
+    {
+      "name": "Probiotic Lozenges (Streptococcus salivarius K12)",
+      "type": "lozenge",
+      "strength": null,
+      "notes": "Oral probiotic lozenges formulated to improve oral microbiome balance and reduce halitosis.",
+      "is_public": true,
+      "tags": ["probiotic", "lozenge", "halitosis", "microbiome"]
+    },
+    {
+      "name": "Vitamin B Complex Capsules",
+      "type": "capsule",
+      "strength": null,
+      "notes": "Supplement frequently prescribed for glossitis, angular cheilitis, and oral neuropathies.",
+      "is_public": true,
+      "tags": ["supplement", "vitamin", "neuropathy", "stomatitis"]
+    },
+    {
+      "name": "Oraqix Periodontal Gel",
+      "type": "gel",
+      "strength": "Lidocaine 2.5% + Prilocaine 2.5%",
+      "notes": "Thermally sensitive periodontal gel that becomes viscous in the sulcus to provide needle-free anesthesia during scaling and root planing.",
+      "is_public": true,
+      "tags": ["anesthetic", "periodontal", "lidocaine", "prilocaine"]
+    },
+    {
+      "name": "Dentipatch Topical Patch",
+      "type": "patch",
+      "strength": "Lidocaine 46.1 mg",
+      "notes": "Mucoadhesive lidocaine patch applied to oral mucosa for localized anesthetic delivery prior to injections.",
+      "is_public": true,
+      "tags": ["anesthetic", "patch", "lidocaine", "mucoadhesive"]
+    },
+    {
+      "name": "Alveogyl Dry Socket Dressing",
+      "type": "paste",
+      "strength": null,
+      "notes": "Iodoform, butamben, and eugenol impregnated paste for soothing and disinfecting extraction sockets affected by alveolar osteitis.",
+      "is_public": true,
+      "tags": ["post-extraction", "iodoform", "analgesic", "antiseptic"]
+    },
+    {
+      "name": "Traxodent Hemostatic Retraction Paste",
+      "type": "paste",
+      "strength": "15% aluminum chloride",
+      "notes": "Cartridge-delivered retraction paste that expands with kaolin to gently displace tissue while controlling sulcular fluid.",
+      "is_public": true,
+      "tags": ["retraction", "hemostatic", "aluminum chloride", "impression"]
+    },
+    {
+      "name": "Expasyl Gingival Retraction Paste",
+      "type": "paste",
+      "strength": "15% aluminum chloride",
+      "notes": "Kaolin-based retraction paste offering atraumatic gingival displacement and hemostasis prior to impression making.",
+      "is_public": true,
+      "tags": ["retraction", "astringent", "paste", "impression"]
+    },
+    {
+      "name": "Biotene Oralbalance Gel",
+      "type": "gel",
+      "strength": null,
+      "notes": "Enzyme-enriched saliva substitute gel providing long-lasting lubrication for xerostomia sufferers.",
+      "is_public": true,
+      "tags": ["saliva substitute", "xerostomia", "gel", "home care"]
+    },
+    {
+      "name": "PreviDent 5000 Booster Plus",
+      "type": "toothpaste",
+      "strength": "1.1% sodium fluoride",
+      "notes": "High-fluoride prescription toothpaste for high-caries-risk patients needing intensive remineralization.",
+      "is_public": true,
+      "tags": ["fluoride", "remineralization", "home care", "toothpaste"]
+    },
+    {
+      "name": "Clinpro 5000 Toothpaste",
+      "type": "toothpaste",
+      "strength": "1.1% sodium fluoride with TCP",
+      "notes": "Tri-calcium phosphate enhanced prescription toothpaste that releases calcium and phosphate with fluoride for enamel repair.",
+      "is_public": true,
+      "tags": ["fluoride", "remineralization", "toothpaste", "calcium phosphate"]
+    },
+    {
+      "name": "MI Paste Plus",
+      "type": "cream",
+      "strength": "CPP-ACP with 0.2% sodium fluoride",
+      "notes": "Casein phosphopeptide-amorphous calcium phosphate cream with fluoride for remineralization and sensitivity relief.",
+      "is_public": true,
+      "tags": ["remineralization", "desensitizing", "cream", "cpp-acp"]
+    },
+    {
+      "name": "Enamelon Preventive Treatment Gel",
+      "type": "gel",
+      "strength": "0.63% stannous fluoride + ACP",
+      "notes": "Professional gel delivering stabilized stannous fluoride and amorphous calcium phosphate to strengthen enamel and reduce sensitivity.",
+      "is_public": true,
+      "tags": ["fluoride", "desensitizing", "gel", "professional"]
     }
   ]
 }
