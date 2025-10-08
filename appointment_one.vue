@@ -1462,12 +1462,55 @@ const startAppointment = async (appointment) => {
     if (appointment.status === 'completed' || appointment.actual_end_at) {
       return
     }
-    
-    // If already timing, stop current
-    if (timing.value && activeAppointment.value) {
+
+    // If this appointment is currently active, treat as stop
+    if (timing.value && activeAppointment.value?.id === appointment.id) {
+      await completeAppointment()
+      return
+    }
+
+    // If another appointment is active, stop it before continuing
+    if (timing.value && activeAppointment.value && activeAppointment.value.id !== appointment.id) {
       await completeAppointment()
     }
-    
+
+    const alreadyInProgress = (appointment.status === 'in-progress' || appointment.status === 'started') &&
+      appointment.actual_start_at &&
+      !appointment.actual_end_at
+
+    if (alreadyInProgress) {
+      const resumeSource = timelineAppointments.value.find(a => a.id === appointment.id) || appointment
+      const updated = { ...resumeSource, status: 'in-progress' }
+      activeAppointment.value = updated
+
+      const tIdx = timelineAppointments.value.findIndex(a => a.id === appointment.id)
+      if (tIdx === -1) {
+        timelineAppointments.value.push(updated)
+      } else {
+        timelineAppointments.value[tIdx] = { ...timelineAppointments.value[tIdx], ...updated }
+      }
+
+      const qIdx = queueAppointments.value.findIndex(a => a.id === appointment.id)
+      if (qIdx !== -1) {
+        queueAppointments.value[qIdx] = { ...queueAppointments.value[qIdx], ...updated }
+      }
+
+      const startTime = new Date(updated.actual_start_at)
+      const now = new Date()
+      const elapsedMs = Math.max(0, now.getTime() - startTime.getTime())
+      const elapsedSeconds = Math.floor(elapsedMs / 1000)
+      const elapsedMinutes = Math.floor(elapsedSeconds / 60)
+      const remainingSeconds = elapsedSeconds % 60
+
+      timing.value = true
+      console.log(`🔁 Resuming appointment ${appointment.id} from elapsed ${elapsedMinutes}m ${remainingSeconds}s`)
+      startTimer(elapsedMinutes, remainingSeconds)
+
+      successMessage.value = `Resumed treatment for ${appointment.patient.first_name} ${appointment.patient.last_name}`
+      setTimeout(() => successMessage.value = null, 3000)
+      return
+    }
+
     // Determine current time as actual start immediately for responsive UI
     const nowIso = new Date().toISOString()
     const timezone_offset = new Date().getTimezoneOffset() * -1
@@ -1505,12 +1548,12 @@ const startAppointment = async (appointment) => {
     timing.value = true
     console.log('🆕 Starting new appointment, calling startTimer(0, 0)')
     startTimer(0, 0)
-    
+
     successMessage.value = `Treatment started for ${appointment.patient.first_name} ${appointment.patient.last_name}`
     setTimeout(() => successMessage.value = null, 3000)
     // Re-sort/layout happens via computed props; optionally refresh later
     // await fetchDailySchedule()
-    
+
   } catch (err) {
     error.value = 'Failed to start appointment'
   }
