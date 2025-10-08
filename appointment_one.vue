@@ -1230,11 +1230,19 @@ const fetchDailySchedule = async (date = null) => {
     const inProgressAppointment = allAptsToCheck.find(a => {
       const isInProgress = (a.status === 'in-progress' || a.status === 'started')
       const hasStartTime = !!a.actual_start_at
-      const notEnded = !a.actual_end_at
-      
-      console.log(`Checking appointment ${a.id}:`, { isInProgress, hasStartTime, notEnded, status: a.status })
-      
-      return isInProgress && hasStartTime && notEnded
+      const isCompletedStatus = a.status === 'completed'
+      const shouldTreatAsActive = isInProgress && hasStartTime && !isCompletedStatus
+
+      console.log(`Checking appointment ${a.id}:`, {
+        isInProgress,
+        hasStartTime,
+        status: a.status,
+        actual_end_at: a.actual_end_at,
+        isCompletedStatus,
+        shouldTreatAsActive
+      })
+
+      return shouldTreatAsActive
     })
     
     console.log('🎯 In-progress appointment result:', {
@@ -1258,7 +1266,26 @@ const fetchDailySchedule = async (date = null) => {
       
       if (shouldResume) {
         // Found an in-progress appointment - resume timing
-        activeAppointment.value = inProgressAppointment
+        const resumed = { ...inProgressAppointment, actual_end_at: null, status: 'in-progress' }
+        activeAppointment.value = resumed
+
+        const timelineIndex = timelineAppointments.value.findIndex(a => a.id === resumed.id)
+        if (timelineIndex !== -1) {
+          timelineAppointments.value[timelineIndex] = {
+            ...timelineAppointments.value[timelineIndex],
+            status: 'in-progress',
+            actual_end_at: null
+          }
+        }
+
+        const queueIndex = queueAppointments.value.findIndex(a => a.id === resumed.id)
+        if (queueIndex !== -1) {
+          queueAppointments.value[queueIndex] = {
+            ...queueAppointments.value[queueIndex],
+            status: 'in-progress',
+            actual_end_at: null
+          }
+        }
         
         // Calculate elapsed time since start
         const startTime = new Date(inProgressAppointment.actual_start_at)
@@ -1459,7 +1486,7 @@ const startAppointment = async (appointment) => {
   try {
     clearMessages()
     // Prevent starting a completed appointment
-    if (appointment.status === 'completed' || appointment.actual_end_at) {
+    if (appointment.status === 'completed') {
       return
     }
 
@@ -1475,12 +1502,11 @@ const startAppointment = async (appointment) => {
     }
 
     const alreadyInProgress = (appointment.status === 'in-progress' || appointment.status === 'started') &&
-      appointment.actual_start_at &&
-      !appointment.actual_end_at
+      appointment.actual_start_at
 
     if (alreadyInProgress) {
       const resumeSource = timelineAppointments.value.find(a => a.id === appointment.id) || appointment
-      const updated = { ...resumeSource, status: 'in-progress' }
+      const updated = { ...resumeSource, status: 'in-progress', actual_end_at: null }
       activeAppointment.value = updated
 
       const tIdx = timelineAppointments.value.findIndex(a => a.id === appointment.id)
@@ -1538,6 +1564,9 @@ const startAppointment = async (appointment) => {
     // If backend returns canonical values, merge them back
     if (response) {
       const merged = { ...updated, ...response }
+      if (merged.status === 'in-progress' || merged.status === 'started') {
+        merged.actual_end_at = null
+      }
       activeAppointment.value = merged
       const t2 = timelineAppointments.value.findIndex(a => a.id === appointment.id)
       if (t2 !== -1) timelineAppointments.value[t2] = { ...timelineAppointments.value[t2], ...merged }
