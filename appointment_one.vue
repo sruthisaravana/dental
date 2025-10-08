@@ -330,7 +330,7 @@
                   <TransitionGroup name="appointment" tag="div">
         <div v-for="appointment in sortedTimelineAppointments" :key="appointment.id"
           class="absolute bg-white border rounded-md shadow-sm p-1 transition-all hover:shadow-md overflow-hidden compact-appointment"
-                         :class="[getAppointmentCardClass(appointment), (appointment.status !== 'completed' ? 'cursor-move' : 'cursor-not-allowed')]"
+                         :class="[getAppointmentCardClass(appointment), timelineZoomClass, (appointment.status !== 'completed' ? 'cursor-move' : 'cursor-not-allowed')]"
                          :style="getAppointmentPosition(appointment)"
                          @click="handleTimelineCardClick(appointment)"
                          @mouseenter="onTimelineCardEnter($event, appointment)"
@@ -747,7 +747,8 @@ const getEndMinutes = (apt) => {
     dur = Math.max(0, Math.round((e - s) / 60000)) || dur
   } else if (apt.actual_start_at && activeAppointment.value?.id === apt.id && timing.value) {
     const s = new Date(apt.actual_start_at)
-    dur = Math.max(0, Math.round((Date.now() - s.getTime()) / 60000)) || dur
+    const elapsed = Math.max(0, Math.round((Date.now() - s.getTime()) / 60000))
+    dur = Math.max(dur, elapsed) || dur
   }
   return start + dur
 }
@@ -818,6 +819,84 @@ const timelineLayout = computed(() => {
   })
   
   return layout
+})
+
+const SNAP_INTERVAL_MINUTES = 15
+const DAY_START_MINUTES = 9 * 60
+const DAY_END_MINUTES = 23 * 60
+
+const snapUpToInterval = (minutes) => {
+  return Math.ceil(minutes / SNAP_INTERVAL_MINUTES) * SNAP_INTERVAL_MINUTES
+}
+
+const snapDownToInterval = (minutes) => {
+  return Math.floor(minutes / SNAP_INTERVAL_MINUTES) * SNAP_INTERVAL_MINUTES
+}
+
+const normalizeIntervalEnd = (start, end, duration) => {
+  if (!Number.isFinite(end) || end <= start) {
+    return start + (duration || SNAP_INTERVAL_MINUTES)
+  }
+  return end
+}
+
+const collectTimelineIntervals = (excludeId = null) => {
+  const intervals = timelineAppointments.value
+    .filter(apt => apt.id !== excludeId)
+    .map(apt => {
+      const start = getStartMinutes(apt)
+      const end = normalizeIntervalEnd(start, getEndMinutes(apt), apt.duration)
+      return { id: apt.id, start, end }
+    })
+    .filter(interval => Number.isFinite(interval.start) && Number.isFinite(interval.end))
+
+  if (activeAppointment.value?.actual_start_at &&
+      activeAppointment.value.id !== excludeId &&
+      !intervals.some(interval => interval.id === activeAppointment.value.id)) {
+    const start = getStartMinutes(activeAppointment.value)
+    const end = normalizeIntervalEnd(start, getEndMinutes(activeAppointment.value), activeAppointment.value.duration)
+    if (Number.isFinite(start) && Number.isFinite(end)) {
+      intervals.push({ id: activeAppointment.value.id, start, end })
+    }
+  }
+
+  return intervals.sort((a, b) => a.start - b.start)
+}
+
+const findNextAvailableStart = (desiredStartMinutes, durationMinutes, excludeId = null) => {
+  const duration = Math.max(durationMinutes || SNAP_INTERVAL_MINUTES, SNAP_INTERVAL_MINUTES)
+  let candidate = Math.max(desiredStartMinutes, DAY_START_MINUTES)
+  candidate = snapUpToInterval(candidate)
+
+  const intervals = collectTimelineIntervals(excludeId)
+
+  for (const interval of intervals) {
+    if (candidate + duration <= interval.start) {
+      break
+    }
+
+    const overlaps = candidate < interval.end && (candidate + duration) > interval.start
+    if (overlaps) {
+      candidate = snapUpToInterval(Math.max(candidate, interval.end))
+    }
+  }
+
+  const latestStart = Math.max(DAY_START_MINUTES, DAY_END_MINUTES - duration)
+  if (candidate > latestStart) {
+    const clamped = snapDownToInterval(latestStart)
+    const overlapsAtClamp = intervals.some(interval => {
+      return clamped < interval.end && (clamped + duration) > interval.start
+    })
+    candidate = overlapsAtClamp ? candidate : clamped
+  }
+
+  return candidate
+}
+
+const timelineZoomClass = computed(() => {
+  if (pixelsPerHour.value >= 96) return 'zoom-xl'
+  if (pixelsPerHour.value >= 64) return 'zoom-lg'
+  return ''
 })
 
 // Helper Functions
@@ -897,8 +976,8 @@ const getAppointmentPosition = (appointment) => {
   }
   
   // Calculate height based on zoom level - remove max height constraint
-  const minHeight = 120 // Minimum readable height (increased from 80 to 120)
-  const calculatedHeight = Math.max(minHeight, (durationMinutes / 60) * pixelsPerHour.value)
+  const zoomAwareMinHeight = Math.max(120, pixelsPerHour.value * 2.5)
+  const calculatedHeight = Math.max(zoomAwareMinHeight, (durationMinutes / 60) * pixelsPerHour.value)
   
   // Enhanced lane-based positioning to prevent overlap
   const layout = timelineLayout.value[appointment.id] || { lane: 0, lanes: 1 }
@@ -2169,18 +2248,16 @@ const addToTimelineAtCurrentTime = async (appointment) => {
   try {
     clearMessages()
     
-    // Calculate current time slot
+    // Calculate desired start based on current time and find next available slot without overlap
     const now = new Date()
     const currentMinutes = now.getHours() * 60 + now.getMinutes()
-    
-    // Snap to 15-minute intervals
-    const snapInterval = 15
-    const snappedMinutes = Math.round(currentMinutes / snapInterval) * snapInterval
-    
-    // Create a date object for the scheduled time
+    const durationMinutes = appointment.duration || 30
+    const scheduledStartMinutes = findNextAvailableStart(currentMinutes, durationMinutes, appointment.id)
+
+    // Create a date object for the scheduled time using the resolved start minutes
     const scheduleTime = new Date(selectedDate.value)
-    scheduleTime.setHours(Math.floor(snappedMinutes / 60))
-    scheduleTime.setMinutes(snappedMinutes % 60)
+    scheduleTime.setHours(Math.floor(scheduledStartMinutes / 60))
+    scheduleTime.setMinutes(scheduledStartMinutes % 60)
     scheduleTime.setSeconds(0)
     scheduleTime.setMilliseconds(0)
     
@@ -2423,13 +2500,45 @@ onMounted(async () => {
 }
 
 /* Compact appointment override: make the card height driven by content/font-size */
+
 .compact-appointment {
-  height: auto !important;      /* ignore inline top/height where appropriate */
-  min-height: 2rem;         /* minimal visible height (increased from 1.25rem to 2rem) */
+  min-height: 2.5rem;
   padding-top: 0.25rem !important;
   padding-bottom: 0.25rem !important;
   display: flex;
   align-items: center;
+}
+
+.compact-appointment.zoom-lg {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+  min-height: 6rem;
+}
+
+.compact-appointment.zoom-xl {
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+  min-height: 8rem;
+}
+
+.compact-appointment.zoom-lg h3,
+.compact-appointment.zoom-xl h3 {
+  font-size: 0.95rem !important;
+}
+
+.compact-appointment.zoom-lg .text-xs,
+.compact-appointment.zoom-xl .text-xs {
+  font-size: 0.8rem !important;
+}
+
+.compact-appointment.zoom-lg .text-\[11px\],
+.compact-appointment.zoom-xl .text-\[11px\] {
+  font-size: 0.8rem !important;
+}
+
+.compact-appointment.zoom-lg .text-\[10px\],
+.compact-appointment.zoom-xl .text-\[10px\] {
+  font-size: 0.75rem !important;
 }
 
 .compact-appointment .flex { /* ensure inner flex doesn't grow the card */
