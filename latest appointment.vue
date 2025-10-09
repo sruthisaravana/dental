@@ -342,9 +342,9 @@
                          @dragend="appointment.status !== 'completed' && (draggedItem = null, isDragging = false, dragPreview.visible = false, dropIndicator.visible = false)">
 
                       <div v-if="hasOverlap(appointment)"
-                           class="absolute top-1 right-1 flex items-center space-x-1 text-[10px] font-semibold text-orange-600">
-                        <span class="w-2 h-2 bg-orange-500 rounded-full"></span>
-                        <span class="uppercase tracking-wide">{{ getOverlapLabel(appointment) }}</span>
+                           class="absolute top-1 right-1"
+                           :title="getOverlapLabel(appointment)">
+                        <span class="block w-2.5 h-2.5 bg-orange-500 rounded-full shadow-sm"></span>
                       </div>
 
                       <!-- COMPACT Timeline Card Content -->
@@ -766,7 +766,6 @@ const timelineLayout = computed(() => {
 
   const px = pixelsPerHour.value
   const baseOffset = 8
-  const overlapGap = 12
 
   const items = appointments.map(apt => {
     const startMinutes = getStartMinutes(apt)
@@ -788,68 +787,24 @@ const timelineLayout = computed(() => {
       apt,
       startMinutes,
       endMinutes,
-      baseTop: top,
+      top,
       height
     }
   })
 
-  const groups = []
-  let currentGroup = []
-  let currentEnd = -Infinity
+  const layout = {}
 
   for (const item of items) {
-    if (currentGroup.length === 0) {
-      currentGroup.push(item)
-      currentEnd = item.endMinutes
-      continue
+    const overlapCount = items.reduce((count, other) => {
+      if (other === item) return count
+      return count + (other.startMinutes < item.endMinutes && item.startMinutes < other.endMinutes ? 1 : 0)
+    }, 0) + 1
+
+    layout[item.apt.id] = {
+      top: item.top,
+      height: item.height,
+      overlapCount
     }
-
-    if (item.startMinutes < currentEnd) {
-      currentGroup.push(item)
-      currentEnd = Math.max(currentEnd, item.endMinutes)
-    } else {
-      groups.push(currentGroup)
-      currentGroup = [item]
-      currentEnd = item.endMinutes
-    }
-  }
-
-  if (currentGroup.length) {
-    groups.push(currentGroup)
-  }
-
-  const layout = {}
-  let cumulativeOffset = 0
-
-  for (const group of groups) {
-    const sortedGroup = group.slice().sort((a, b) => a.startMinutes - b.startMinutes)
-    const groupBaseTop = Math.min(...sortedGroup.map(item => item.baseTop))
-    const baselineBottom = Math.max(...sortedGroup.map(item => item.baseTop + item.height))
-
-    let lastBottom = null
-
-    sortedGroup.forEach((item, index) => {
-      const desiredTop = item.baseTop + cumulativeOffset
-      const gapBefore = lastBottom === null ? 0 : overlapGap
-      const stackedTop = lastBottom === null ? desiredTop : lastBottom + gapBefore
-      const top = Math.max(desiredTop, stackedTop)
-
-      layout[item.apt.id] = {
-        top,
-        height: item.height,
-        overlapCount: sortedGroup.length,
-        stackIndex: index
-      }
-
-      lastBottom = top + item.height
-    })
-
-    const stackedBottom = lastBottom ?? (groupBaseTop + cumulativeOffset)
-    const stackedHeight = stackedBottom - (groupBaseTop + cumulativeOffset)
-    const baselineHeight = baselineBottom - groupBaseTop
-    const additionalOffset = Math.max(0, stackedHeight - baselineHeight)
-
-    cumulativeOffset += additionalOffset
   }
 
   return layout
@@ -971,7 +926,7 @@ const getAppointmentPosition = (appointment) => {
     }
   }
 
-  let zIndex = 10 + (layout.stackIndex ?? 0)
+  let zIndex = 10
   if (selectedAppointment.value?.id === appointment.id) zIndex += 10
   if (activeAppointment.value?.id === appointment.id && timing.value) zIndex += 15
 
