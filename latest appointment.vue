@@ -326,10 +326,12 @@
                 </div>
 
                 <!-- Scheduled Appointments on Timeline - CLEANED UP -->
-                <div class="relative ml-20 pt-2 timeline-grid" :style="{ backgroundSize: '100% ' + pixelsPerHour + 'px' }">
+                <div
+                  class="relative ml-20 pt-2 timeline-grid"
+                  :style="{ backgroundSize: '100% ' + pixelsPerHour + 'px', minHeight: timelineContentHeight + 'px' }">
                   <TransitionGroup name="appointment" tag="div">
         <div v-for="appointment in sortedTimelineAppointments" :key="appointment.id"
-          class="absolute bg-white border rounded-md shadow-sm p-1 transition-all hover:shadow-md overflow-hidden compact-appointment"
+          class="absolute bg-white border rounded-md shadow-sm p-1 transition-all hover:shadow-md overflow-hidden compact-appointment relative"
                          :class="[getAppointmentCardClass(appointment), (appointment.status !== 'completed' ? 'cursor-move' : 'cursor-not-allowed')]"
                          :style="getAppointmentPosition(appointment)"
                          @click="handleTimelineCardClick(appointment)"
@@ -338,7 +340,13 @@
                          :draggable="appointment.status !== 'completed'"
                          @dragstart="appointment.status !== 'completed' && startDrag($event, appointment)"
                          @dragend="appointment.status !== 'completed' && (draggedItem = null, isDragging = false, dragPreview.visible = false, dropIndicator.visible = false)">
-                      
+
+                      <div v-if="hasOverlap(appointment)"
+                           class="absolute top-1 right-1"
+                           :title="getOverlapLabel(appointment)">
+                        <span class="block w-2.5 h-2.5 bg-orange-500 rounded-full shadow-sm"></span>
+                      </div>
+
                       <!-- COMPACT Timeline Card Content -->
                       <div class="flex flex-row items-center justify-between space-x-1 w-full leading-none">
                         <!-- Name, Phone, Reason -->
@@ -753,72 +761,80 @@ const getEndMinutes = (apt) => {
 }
 
 const timelineLayout = computed(() => {
-  const apps = sortedTimelineAppointments.value
-  if (apps.length === 0) return {}
+  const appointments = sortedTimelineAppointments.value
+  if (appointments.length === 0) return {}
 
-  // Much simpler and more reliable approach
-  // Sort appointments by start time
-  const sortedApps = apps.slice().sort((a, b) => {
-    const aStart = getStartMinutes(a)
-    const bStart = getStartMinutes(b)
-    return aStart - bStart
+  const px = pixelsPerHour.value
+  const baseOffset = 8
+
+  const items = appointments.map(apt => {
+    const startMinutes = getStartMinutes(apt)
+    const endMinutes = getEndMinutes(apt)
+    const clampedStart = Math.max(startMinutes, 9 * 60)
+    const top = ((clampedStart - 9 * 60) / 60) * px + baseOffset
+
+    let durationMinutes = apt.duration || 30
+    if (apt.actual_start_at && apt.actual_end_at) {
+      durationMinutes = getActualDuration(apt)
+    } else if (apt.actual_start_at && activeAppointment.value?.id === apt.id && timing.value) {
+      const startedAt = new Date(apt.actual_start_at)
+      durationMinutes = Math.max(0, Math.round((Date.now() - startedAt.getTime()) / 60000)) || durationMinutes
+    }
+
+    const height = Math.max(120, (durationMinutes / 60) * px)
+
+    return {
+      apt,
+      startMinutes,
+      endMinutes,
+      top,
+      height
+    }
   })
 
   const layout = {}
-  const activeLanes = [] // Track end times for each lane
 
-  for (const apt of sortedApps) {
-    const startMinutes = getStartMinutes(apt)
-    const endMinutes = getEndMinutes(apt)
-    
-    // Find first available lane where appointment doesn't overlap
-    let assignedLane = -1
-    
-    for (let i = 0; i < activeLanes.length; i++) {
-      // Check if this lane is free (previous appointment ended)
-      if (startMinutes >= activeLanes[i]) {
-        assignedLane = i
-        break
-      }
-    }
-    
-    // If no available lane found, create new lane
-    if (assignedLane === -1) {
-      assignedLane = activeLanes.length
-      activeLanes.push(endMinutes)
-    } else {
-      // Update the end time for this lane
-      activeLanes[assignedLane] = endMinutes
-    }
-    
-    layout[apt.id] = { 
-      lane: assignedLane, 
-      lanes: Math.max(activeLanes.length, assignedLane + 1)
+  for (const item of items) {
+    const overlapCount = items.reduce((count, other) => {
+      if (other === item) return count
+      return count + (other.startMinutes < item.endMinutes && item.startMinutes < other.endMinutes ? 1 : 0)
+    }, 0) + 1
+
+    layout[item.apt.id] = {
+      top: item.top,
+      height: item.height,
+      overlapCount
     }
   }
-  
-  // Update all appointments with final lane count
-  const totalLanes = activeLanes.length
-  for (const apt of sortedApps) {
-    if (layout[apt.id]) {
-      layout[apt.id].lanes = totalLanes
-    }
-  }
-  
-  console.log('Timeline Layout Debug:', {
-    totalAppointments: apps.length,
-    appointments: apps.map(a => ({
-      id: a.id,
-      patient: a.patient?.first_name + ' ' + a.patient?.last_name,
-      startMinutes: getStartMinutes(a),
-      endMinutes: getEndMinutes(a),
-      status: a.status
-    })),
-    finalLayout: layout
-  })
-  
+
   return layout
 })
+
+const timelineContentHeight = computed(() => {
+  const layoutEntries = Object.values(timelineLayout.value)
+  if (layoutEntries.length === 0) {
+    return (24 - 9) * pixelsPerHour.value
+  }
+
+  const maxBottom = layoutEntries.reduce((max, entry) => {
+    if (!entry || typeof entry !== 'object') return max
+    const bottom = (entry.top || 0) + (entry.height || 0)
+    return Math.max(max, bottom)
+  }, 0)
+
+  return Math.max(maxBottom + 40, (24 - 9) * pixelsPerHour.value)
+})
+
+const hasOverlap = (appointment) => {
+  const layout = timelineLayout.value[appointment.id]
+  return (layout?.overlapCount || 0) > 1
+}
+
+const getOverlapLabel = (appointment) => {
+  const count = timelineLayout.value[appointment.id]?.overlapCount || 0
+  if (count <= 1) return ''
+  return `${count} overlapping`
+}
 
 // Helper Functions
 const clearMessages = () => {
@@ -880,51 +896,47 @@ const getCurrentTimePosition = () => {
 
 // IMPROVED: Appointment positioning on timeline with proper overlap handling
 const getAppointmentPosition = (appointment) => {
-  const startMinutes = parseTime(appointment.actual_start_at) ?? parseTime(appointment.scheduled_at) ?? (9 * 60)
-  const startHour = Math.floor(startMinutes / 60)
-  const startMinuteOffset = startMinutes % 60
-  
-  if (startHour < 9) return { top: '8px', height: '80px', zIndex: 5 }
-  
-  const hoursSince9 = startHour - 9
-  const px = pixelsPerHour.value
-  const topPosition = (hoursSince9 * px) + (startMinuteOffset / 60 * px) + 8
-  
-  // Height: use planned duration while running; actual duration once completed
-  let durationMinutes = appointment.duration || 30
-  if (appointment.actual_start_at && appointment.actual_end_at) {
-    durationMinutes = getActualDuration(appointment)
+  const layout = timelineLayout.value[appointment.id]
+
+  if (!layout) {
+    const startMinutes = parseTime(appointment.actual_start_at) ?? parseTime(appointment.scheduled_at) ?? (9 * 60)
+    const startHour = Math.floor(startMinutes / 60)
+    const startMinuteOffset = startMinutes % 60
+
+    if (startHour < 9) return { top: '8px', height: '120px', zIndex: 5, left: '0%', width: '100%' }
+
+    const hoursSince9 = startHour - 9
+    const px = pixelsPerHour.value
+    const topPosition = (hoursSince9 * px) + (startMinuteOffset / 60 * px) + 8
+
+    let durationMinutes = appointment.duration || 30
+    if (appointment.actual_start_at && appointment.actual_end_at) {
+      durationMinutes = getActualDuration(appointment)
+    }
+
+    const fallbackHeight = Math.max(120, (durationMinutes / 60) * pixelsPerHour.value)
+
+    return {
+      top: `${topPosition}px`,
+      height: `${fallbackHeight}px`,
+      zIndex: 5,
+      left: '0%',
+      width: '100%',
+      borderRadius: '8px'
+    }
   }
-  
-  // Calculate height based on zoom level - remove max height constraint
-  const minHeight = 120 // Minimum readable height (increased from 80 to 120)
-  const calculatedHeight = Math.max(minHeight, (durationMinutes / 60) * pixelsPerHour.value)
-  
-  // Enhanced lane-based positioning to prevent overlap
-  const layout = timelineLayout.value[appointment.id] || { lane: 0, lanes: 1 }
-  const totalLanes = Math.max(layout.lanes, 1)
-  
-  // Calculate lane positioning - divide available width among overlapping items
-  // Each item gets proportional width based on total lanes
-  const gapPercentage = totalLanes > 1 ? 1 : 0 // Small gap between items
-  const itemWidth = (100 - (gapPercentage * (totalLanes - 1))) / totalLanes
-  
-  // Position items horizontally based on lane number
-  const leftPosition = layout.lane * (itemWidth + gapPercentage)
-  
-  // Higher z-index for selected/active appointments
-  let zIndex = 10 + layout.lane // Higher lane gets higher z-index
+
+  let zIndex = 10
   if (selectedAppointment.value?.id === appointment.id) zIndex += 10
   if (activeAppointment.value?.id === appointment.id && timing.value) zIndex += 15
-  
+
   return {
-    top: `${topPosition}px`,
-    height: `${calculatedHeight}px`,
-    zIndex: zIndex,
-    left: `${leftPosition}%`,
-    width: `${itemWidth}%`,
-    // Enhanced styling for better visibility
-    border: totalLanes > 1 ? '2px solid rgba(59, 130, 246, 0.3)' : undefined,
+    top: `${layout.top}px`,
+    height: `${layout.height}px`,
+    zIndex,
+    left: '0%',
+    width: '100%',
+    border: hasOverlap(appointment) ? '2px solid rgba(249, 115, 22, 0.35)' : undefined,
     borderRadius: '8px'
   }
 }
@@ -948,11 +960,7 @@ const calculateDropPosition = (event) => {
 const isTightCard = (appointment) => {
   const layout = timelineLayout.value[appointment.id]
   if (!layout) return false
-  // If there are 2+ lanes, likely overlapping. Also check height
-  const start = getStartMinutes(appointment)
-  const end = getEndMinutes(appointment)
-  const heightPx = Math.max(112, (end - start) / 60 * pixelsPerHour.value)
-  return layout.lanes > 1 || heightPx < 130
+  return (layout.overlapCount ?? 1) > 1 || layout.height < 130
 }
 
 // On hover, if multiple items are within 10px vertically and overlapping, show popover list
