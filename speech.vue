@@ -57,7 +57,8 @@ const start = async () => {
     status.value = 'Connecting websocket...';
     const loc = window.location;
     const wsProto = loc.protocol === 'https:' ? 'wss' : 'ws';
-    ws = new WebSocket(`${wsProto}://${loc.host}/api/realtime-ws`);
+    const wsHost = `${loc.hostname}:2095`;
+    ws = new WebSocket(`${wsProto}://${wsHost}/api/realtime-ws`);
 
     ws.addEventListener('open', () => {
       status.value = 'Websocket open — streaming audio';
